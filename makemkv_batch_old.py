@@ -192,11 +192,10 @@ def disc_inserted(source):
     return not grep('please insert', os.popen(shlex.join(['drutil', '-drive', str(drutil_index), 'discinfo'])).readlines())
 
 def wait_for_disc_inserted(source):
-  notified = False
+  if not disc_inserted(source):
+    print(f'Please insert a disc into {source}')
+    notify(f'Please insert a disc into {source}')
   while not disc_inserted(source):
-    if not notified:
-      print(f'Please insert a disc into {source}')
-      notify(f'Please insert a disc into {source}')
     sleep(1)
 
 def eject_disc(source):
@@ -229,6 +228,41 @@ def rsync(source, dest):
     f'{source}', dest
   ]).wait()
 
+def sanitize(value: str): # Strips out non alphanumeric characters and replaces with "_"
+  return re.sub(r'[^\w]', '_', value.lower())
+
+def string_to_list(_input):
+  if (type(_input) is list):
+    return _input
+
+  new_list = [
+    v 
+    for v 
+    in re.sub(r'[^,\d-]', '', _input).split(',')
+    if v != ''
+  ]
+
+  for index, value in enumerate(new_list):
+    if '-' in value:
+      start, end = [int(v) for v in value.split('-')]
+      new_list.remove(value)
+      for inner_index, value in enumerate(range(start, end + 1)):
+        new_list.insert(index + inner_index, str(value))
+
+  return new_list
+
+def input_with_default(
+    prompt, 
+    validation = lambda v: v != '' and v is not None, 
+    value=None
+  ):
+  while True:
+    _input = input(f'{prompt}\n({value})> ')
+    if validation(_input):
+      return _input
+    elif validation(value):
+      return value
+
 def rip_disc(
     source, 
     dest,
@@ -237,6 +271,8 @@ def rip_disc(
   notify(f'Backing up {source} to {dest}')
   print(f'Backing up {source} to {dest}')
 
+  wait_for_disc_inserted(source)
+
   # Do the actual rip + eject the disc when done
   for rip_title in rip_titles:
     print(f'Ripping title {rip_title}')
@@ -244,7 +280,15 @@ def rip_disc(
     # os.system(shlex.join([ MAKEMKVCON, 'mkv', source, rip_title, dest]))
     subprocess.Popen([ MAKEMKVCON, 'mkv', source, rip_title, dest]).wait()
 
-def rip_movie(source, dest_dir, id=None, dry_run=False, id_key="imdbid"):
+def rip_movie(
+    source, 
+    dest_dir, 
+    toc: TOC,
+    movie_indexes: list[int],
+    extras_indexes: list[int],
+    movie_name: str,
+    id: str,
+    id_key="imdbid"):
   '''
   If there is more than one title of the same highest length, both will be put
   in the same directory with their index in the TOC as iterators, i.e.
@@ -252,55 +296,29 @@ def rip_movie(source, dest_dir, id=None, dry_run=False, id_key="imdbid"):
   `<dir>/<toc.fields.name> [<id_key>-<id>] - <index>.mkv`
   '''
 
-  if (source.startswith('disc') or source.startswith('dev')):
-    if not disc_inserted(source):
-      print('Please insert a disc or hit Ctrl-C to abort')
-      notify('Please insert a disc')
+  movie_name = sanitize(movie_name)
+  movie_name += f" [{id_key}-{id}]"
 
-      while not disc_inserted(0):
-        sleep(1)
-
-  toc_lines = get_toc(source)
-  toc = load_toc(toc_lines)
-
-  source_name = re.sub(r'[^\w]', '_', toc.name.lower())
-  if (id is not None):
-    source_name += f" [{id_key}-{id}]"
-  titles_by_length = sorted(toc.titles, key = lambda title: hms_to_seconds(title.runtime), reverse=True)
-  longest_titles = [
-    title
-    for title
-    in toc.titles
-    if title.runtime == titles_by_length[0].runtime
-  ]
- 
-  print("All Titles")
-  toc.print()
-
-  print("Main title(s)", ','.join([title.index for title in longest_titles]))
-  print(f"These titles will be given the source name of {source_name}")
-  print(f"and copied to {dest_dir}/{source_name}")
+  print(f"These titles will be copied to {dest_dir}/{movie_name}")
 
   try:
     # Set rip dir to a temporary file location for extraction to enable more
     # stable rips when the destination is a network location
     temp_dir = TemporaryDirectory()
-    rip_dir = os.path.join(temp_dir.name, source_name)
-    os.makedirs(os.path.join(temp_dir.name, source_name,  'extras'), exist_ok=True)
+    rip_dir = os.path.join(temp_dir.name, movie_name)
+    os.makedirs(os.path.join(temp_dir.name, movie_name,  'extras'), exist_ok=True)
 
     with open(os.path.join(rip_dir, f'makemkvcon.txt'), 'w') as file:
-      file.writelines(toc_lines)
+      file.writelines(toc.lines)
 
     rip_disc(source, rip_dir)
 
-    os.system(shlex.join(['ls', '-lR', temp_dir.name]))
-
     failed_titles = []
-    for title in longest_titles:
+    for title in [title for title in toc.source.titles if title.index in movie_indexes]:
       try:
         os.rename(
           os.path.join(rip_dir, title.filename), 
-          os.path.join(rip_dir, f"{source_name} - {title.index}.mkv") #TODO: Better differentiator here for the index
+          os.path.join(rip_dir, f"{movie_name} - {title.index}.mkv") #TODO: Better differentiator here for the index
         )
       except FileNotFoundError as ex:
         failed_titles.append(title)
@@ -308,8 +326,8 @@ def rip_movie(source, dest_dir, id=None, dry_run=False, id_key="imdbid"):
     for title in [
       title 
       for title
-      in toc.titles
-      if title.index not in [title.index for title in longest_titles]
+      in toc.source.titles
+      if title.index in extras_indexes
     ]:
       try:
         os.rename(
@@ -319,22 +337,64 @@ def rip_movie(source, dest_dir, id=None, dry_run=False, id_key="imdbid"):
       except FileNotFoundError as ex:
         failed_titles.append(title)
 
+    for title in [
+      title for title
+      in toc.source.titles
+      if title.index not in extras_indexes
+      and title.index not in movie_indexes
+    ]:
+      try:
+        os.remove( os.path.join(rip_dir, title.filename))
+      except FileNotFoundError:
+        print("Could not clean up", os.path.join(rip_dir, title.filename))
+
     if len(failed_titles) > 0:
       print("Some failed to rip or copy")
       print()
       for title in failed_titles:
         print(f'{title.index}: {title.filename}, {title.runtime}')
-      print("press Enter to continue or Ctrl-C to cancel")
-      try:
-        input()
-      except KeyboardInterrupt:
-        print("Quitting...")
-        sys.exit(256)
 
     rsync(os.path.join(rip_dir), dest_dir)
 
   finally:
     temp_dir.cleanup()
+
+def interactive_rip_movie(source, dest_dir, batch=False):
+  while True:
+    toc = TOC()
+    toc.get_from_disc(source)
+    
+    titles_by_length = sorted(toc.source.titles, key = lambda title: hms_to_seconds(title.runtime), reverse=True)
+    movie_index = [
+      title.index
+      for title
+      in toc.source.titles
+      if title.runtime == titles_by_length[0].runtime
+    ]
+
+    extras_index = [
+      title.index 
+      for title 
+      in toc.source.titles 
+      if title.index not in movie_index
+    ]
+  
+    print("All Titles")
+    toc.source.print()
+
+    movie_name = input_with_default("What is the name of this movie?", value=toc.source.name)
+
+    id = input_with_default('What is the IMDB ID of this movie?')
+
+    movie_index = input_with_default("Which title(s) are the main movie?", value=movie_index)
+    movie_index = string_to_list(movie_index)
+
+    extras_index = input_with_default("Which title(s) are extra features?", value=extras_index)
+    extras_index = string_to_list(extras_index) 
+
+    rip_movie(
+      source, dest_dir, toc, movie_index, extras_index, movie_name, id
+    )
 
 def rip_show(
     source: str, 
@@ -351,14 +411,6 @@ def rip_show(
   '''
   `<dir>/<show_name>/Season <season_number>/<show_name> S<season_number>E<episode_number>.mkv`
   '''
-
-  if (source.startswith('disc') or source.startswith('dev')):
-    if not disc_inserted(source):
-      print('Please insert a disc or hit Ctrl-C to abort')
-      notify('Please insert a disc')
-
-      while not disc_inserted():
-        sleep(1)
 
   show_name = re.sub(r'[^\w]', '_', show_name.lower())
   source_name = show_name
@@ -392,15 +444,15 @@ def rip_show(
           with open(os.path.join(rip_dir, f'{toc.source.name}-makemkvcon.txt'), 'w') as file:
             file.writelines(toc.lines)
 
-          rip_disc(source, rip_dir, rip_titles=episode_indexes, eject=False)
-          rip_disc(source, rip_dir, rip_titles=extras_indexes, eject=False)
+          rip_disc(source, rip_dir, rip_titles=episode_indexes)
+          rip_disc(source, rip_dir, rip_titles=extras_indexes)
 
         failed_titles = []
         if DO_SORT:
           for index in episode_indexes:
             try:
               os.rename(
-                os.path.join(rip_dir, toc.title[index].filename), 
+                os.path.join(rip_dir, toc.source.titles[int(index)].filename), 
                 os.path.join(rip_dir, season_dir, f"{show_name} S{season_number:02d}E{int(index)+first_ep:02d}.mkv")
               )
             except FileNotFoundError as ex:
@@ -409,8 +461,8 @@ def rip_show(
           for index in extras_indexes:
             try:
               os.rename(
-                os.path.join(rip_dir, toc.title[index].filename), 
-                os.path.join(rip_dir, season_dir, 'extras', title.filename)
+                os.path.join(rip_dir, toc.source.titles[int(index)].filename), 
+                os.path.join(rip_dir, season_dir, 'extras', toc.source.titles[int(index)].filename)
               )
             except FileNotFoundError as ex:
               failed_titles.append(title)
@@ -494,22 +546,17 @@ def interactive_rip_show(source, dest_dir, batch=False):
       show_name, season_number, id, id_key
     )
 
+    print('Waiting for TOC read to complete...')
     thread.join()
 
     print("All Titles")
     toc.source.print()
     
-    _input = input(f'Which titles are episode? (enter comma separated numbers)\n({episode_indexes}) > ')
-    episode_indexes = [
-      v for v in re.sub(r'[^,\d]', '', _input).split(',')
-      if v != ''
-    ]
+    episode_indexes = input_with_default("Which titles are episodes?", value=episode_indexes)
+    episode_indexes = string_to_list(episode_indexes)
 
-    _input = input(f'Which titles are extras? (enter comma separated numbers)\n({extras_indexes})> ')
-    extras_indexes = [
-      v for v in re.sub(r'[^,\d]', '', _input).split(',')
-      if v != ''
-    ]
+    extras_indexes = input_with_default('Which titles are extras?', value=extras_indexes)
+    extras_indexes = string_to_list(extras_indexes)
 
     rip_show(
       source, 
@@ -543,7 +590,10 @@ if __name__=='__main__':
   DO_RIP = not opts.skip_rip
 
   if opts.mode.startswith('movie'):
-    rip_movie(opts.source, opts.dest_dir, id=opts.imdbid, id_key='imdbid')
+    if opts.batch:
+      interactive_rip_movie(opts.source, opts.dest_dir, batch=True)
+    else:
+      interactive_rip_movie(opts.source, opts.dest_dir, batch=False)
   elif opts.mode.startswith('show'):
     if opts.batch:
       interactive_rip_show(opts.source, opts.dest_dir, batch=True)
@@ -551,4 +601,4 @@ if __name__=='__main__':
       # TODO: If params provided to rip show immediately do it
       # Need source, dest, episode indexes, extras indexes, show name, season number, first ep, tmdb id
       # Else rip a single disc (i.e. not batch mode) interactively
-      interactive_rip_show(opts.source, opts.dest_dir)
+      interactive_rip_show(opts.source, opts.dest_dir, batch=False)
