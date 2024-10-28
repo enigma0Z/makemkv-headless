@@ -4,7 +4,8 @@ import os
 import re
 import shlex
 
-from disc import MAKEMKVCON, wait_for_disc_inserted
+from disc import wait_for_disc_inserted
+from makemkv import MAKEMKVCON # TODO: move dependend functionality into makemkv module
 from util import notify
 
 class BaseInfo:
@@ -145,8 +146,11 @@ class TitleInfo (BaseInfo):
   key = 'TINFO'
 
   _field_lookup = {
+    'chapters': '8,0',
     'runtime': '9,0',
     'size': '10,0',
+    'segments': '25,0',
+    'segments_map': '26,0',
     'filename': '27,0'
   }
 
