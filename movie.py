@@ -44,7 +44,7 @@ def rip_movie(
 
   if features.DO_RIP:
     print(f"These titles will be given the source name of {movie_name_with_id}")
-    print(f"and copied to {dest_path}/{movie_name} SxxExx.mkv")
+    print(f"and copied to {dest_path}/{movie_name_with_id}/{movie_name_with_id}.mkv")
 
     with open(os.path.join(rip_path, f'{toc.source.name}-makemkvcon.txt'), 'w') as file:
       file.writelines(toc.lines)
