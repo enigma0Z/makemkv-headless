@@ -44,6 +44,9 @@ def string_to_list_int(_input):
   if (type(_input) is list):
     return _input
 
+  elif (type(_input) is None):
+    return []
+
   new_list = [
     v 
     for v 
