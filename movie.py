@@ -111,6 +111,7 @@ def rip_movie_interactive(source, dest_path, batch=False):
   id_key="tmdbid"
 
   while True:
+    wait_for_disc_inserted(source)
     extras_indexes = None # Reset per loop
 
     toc = TOC()
