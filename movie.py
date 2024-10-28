@@ -8,8 +8,10 @@ import threading
 
 import features
 
+from disc import eject_disc, wait_for_disc_inserted
+from makemkv import rip_disc
 from toc import TOC
-from util import input_with_default, rsync, sanitize, string_to_list_int
+from util import hms_to_seconds, input_with_default, rsync, sanitize, string_to_list_int
 
 def rip_movie(
     source: str, 
@@ -29,8 +31,6 @@ def rip_movie(
   # For naming episodes
   movie_name = sanitize(movie_name) # Show files
   movie_name_with_id = f"{movie_name} [{id_key}-{id}]" # Show folder
-
-  dest_path = os.path.join(dest_path, movie_name_with_id)
 
   # Set rip dir to a temporary file location for extraction to enable more
   # stable rips when the destination is a network location
