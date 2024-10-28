@@ -63,6 +63,9 @@ def string_to_list_int(_input):
       new_list.remove(value)
       for inner_index, value in enumerate(range(start, end + 1)):
         new_list.insert(index + inner_index, int(value))
+    
+    else:
+      new_list[index] = int(value)
 
   return new_list
 
