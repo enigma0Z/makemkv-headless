@@ -135,6 +135,13 @@ def rip_movie_interactive(source, dest_path, batch=False):
     extras_indexes = input_with_default('Which titles are extras?', extras_indexes, lambda x: True)
     extras_indexes = string_to_list_int(extras_indexes)
 
+    rip_all = False
+    if(sorted(all_indexes) == sorted(main_indexes + extras_indexes)):
+      print('Ripping all titles')
+      rip_all = True
+    else:
+      print(f'Ripping main features {main_indexes} and extras {extras_indexes}')
+
     rip_movie(
       source, 
       dest_path, 
