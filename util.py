@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from math import trunc
 import os
 import re
 import shlex
