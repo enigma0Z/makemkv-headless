@@ -28,15 +28,15 @@ if __name__=='__main__':
   parser.add_argument('--skip-rip', action='store_true')
   parser.add_argument('--skip-copy', action='store_true')
   parser.add_argument('--skip-cleanup', action='store_true')
+  parser.add_argument('--skip-split', action='store_true')
 
   opts = parser.parse_args(sys.argv[1:])
 
-  DO_SORT = not opts.skip_sort
-  DO_RIP = not opts.skip_rip
-  DO_COPY = not opts.skip_copy
-  DO_CLEANUP = not opts.skip_cleanup
-
-  if opts.mode.startswith('movie'):
+  features.DO_SORT = not opts.skip_sort
+  features.DO_RIP = not opts.skip_rip
+  features.DO_COPY = not opts.skip_copy
+  features.DO_CLEANUP = not opts.skip_cleanup
+  features.DO_SPLIT = not opts.skip_split
     if opts.batch:
       rip_movie_interactive(opts.source, opts.dest_dir, batch=True)
     else:

@@ -42,7 +42,7 @@ def rip_movie(
     'extras'
   ), exist_ok=True)
 
-  if DO_RIP:
+  if features.DO_RIP:
     print(f"These titles will be given the source name of {movie_name_with_id}")
     print(f"and copied to {dest_path}/{movie_name} SxxExx.mkv")
 
@@ -57,7 +57,7 @@ def rip_movie(
 
   def sorting_thread():
     failed_titles = []
-    if DO_SORT:
+    if features.DO_SORT:
       for index in main_indexes:
         title = toc.titles[index]
         try:
@@ -90,11 +90,11 @@ def rip_movie(
           print("Quitting...")
           sys.exit(256)
 
-    if DO_COPY:
+    if features.DO_COPY:
       os.makedirs(dest_path, exist_ok=True)
       rsync(os.path.join(rip_path), dest_path)
 
-    if DO_CLEANUP:
+    if features.DO_CLEANUP:
       shutil.rmtree(temp_dir)
     else:
       print(f"Leaving rip source at {temp_dir}")

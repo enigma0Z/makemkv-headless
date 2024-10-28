@@ -47,7 +47,7 @@ def rip_show(
     'extras'
   ), exist_ok=True)
 
-  if DO_RIP:
+  if features.DO_RIP:
     print(f"These titles will be given the source name of {show_name_with_id}")
     print(f"and copied to {dest_season_path}/{show_name} SxxExx.mkv")
 
@@ -61,17 +61,9 @@ def rip_show(
       rip_disc(source, rip_path, rip_titles=extras_indexes)
 
   def sorting_thread():
-    failed_titles = []
-    if DO_SORT:
-      for i, index in enumerate(episode_indexes):
-        title = toc.source.titles[index]
-        try:
-          os.rename(
-            os.path.join(rip_path, title.filename), 
-            os.path.join(rip_path, season_dir, f"{show_name} S{season_number:02d}E{i+first_ep:02d}.mkv")
-          )
-        except FileNotFoundError as ex:
-          failed_titles.append(title)
+      if features.DO_SORT:
+            if features.DO_SPLIT:
+            if (features.DO_CLEANUP):
 
       for index in extras_indexes:
         title = toc.source.titles[index]
@@ -95,14 +87,11 @@ def rip_show(
           print("Quitting...")
           sys.exit(256)
 
-    if DO_COPY:
+      if features.DO_COPY:
       os.makedirs(dest_season_path, exist_ok=True)
       rsync(os.path.join(rip_path), dest_path)
 
-    if DO_CLEANUP:
-      shutil.rmtree(temp_dir)
-    else:
-      print(f"Leaving rip source at {temp_dir}")
+      if features.DO_CLEANUP:
 
   threading.Thread(target=sorting_thread).start()
 
