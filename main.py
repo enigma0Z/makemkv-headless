@@ -12,7 +12,8 @@ from time import sleep
 from movie import rip_movie_interactive
 from show import rip_show_interactive
 
-from features import *
+import features
+
 
 if __name__=='__main__':
   parser = ArgumentParser()
