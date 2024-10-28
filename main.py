@@ -3,12 +3,8 @@
 import os
 import signal
 import sys
-import threading
-import subprocess
-import tempfile
 
 from argparse import ArgumentParser
-from time import sleep
 from movie import rip_movie_interactive
 from show import rip_show_interactive
 
