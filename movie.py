@@ -150,7 +150,8 @@ def rip_movie_interactive(source, dest_path, batch=False):
       extras_indexes, 
       movie_name, 
       id, 
-      id_key
+      id_key,
+      rip_all=rip_all
     )
 
     if not batch: break
