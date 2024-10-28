@@ -76,7 +76,15 @@ def input_with_default(
   ):
   while True:
     _input = input(f'{prompt}\n({value})> ')
-    if validation(_input):
-      return _input
-    elif validation(value):
-      return value
+    try:
+      if _input == '' and value is not None:
+        return value
+      elif _input.casefold() == 'none':
+        return ''
+      elif validation(_input):
+        return _input
+      elif validation(value):
+        return value
+    except AttributeError:
+      print("Error validating input")
+      continue
