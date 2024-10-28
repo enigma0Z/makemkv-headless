@@ -72,6 +72,7 @@ if __name__=='__main__':
   parser.add_argument('--skip-copy', action='store_true')
   parser.add_argument('--skip-cleanup', action='store_true')
   parser.add_argument('--skip-split', action='store_true')
+  parser.add_argument('--source-path', action='store')
 
   opts = parser.parse_args(sys.argv[1:])
 
