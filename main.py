@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-import shutil
-import shlex
-import re
+import signal
 import sys
 import threading
 import subprocess
@@ -37,6 +35,10 @@ if __name__=='__main__':
   features.DO_COPY = not opts.skip_copy
   features.DO_CLEANUP = not opts.skip_cleanup
   features.DO_SPLIT = not opts.skip_split
+  def sigint_handler(signal, frame):
+    print('Press Ctrl-Z and kill job to cancel')
+
+  signal.signal(signal.SIGINT, sigint_handler)
     if opts.batch:
       rip_movie_interactive(opts.source, opts.dest_dir, batch=True)
     else:
