@@ -92,7 +92,7 @@ def rip_movie(
 
     if features.DO_COPY:
       os.makedirs(dest_path, exist_ok=True)
-      rsync(os.path.join(rip_path), dest_path)
+      rsync(rip_path, dest_path)
 
     if features.DO_CLEANUP:
       shutil.rmtree(temp_dir)
