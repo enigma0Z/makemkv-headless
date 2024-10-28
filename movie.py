@@ -59,7 +59,7 @@ def rip_movie(
     failed_titles = []
     if features.DO_SORT:
       for index in main_indexes:
-        title = toc.titles[index]
+        title = toc.source.titles[int(index)]
         try:
           os.rename(
             os.path.join(rip_path, title.filename), 
@@ -69,7 +69,7 @@ def rip_movie(
           failed_titles.append(title)
 
       for index in extras_indexes:
-        title = toc.titles[index]
+        title = toc.source.titles[int(index)]
         try:
           os.rename(
             os.path.join(rip_path, title.filename), 
