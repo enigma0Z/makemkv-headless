@@ -129,9 +129,28 @@ def rip_movie_interactive(source, dest_path, batch=False):
 
     print("All Titles")
     toc.source.print()
+
+    all_indexes = [
+      title.index
+      for title in toc.source.titles
+    ]
+
+    longest_title = sorted(
+      toc.source.titles, 
+      key=lambda title: hms_to_seconds(title.runtime),
+      reverse=True
+    )[0]
+
+    main_indexes = [longest_title.index]
     
     main_indexes = input_with_default("Which titles are the main feature?", value=main_indexes)
     main_indexes = string_to_list_int(main_indexes)
+
+    extras_indexes = [
+      title.index
+      for title in toc.source.titles
+      if title.index not in main_indexes
+    ]
 
     extras_indexes = input_with_default('Which titles are extras?', extras_indexes, lambda x: True)
     extras_indexes = string_to_list_int(extras_indexes)
