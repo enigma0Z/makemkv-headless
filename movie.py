@@ -6,8 +6,8 @@ import sys
 import tempfile
 import threading
 
-from disc import eject_disc, rip_disc
-from features import DO_CLEANUP, DO_COPY, DO_RIP, DO_SORT
+import features
+
 from toc import TOC
 from util import input_with_default, rsync, sanitize, string_to_list_int
 
