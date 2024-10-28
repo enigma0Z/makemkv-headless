@@ -14,6 +14,13 @@ def hms_to_seconds(time):
   minutes *= 60
   return hours + minutes + seconds
 
+def seconds_to_hms(seconds):
+  seconds = round(seconds)
+  hours = trunc(seconds/60/60)
+  minutes = trunc(seconds/60) - hours * 60
+  seconds = seconds - hours * 60 * 60 - minutes * 60
+  return f'{hours}:{minutes:02d}:{seconds:02d}'
+
 def notify(message):
   os.popen(shlex.join([
     'osascript', '-e',
