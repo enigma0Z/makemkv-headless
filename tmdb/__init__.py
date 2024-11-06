@@ -13,7 +13,13 @@ class Data:
     self.data = data
 
   def __getattr__(self, attr: str):
-    return self.data[attr]
+    try:
+      return self.data[attr]
+    except KeyError as ex:
+      if attr == 'name':
+        return self.data['title']
+      else:
+        raise ex
 
 class SearchResult (Data):
   def __init__(self, data, content_type):

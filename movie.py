@@ -10,6 +10,7 @@ import features
 
 from disc import eject_disc, wait_for_disc_inserted
 from makemkv import rip_disc
+import tmdb
 from toc import TOC
 from util import hms_to_seconds, input_with_default, rsync, sanitize, string_to_list_int
 
@@ -22,7 +23,12 @@ def rip_movie(
     movie_name: str,
     id: str,
     id_key="tmdbid",
-    rip_all=False
+    rip_all=False,
+    print_input=print,
+    print_mkv=print,
+    print_sort=print,
+    print_status=print,
+    get_input=input,
   ):
   '''
   `<dir>/<movie_name>/Season <season_number>/<movie_name> S<season_number>E<episode_number>.mkv`
@@ -43,17 +49,17 @@ def rip_movie(
   ), exist_ok=True)
 
   if features.DO_RIP:
-    print(f"These titles will be given the source name of {movie_name_with_id}")
-    print(f"and copied to {dest_path}/{movie_name_with_id}/{movie_name_with_id}.mkv")
+    print_sort(f"These titles will be given the source name of {movie_name_with_id}")
+    print_sort(f"and copied to {dest_path}/{movie_name_with_id}/{movie_name_with_id}.mkv")
 
     with open(os.path.join(rip_path, f'{toc.source.name}-makemkvcon.txt'), 'w') as file:
       file.writelines(toc.lines)
 
     if rip_all:
-      rip_disc(source, rip_path, ['all'])
+      rip_disc(source, rip_path, ['all'], print_mkv=print_mkv, print_status=print_status)
     else:
-      rip_disc(source, rip_path, rip_titles=main_indexes)
-      rip_disc(source, rip_path, rip_titles=extras_indexes)
+      rip_disc(source, rip_path, rip_titles=main_indexes, print_mkv=print_mkv, print_status=print_status)
+      rip_disc(source, rip_path, rip_titles=extras_indexes, print_mkv=print_mkv, print_status=print_status)
 
   def sorting_thread():
     failed_titles = []
@@ -79,31 +85,40 @@ def rip_movie(
           failed_titles.append(title)
 
       if len(failed_titles) > 0:
-        print("Some failed to rip or copy")
-        print()
+        print_sort("Some failed to rip or copy")
+        print_sort()
         for title in failed_titles:
-          print(f'{title.index}: {title.filename}, {title.runtime}')
-        print("press Enter to continue or Ctrl-C to cancel")
+          print_sort(f'{title.index}: {title.filename}, {title.runtime}')
+        print_sort("press Enter to continue or Ctrl-C to cancel")
         try:
-          input()
+          get_input()
         except KeyboardInterrupt:
-          print("Quitting...")
+          print_input("Quitting...")
           sys.exit(256)
 
     if features.DO_COPY:
       os.makedirs(dest_path, exist_ok=True)
-      rsync(rip_path, dest_path)
+      rsync(rip_path, dest_path, _print=print_sort)
 
     if features.DO_CLEANUP:
       shutil.rmtree(temp_dir)
     else:
-      print(f"Leaving rip source at {temp_dir}")
+      print_sort(f"Leaving rip source at {temp_dir}")
 
   threading.Thread(target=sorting_thread).start()
 
   eject_disc(source)
 
-def rip_movie_interactive(source, dest_path, batch=False):
+def rip_movie_interactive(
+    source, 
+    dest_path, 
+    batch=False,
+    print_input=print,
+    print_mkv=print,
+    print_sort=print,
+    print_status=print,
+    get_input=input,
+  ):
   movie_name = None
   id = None
   main_indexes = None
@@ -114,21 +129,36 @@ def rip_movie_interactive(source, dest_path, batch=False):
     wait_for_disc_inserted(source)
     extras_indexes = None # Reset per loop
 
-    toc = TOC()
+    toc = TOC(print=print_mkv)
 
     thread = threading.Thread(target=toc.get_from_disc, args=[source])
 
-    print('Getting Disc Toc...')
+    print_mkv('Getting Disc Toc...')
     thread.start()
 
-    movie_name = input_with_default('What is the name of this movie?', movie_name)
-    id = input_with_default(f'What is the {id_key} of this movie?', id)
+    movie_name = get_input('What is the name of this movie?', movie_name)
 
-    print('Waiting for TOC read to complete...')
+    results = tmdb.search('movie', movie_name)
+    if (id is None and len(results) > 0):
+      id = results[0].id
+      for result in results:
+        print_mkv(result)
+      
+      print_input(f'These came up when searching for "{movie_name}" on TMDB and the first was auto-selected.')
+      print_input(f'Verify at the link above or input the correct ID.')
+    else:
+      print_input('Pre-selected ID', id)
+      print_input('Number of results', len(results))
+      for result in results:
+        print_mkv(result)
+
+    id = get_input(f'What is the {id_key} of this movie?', id)
+
+    print_status('Waiting for TOC read to complete...')
     thread.join()
 
-    print("All Titles")
-    toc.source.print()
+    print_mkv("All Titles")
+    print_mkv(toc.source)
 
     all_indexes = [
       title.index
@@ -143,7 +173,7 @@ def rip_movie_interactive(source, dest_path, batch=False):
 
     main_indexes = [longest_title.index]
     
-    main_indexes = input_with_default("Which titles are the main feature?", value=main_indexes)
+    main_indexes = get_input("Which titles are the main feature?", value=main_indexes)
     main_indexes = string_to_list_int(main_indexes)
 
     extras_indexes = [
@@ -152,15 +182,15 @@ def rip_movie_interactive(source, dest_path, batch=False):
       if title.index not in main_indexes
     ]
 
-    extras_indexes = input_with_default('Which titles are extras?', extras_indexes, lambda x: True)
+    extras_indexes = get_input('Which titles are extras?', extras_indexes, lambda x: True)
     extras_indexes = string_to_list_int(extras_indexes)
 
     rip_all = False
     if(sorted(all_indexes) == sorted(main_indexes + extras_indexes)):
-      print('Ripping all titles')
+      print_mkv('Ripping all titles')
       rip_all = True
     else:
-      print(f'Ripping main features {main_indexes} and extras {extras_indexes}')
+      print_mkv(f'Ripping main features {main_indexes} and extras {extras_indexes}')
 
     rip_movie(
       source, 
@@ -171,7 +201,14 @@ def rip_movie_interactive(source, dest_path, batch=False):
       movie_name, 
       id, 
       id_key,
-      rip_all=rip_all
+      rip_all=rip_all,
+      print_input=print_input,
+      print_mkv=print_mkv,
+      print_sort=print_sort,
+      print_status=print_status,
+      get_input=get_input,
     )
 
     if not batch: break
+  
+  return {}

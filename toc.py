@@ -3,6 +3,8 @@
 import os
 import re
 import shlex
+import subprocess
+from sys import stderr
 
 from disc import wait_for_disc_inserted
 from makemkv import MAKEMKVCON # TODO: move dependend functionality into makemkv module
@@ -29,30 +31,40 @@ class BaseInfo:
       try:
         return re.sub(
           r'^"', '', re.sub(
-            r'"\n$', '', self.fields[self._field_lookup[name]]
+            r'"\n?$', '', self.fields[self._field_lookup[name]]
           )
         )
       except Exception as ex:
-        print('Failed to look up', name, self.fields)
+        print('Failed to look up', name, self.fields, file=stderr)
         raise(ex)
 
 class TOC:
-  def __init__(self):
+  def __init__(self, print=print):
     self.lines = []
     self.source = None
+    self.print=print
 
   def get_from_disc(self, source):
-    print('Loading Disc TOC (this will take a while)')
+    self.print('Loading Disc TOC (this will take a while)')
     notify('Loading Disc TOC (this will take a while)')
 
-    wait_for_disc_inserted(source)
+    wait_for_disc_inserted(source, self.print)
 
     cmd = shlex.join([
       MAKEMKVCON, 'info', source, '--robot'
     ])
 
     # Load the disc TOC from makemkvcon output
-    self.lines = os.popen(cmd).readlines()
+    with subprocess.Popen(
+      [MAKEMKVCON, 'info', source, '--robot'],
+      stdout=subprocess.PIPE,
+      stderr=subprocess.PIPE,
+    ) as process:
+      for b_line in process.stdout:
+        line = b_line.decode('UTF-8').strip()
+        self.lines += [line]
+        if self.print != print: self.print(line)
+
     self.load()
 
   def get_from_list(self, lines):
@@ -134,10 +146,12 @@ class SourceInfo (BaseInfo):
         ]))
         self.titles[title_number].tracks[-1].fields['index'] = track
 
-  def print(self):
-    print(self.name)
+  def __str__(self):
+    lines = [self.name]
     for title in self.titles:
-      print(f'{title.index} - {title.runtime}, {title.filename}')
+      lines += [f'{title.index} - {title.runtime}, {title.filename}']
+
+    return '\n'.join(lines)
 
 class TitleInfo (BaseInfo):
   '''

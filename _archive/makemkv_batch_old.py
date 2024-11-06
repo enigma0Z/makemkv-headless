@@ -191,7 +191,7 @@ def disc_inserted(source):
     drutil_index = int(source.split(':')[1]) + 1
     return not grep('please insert', os.popen(shlex.join(['drutil', '-drive', str(drutil_index), 'discinfo'])).readlines())
 
-def wait_for_disc_inserted(source):
+def wait_for_disc_inserted(source, print=print):
   if not disc_inserted(source):
     print(f'Please insert a disc into {source}')
     notify(f'Please insert a disc into {source}')
@@ -223,10 +223,16 @@ def rsync(source, dest):
   # Put output files into their final destinations if the rip was done locally
   print(f'Copying local rip from {source} to {dest}')
   notify(f'Copying local rip to {dest}')
-  subprocess.Popen([
-    'rsync', '-av',
-    f'{source}', dest
-  ]).wait()
+  process = subprocess.Popen(
+    [ 'rsync', '-av', f'{source}', dest ],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE
+  )
+
+  process.wait()
+  if process.returncode > 0:
+    print('Rsync of ')
+
 
 def sanitize(value: str): # Strips out non alphanumeric characters and replaces with "_"
   return re.sub(r'[^\w]', '_', value.lower())
@@ -278,7 +284,11 @@ def rip_disc(
     print(f'Ripping title {rip_title}')
     notify(f'Ripping title {rip_title}')
     # os.system(shlex.join([ MAKEMKVCON, 'mkv', source, rip_title, dest]))
-    subprocess.Popen([ MAKEMKVCON, 'mkv', source, rip_title, dest]).wait()
+    subprocess.Popen(
+      [ MAKEMKVCON, 'mkv', source, rip_title, dest],
+      preexec_fn=os.setpgrp
+    ).wait()
+    
 
 def rip_movie(
     source, 

@@ -4,6 +4,7 @@ from math import trunc
 import os
 import re
 import shlex
+import shutil
 import subprocess
 
 def grep(term, lines):
@@ -23,19 +24,58 @@ def seconds_to_hms(seconds):
   return f'{hours}:{minutes:02d}:{seconds:02d}'
 
 def notify(message):
-  os.popen(shlex.join([
-    'osascript', '-e',
-    f'display notification "{message}" with title "Disc Backup"'
-  ]))
+  subprocess.Popen(
+    [
+      'osascript', '-e',
+      f'display notification "{message}" with title "Disc Backup"'
+    ],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+  )
 
-def rsync(source, dest):
+def clearing_line(line=''):
+  return line + ' ' * (-len(line) % shutil.get_terminal_size().columns)
+
+def rsync(source, dest, _print=print):
   # Put output files into their final destinations if the rip was done locally
-  print(f'Copying local rip from {source} to {dest}')
+  _print(f'Copying local rip from {source} to {dest}')
   notify(f'Copying local rip to {dest}')
-  subprocess.Popen([
-    'rsync', '-av',
-    f'{source}', dest
-  ]).wait()
+  process = subprocess.Popen(
+    [ 'rsync', '-av', f'{source}', dest ], 
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    preexec_fn=os.setpgrp,
+  )
+
+  with process:
+    for b_line in process.stdout:
+      line = b_line.decode('utf-8').strip()
+      if _print==print:
+        _print('\033[F'*4, end=None)
+        line = clearing_line(line) + '\n\n'
+      
+      _print(line)
+
+  if process.returncode == 0:
+    line = f'rsync completed successfully for {os.path.split(source)[-1]}'
+    if _print==print:
+      _print('\033[F'*4, end=None) 
+      line = clearing_line(line)
+    print(line)
+  else:
+    line = f'RSYNC FAILED FOR {dest}'
+    if _print==print:
+      _print('\033[F'*4, end=None) 
+      line=clearing_line(line)
+    print(line)
+
+    for line in process.stderr.readlines():
+      if _print==print:
+        _print(clearing_line(line))
+      else:
+        _print(line)
+
+  if _print==print: _print(clearing_line() + '\n'*2, end=None)
 
 def sanitize(value: str): # Strips out non alphanumeric characters and replaces with "_"
   return re.sub(r'[^\w]', '_', value.lower())

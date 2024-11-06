@@ -5,6 +5,7 @@ import signal
 import sys
 
 from argparse import ArgumentParser
+from curses_interface import CursesInterface
 from movie import rip_movie_interactive
 from show import rip_show_interactive
 
@@ -14,7 +15,12 @@ from util import input_with_default
 
 def interactive_rip(
     source, dest_dir,
-    source_path: str = None
+    source_path: str = None,
+    print_input=print,
+    print_mkv=print,
+    print_sort=print,
+    print_status=print,
+    get_input=input_with_default,
   ):
   media_choices = ['Blu-Ray', 'DVD']
   media_choices_casefold = [choice.casefold() for choice in media_choices]
@@ -27,16 +33,16 @@ def interactive_rip(
   rip_args = {}
 
   while True:
-    media = input_with_default(
+    media = get_input(
       'Is this Blu-Ray or DVD?', 
       media, 
       lambda v: 
         v.casefold() in [choice.casefold() for choice in media_choices_casefold]
     )
 
-    print('Media:', media)
+    print_input('Media:', media)
 
-    content = input_with_default(
+    content = get_input(
       'Is this a show or movie?', 
       content, 
       lambda v: 
@@ -44,16 +50,40 @@ def interactive_rip(
     )
 
     media = media_choices[media_choices_casefold.index(media.casefold())]
+    old_content = content
     content = content_choices[content_choices_casefold.index(content.casefold())]
+    if (content != old_content):
+      rip_args = {}
 
-    dest_dir = os.path.join(dest_dir, media, 'Main', content + 's')
-    print(dest_dir)
+    new_dest_dir = os.path.join(dest_dir, media, 'Main', content + 's')
+    print_input(new_dest_dir)
 
     if content.casefold() == 'show':
-      rip_args = rip_show_interactive(source, dest_dir, **rip_args, batch=False, source_path=source_path)
+      rip_args = rip_show_interactive(
+        source, 
+        new_dest_dir, 
+        **rip_args, 
+        batch=False, 
+        source_path=source_path,
+        print_input=print_input,
+        print_mkv=print_mkv,
+        print_sort=print_sort,
+        print_status=print_status,
+        get_input=get_input,
+      )
 
     elif content.casefold() == 'movie':
-      rip_args = rip_movie_interactive(source, dest_dir, **rip_args, batch=False)
+      rip_args = rip_movie_interactive(
+        source, 
+        new_dest_dir, 
+        **rip_args, 
+        batch=False,
+        print_input=print_input,
+        print_mkv=print_mkv,
+        print_sort=print_sort,
+        print_status=print_status,
+        get_input=get_input,
+      )
 
 if __name__=='__main__':
   parser = ArgumentParser()
@@ -69,6 +99,7 @@ if __name__=='__main__':
   parser.add_argument('--skip-cleanup', action='store_true')
   parser.add_argument('--skip-split', action='store_true')
   parser.add_argument('--source-path', action='store')
+  parser.add_argument('--curses', action='store_true')
 
   opts = parser.parse_args(sys.argv[1:])
 
@@ -78,13 +109,28 @@ if __name__=='__main__':
   features.DO_CLEANUP = not opts.skip_cleanup
   features.DO_SPLIT = not opts.skip_split
 
-  def sigint_handler(signal, frame):
-    print('Press Ctrl-Z and kill job to cancel')
+  if not opts.curses:
+    def sigint_handler(signal, frame):
+      print('Press Ctrl-Z and kill job to cancel')
 
-  signal.signal(signal.SIGINT, sigint_handler)
+    signal.signal(signal.SIGINT, sigint_handler)
+    os.setpgrp() # Blocks sub-processes from receiving ctrl-c
 
   if opts.mode is None:
-    interactive_rip(opts.source, opts.dest_dir, source_path=opts.source_path)
+    if opts.curses:
+      with CursesInterface() as iface:
+        interactive_rip(
+          opts.source, 
+          opts.dest_dir, 
+          source_path=opts.source_path,
+          print_input=iface.input_w.print,
+          print_mkv=iface.mkv_w.print,
+          print_sort=iface.sort_w.print,
+          print_status=iface.status_w.print,
+          get_input=iface.input_with_default
+        )
+    else:
+      interactive_rip(opts.source, opts.dest_dir, source_path=opts.source_path)
   elif opts.mode.startswith('movie'):
     if opts.batch:
       rip_movie_interactive(opts.source, opts.dest_dir, batch=True)

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import os
-import re
 import shutil
 import sys
 import tempfile
@@ -16,7 +15,6 @@ import tmdb
 from toc import TOC
 from util import input_with_default, rsync, sanitize, string_to_list_int
 
-
 def rip_show(
     source: str, 
     dest_path: str, 
@@ -30,7 +28,12 @@ def rip_show(
     id_key="tmdbid",
     rip_all=False,
     split_segments=None,
-    source_path=None
+    source_path=None,
+    print_input=print,
+    print_mkv=print,
+    print_sort=print,
+    print_status=print,
+    get_input=input,
   ):
   '''
   `<dir>/<show_name>/Season <season_number>/<show_name> S<season_number>E<episode_number>.mkv`
@@ -49,7 +52,7 @@ def rip_show(
     temp_dir = tempfile.mkdtemp()
     rip_path = os.path.join(temp_dir, show_name_with_id)
   else:
-    print("Setting temp dir to provided source path")
+    print_mkv("Setting temp dir to provided source path")
     temp_dir = source_path
     rip_path = os.path.join(temp_dir, show_name_with_id)
 
@@ -60,17 +63,18 @@ def rip_show(
   ), exist_ok=True)
 
   if features.DO_RIP:
-    print(f"These titles will be given the source name of {show_name_with_id}")
-    print(f"and copied to {dest_season_path}/{show_name} SxxExx.mkv")
+    print_sort(f"These titles will be given the source name of {show_name_with_id}")
+    print_sort(f"and copied to {dest_season_path}/{show_name} SxxExx.mkv")
 
     with open(os.path.join(rip_path, f'{toc.source.name}-makemkvcon.txt'), 'w') as file:
-      file.writelines(toc.lines)
+      for line in toc.lines:
+        file.write(line + '\n')
 
     if rip_all:
-      rip_disc(source, rip_path, ['all'])
+      rip_disc(source, rip_path, rip_titles=['all'], print_mkv=print_mkv, print_status=print_status)
     else:
-      rip_disc(source, rip_path, rip_titles=episode_indexes)
-      rip_disc(source, rip_path, rip_titles=extras_indexes)
+      rip_disc(source, rip_path, rip_titles=episode_indexes, print_mkv=print_mkv, print_status=print_status)
+      rip_disc(source, rip_path, rip_titles=extras_indexes, print_mkv=print_mkv, print_status=print_status)
 
   def sorting_thread():
     try:
@@ -83,7 +87,8 @@ def rip_show(
               split_mkv(
                 os.path.join(rip_path, title.filename), 
                 os.path.join(rip_path, 'split-%d.mkv'),
-                split_segments
+                split_segments,
+                print=print_sort
               )
             for segment_index in range(0, len(split_segments)+1):
               try:
@@ -92,9 +97,9 @@ def rip_show(
                     os.path.join(rip_path, season_dir, f"{show_name} S{season_number:02d}E{segment_index+first_ep:02d}.mkv")
                   )
               except FileNotFoundError as ex:
-                print('Failed to rename segment', segment_index)
-                print(ex)
-                failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}, Segment {segment_index}')
+                print_sort('Failed to rename segment', segment_index)
+                print_sort(ex)
+                failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}, Segment {segment_index}\n{ex}')
             if (features.DO_CLEANUP):
               os.remove(os.path.join(rip_path, title.filename))
           else:
@@ -104,7 +109,7 @@ def rip_show(
                 os.path.join(rip_path, season_dir, f"{show_name} S{season_number:02d}E{i+first_ep:02d}.mkv")
               )
             except FileNotFoundError as ex:
-              failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}')
+              failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}\n{ex}')
 
         for index in extras_indexes:
           title = toc.source.titles[int(index)]
@@ -114,33 +119,33 @@ def rip_show(
               os.path.join(rip_path, season_dir, 'extras', title.filename)
             )
           except FileNotFoundError as ex:
-            failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}')
+            failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}\n{ex}')
 
         if len(failed_titles) > 0:
-          print("Some failed to rip or copy")
-          print()
+          print_sort("Some shows failed to rip or copy")
+          print_sort()
           for title in failed_titles:
-            print(f'{title.index}: {title.filename}, {title.runtime}')
-          print("press Enter to continue or Ctrl-C to cancel")
+            print(title, file=sys.stderr)
+            print_sort(title)
           try:
-            input()
+            get_input("press Enter to continue or Ctrl-C to cancel")
           except KeyboardInterrupt:
-            print("Quitting...")
+            print_input("Quitting...")
             sys.exit(256)
 
       if features.DO_COPY:
         os.makedirs(dest_season_path, exist_ok=True)
-        rsync(os.path.join(rip_path), dest_path)
+        rsync(os.path.join(rip_path), dest_path, _print=print_sort)
 
     finally:
       if features.DO_CLEANUP:
         shutil.rmtree(temp_dir)
       else:
-        print(f"Leaving rip source at {temp_dir}")
+        print_sort(f"Leaving rip source at {temp_dir}")
 
   threading.Thread(target=sorting_thread, daemon=True).start()
 
-  eject_disc(source)
+  eject_disc(source, print=print_mkv)
 
 def rip_show_interactive(
     source, 
@@ -154,60 +159,66 @@ def rip_show_interactive(
     extras_indexes = None,
     split_segments = True,
     batch=False, 
-    source_path=None
+    source_path=None,
+    print_input=print,
+    print_mkv=print,
+    print_sort=print,
+    print_status=print,
+    get_input=input_with_default,
   ):
 
-  print('Source Path', source_path)
+  print_input('Source Path', source_path)
 
   while True:
     # Reset per loop
     first_ep = None 
     extras_indexes = None
 
-    toc = TOC()
+    toc = TOC(print=print_mkv)
 
     thread = threading.Thread(target=toc.get_from_disc, args=[source])
 
-    print('Getting Disc Toc...')
+    print_mkv('Getting Disc Toc...')
     thread.start()
 
-    show_name = input_with_default('What is the name of this show?', show_name)
+    show_name = get_input('What is the name of this show?', show_name)
 
     results = tmdb.search('tv', show_name)
     if (id is None and len(results) > 0):
       id = results[0].id
       for result in results:
-        print(result)
+        print_input(result)
       
-      print(f'These came up when searching for "{show_name}" on TMDB and the first was auto-selected.')
-      print(f'Verify at the link above or input the correct ID.')
+      print_input(f'These came up when searching for "{show_name}" on TMDB and the first was auto-selected.')
+      print_input(f'Verify at the link above or input the correct ID.')
     else:
-      print('Pre-selected ID', id)
-      print('Number of results', len(results))
-      print(results)
+      print_input('Pre-selected ID', id)
+      print_input('Number of results', len(results))
+      for result in results:
+        print_input(result)
 
-    id = input_with_default(f'What is the {id_key} of this show?', id)
-    season_number = int(input_with_default(f'What season is this disc?'))
-    first_ep = int(input_with_default(f'What is the first episode number on this disc?', first_ep))
+    id = get_input(f'What is the {id_key} of this show?', id)
+    season_number = int(get_input(f'What season is this disc?'))
+    first_ep = int(get_input(f'What is the first episode number on this disc?', first_ep))
 
-    print('Waiting for TOC read to complete...')
+    print_status('Waiting for TOC read to complete...')
     thread.join()
 
-    print("All Titles")
-    toc.source.print()
+    print_mkv("All Titles")
+    print_mkv(toc.source)
 
     all_indexes = [
       title.index
       for title in toc.source.titles
     ]
 
-    episode_indexes = input_with_default("Which titles are episodes?", value=episode_indexes)
+    episode_indexes = get_input("Which titles are episodes?", value=episode_indexes)
     episode_indexes = string_to_list_int(episode_indexes)
 
     if len(episode_indexes) == 1:
       selected_title = toc.source.titles[episode_indexes[0]]
-      print("Segments:", selected_title.segments)
-      split_segments = input_with_default(
+      print_mkv(f'Segments: {selected_title.segments} Chapters: {selected_title.chapters}')
+      split_segments = get_input(
         f"Only one title was selected, should this be split by segment ({selected_title.segments} total)?",
         split_segments,
         lambda v: 
@@ -224,15 +235,17 @@ def rip_show_interactive(
       if (split_segments):
         chapter_count = int(selected_title.chapters)
         segment_count = int(selected_title.segments)
-        episode_count = int(input_with_default('How many episodes are on this disc?', segment_count, lambda x: int(x)))
+        episode_count = int(get_input('How many episodes are on this disc?', segment_count, lambda x: int(x)))
         chapters_per_segment = chapter_count / episode_count
-        chapters_per_segment = int(input_with_default('How many chapters per episode should the final file be split into?', chapters_per_segment, lambda x: int(x)))
+        chapters_per_segment = int(get_input('How many chapters per episode should the final file be split into?', chapters_per_segment, lambda x: int(x)))
 
         # +1 for mkvmerge
         # which indexes on 0, but takes the chapter number at which to split by the _START_
         # We then take all but the last index of the result since the last start point will be a chapter that does not exist
         split_segments = [v + chapters_per_segment + 1 for v in range(0, chapter_count, chapters_per_segment)][0:-1]
-        print('Will split at chapters', split_segments)
+        print_mkv('Will split at chapters', split_segments)
+    else: 
+      split_segments = False
 
     extras_indexes = [
       title.index
@@ -240,15 +253,15 @@ def rip_show_interactive(
       if title.index not in episode_indexes
     ]
 
-    extras_indexes = input_with_default('Which titles are extras?', extras_indexes, lambda x: True)
+    extras_indexes = get_input('Which titles are extras?', extras_indexes, lambda x: True)
     extras_indexes = string_to_list_int(extras_indexes)
 
     rip_all = False
     if(sorted(all_indexes) == sorted(episode_indexes + extras_indexes)):
-      print('Ripping all titles')
+      print_mkv('Ripping all titles')
       rip_all = True
     else:
-      print(f'Ripping main features {episode_indexes} and extras {extras_indexes}')
+      print_mkv(f'Ripping main features {episode_indexes} and extras {extras_indexes}')
 
     rip_show(
       source, 
@@ -263,7 +276,12 @@ def rip_show_interactive(
       id_key,
       rip_all=rip_all,
       split_segments=split_segments,
-      source_path=source_path
+      source_path=source_path,
+      print_input=print_input,
+      print_mkv=print_mkv,
+      print_sort=print_sort,
+      print_status=print_status,
+      get_input=get_input,
     )
 
     if not batch: break
