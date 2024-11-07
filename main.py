@@ -6,6 +6,7 @@ import sys
 
 from argparse import ArgumentParser
 from curses_interface import CursesInterface
+from interface import Interface, PlaintextInterface
 from movie import rip_movie_interactive
 from show import rip_show_interactive
 
@@ -16,11 +17,7 @@ from util import input_with_default
 def interactive_rip(
     source, dest_dir,
     source_path: str = None,
-    print_input=print,
-    print_mkv=print,
-    print_sort=print,
-    print_status=print,
-    get_input=input_with_default,
+    interface: Interface = PlaintextInterface(),
   ):
   media_choices = ['Blu-Ray', 'DVD']
   media_choices_casefold = [choice.casefold() for choice in media_choices]
@@ -33,16 +30,16 @@ def interactive_rip(
   rip_args = {}
 
   while True:
-    media = get_input(
+    media = interface.get_input(
       'Is this Blu-Ray or DVD?', 
       media, 
       lambda v: 
         v.casefold() in [choice.casefold() for choice in media_choices_casefold]
     )
 
-    print_input('Media:', media)
+    interface.print_input('Media:', media)
 
-    content = get_input(
+    content = interface.get_input(
       'Is this a show or movie?', 
       content, 
       lambda v: 
@@ -56,7 +53,7 @@ def interactive_rip(
       rip_args = {}
 
     new_dest_dir = os.path.join(dest_dir, media, 'Main', content + 's')
-    print_input(new_dest_dir)
+    interface.print_input(new_dest_dir)
 
     if content.casefold() == 'show':
       rip_args = rip_show_interactive(
@@ -65,11 +62,7 @@ def interactive_rip(
         **rip_args, 
         batch=False, 
         source_path=source_path,
-        print_input=print_input,
-        print_mkv=print_mkv,
-        print_sort=print_sort,
-        print_status=print_status,
-        get_input=get_input,
+        interface=interface
       )
 
     elif content.casefold() == 'movie':
@@ -78,11 +71,7 @@ def interactive_rip(
         new_dest_dir, 
         **rip_args, 
         batch=False,
-        print_input=print_input,
-        print_mkv=print_mkv,
-        print_sort=print_sort,
-        print_status=print_status,
-        get_input=get_input,
+        interface=interface
       )
 
 if __name__=='__main__':
@@ -116,21 +105,18 @@ if __name__=='__main__':
     signal.signal(signal.SIGINT, sigint_handler)
     os.setpgrp() # Blocks sub-processes from receiving ctrl-c
 
+  interface = PlaintextInterface()
+  if opts.curses:
+    interface = CursesInterface()
+
   if opts.mode is None:
-    if opts.curses:
-      with CursesInterface() as iface:
-        interactive_rip(
-          opts.source, 
-          opts.dest_dir, 
-          source_path=opts.source_path,
-          print_input=iface.input_w.print,
-          print_mkv=iface.mkv_w.print,
-          print_sort=iface.sort_w.print,
-          print_status=iface.status_w.print,
-          get_input=iface.input_with_default
-        )
-    else:
-      interactive_rip(opts.source, opts.dest_dir, source_path=opts.source_path)
+    with interface:
+      interactive_rip(
+        opts.source, 
+        opts.dest_dir, 
+        source_path=opts.source_path,
+        interface=interface,
+      )
   elif opts.mode.startswith('movie'):
     if opts.batch:
       rip_movie_interactive(opts.source, opts.dest_dir, batch=True)

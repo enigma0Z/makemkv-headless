@@ -7,6 +7,8 @@ import shlex
 import shutil
 import subprocess
 
+from interface import PlaintextInterface
+
 def grep(term, lines):
   return True in [ term.casefold() in line.casefold() for line in lines ]
 
@@ -36,9 +38,9 @@ def notify(message):
 def clearing_line(line=''):
   return line + ' ' * (-len(line) % shutil.get_terminal_size().columns)
 
-def rsync(source, dest, _print=print):
+def rsync(source, dest, interface=PlaintextInterface()):
   # Put output files into their final destinations if the rip was done locally
-  _print(f'Copying local rip from {source} to {dest}')
+  interface.print_sort(f'Copying local rip from {source} to {dest}')
   notify(f'Copying local rip to {dest}')
   process = subprocess.Popen(
     [ 'rsync', '-av', f'{source}', dest ], 
@@ -50,32 +52,18 @@ def rsync(source, dest, _print=print):
   with process:
     for b_line in process.stdout:
       line = b_line.decode('utf-8').strip()
-      if _print==print:
-        _print('\033[F'*4, end=None)
-        line = clearing_line(line) + '\n\n'
       
-      _print(line)
+      interface.print_sort(line)
 
   if process.returncode == 0:
     line = f'rsync completed successfully for {os.path.split(source)[-1]}'
-    if _print==print:
-      _print('\033[F'*4, end=None) 
-      line = clearing_line(line)
-    print(line)
+    interface.print_sort(line)
   else:
     line = f'RSYNC FAILED FOR {dest}'
-    if _print==print:
-      _print('\033[F'*4, end=None) 
-      line=clearing_line(line)
-    print(line)
+    interface.print_sort(line)
 
     for line in process.stderr.readlines():
-      if _print==print:
-        _print(clearing_line(line))
-      else:
-        _print(line)
-
-  if _print==print: _print(clearing_line() + '\n'*2, end=None)
+      interface.print_sort(line)
 
 def sanitize(value: str): # Strips out non alphanumeric characters and replaces with "_"
   return re.sub(r'[^\w]', '_', value.lower())

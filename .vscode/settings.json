@@ -4,6 +4,7 @@
     "MAKEMKVCON",
     "mkvtoolnix",
     "setpgrp",
-    "tmdb"
+    "tmdb",
+    "tmdbid"
   ]
 }

@@ -6,8 +6,9 @@ import threading
 
 from curses import ascii
 from math import floor
-from time import sleep
 from sys import stderr
+
+from interface import Interface
 
 KEY_ENTER = 10
 KEY_BACKSPACE = 127
@@ -99,7 +100,7 @@ class BorderWindow:
     # self.win.addstr(self.scroll_height, 0, f'{str}{end}')
     # self.win.refresh()
 
-class CursesInterface:
+class CursesInterface(Interface):
   def __init__(self):
     self.win = WindowRegistry()
     self.shutdown = threading.Event()
@@ -137,7 +138,6 @@ class CursesInterface:
     curses.endwin()
     # print('Succesfully cleaned up curses')
 
-
   def input_thread_fn(self):
     self.screen.refresh()
     self.input_w.refresh()
@@ -148,7 +148,7 @@ class CursesInterface:
         prompt = self.input_queue.get()
         input_complete = False
         input_str = ''
-        self.input_w.print(prompt, end=None)
+        self.print_input(prompt, end=None)
         _, start_x = self.input_w.win.getyx()
         while not input_complete:
           k = _curses_response(self.input_w.win.getch)
@@ -279,3 +279,39 @@ class CursesInterface:
 
   def refresh(self):
     self.screen.refresh()
+
+  def sanitize_print(self, text, sep, end):
+    if text == None: text = []
+    text = [str(s) for s in text if s is not None]
+
+    if sep == None: sep = '' 
+    else: sep = str(sep)
+
+    if end == None: end = ''
+    else: end = str(end)
+
+    return [text, sep, end]
+
+  def print_status(self, *text: list[str], sep=' ', end='\n'):
+    text, sep, end = self.sanitize_print(text, sep, end)
+    self.status_w.print(sep.join(text), end=end)
+
+  def print_mkv(self, *text: list[str], sep=' ', end='\n'):
+    text, sep, end = self.sanitize_print(text, sep, end)
+    self.mkv_w.print(sep.join(text), end=end)
+
+  def print_input(self, *text: list[str], sep=' ', end='\n'):
+    text, sep, end = self.sanitize_print(text, sep, end)
+    self.input_w.print(sep.join([s if s is not None else '' for s in text]), end=end)
+
+  def print_sort(self, *text: list[str], sep=' ', end='\n'):
+    text, sep, end = self.sanitize_print(text, sep, end)
+    self.sort_w.print(sep.join(text), end=end)
+
+  def get_input(
+      self, 
+      prompt: str, 
+      value: any, 
+      validation = lambda v: v != '' and v is not None
+    ) -> str:
+    return self.input_with_default(prompt, value, validation)

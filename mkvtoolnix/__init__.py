@@ -3,9 +3,16 @@
 import os
 import subprocess
 
+from interface import Interface, PlaintextInterface
+
 MKVMERGE='/opt/homebrew/bin/mkvmerge'
 
-def split_mkv(input: str, output: str, chapters: list[int], print=lambda x: None):
+def split_mkv(
+    input: str, 
+    output: str, 
+    chapters: list[int], 
+    interface: Interface = PlaintextInterface()
+  ):
   with subprocess.Popen(
     [
       MKVMERGE, 
@@ -19,9 +26,9 @@ def split_mkv(input: str, output: str, chapters: list[int], print=lambda x: None
   ) as process:
     for b_line in process.stdout:
       line = b_line.decode('UTF-8').strip()
-      print(line)
+      interface.print_sort(line)
 
     process.wait()
 
   if (process.returncode > 0):
-    print('There was an error splitting the output file, see above')
+    interface.print_sort('There was an error splitting the output file, see above')

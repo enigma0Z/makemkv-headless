@@ -13,7 +13,7 @@
       "args": [
         "dev:/dev/disk6",
         "/Volumes/Plex/Media",
-        "--skip-cleanup"
+        "--curses"
       ]
     }
   ]

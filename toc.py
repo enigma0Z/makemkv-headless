@@ -7,6 +7,7 @@ import subprocess
 from sys import stderr
 
 from disc import wait_for_disc_inserted
+from interface import PlaintextInterface
 from makemkv import MAKEMKVCON # TODO: move dependend functionality into makemkv module
 from util import notify
 
@@ -39,20 +40,14 @@ class BaseInfo:
         raise(ex)
 
 class TOC:
-  def __init__(self, print=print):
+  def __init__(self, interface=PlaintextInterface()):
     self.lines = []
     self.source = None
-    self.print=print
+    self.interface=interface
 
   def get_from_disc(self, source):
-    self.print('Loading Disc TOC (this will take a while)')
-    notify('Loading Disc TOC (this will take a while)')
 
-    wait_for_disc_inserted(source, self.print)
-
-    cmd = shlex.join([
-      MAKEMKVCON, 'info', source, '--robot'
-    ])
+    self.interface.print_mkv('Loading disc TOC')
 
     # Load the disc TOC from makemkvcon output
     with subprocess.Popen(
@@ -63,7 +58,8 @@ class TOC:
       for b_line in process.stdout:
         line = b_line.decode('UTF-8').strip()
         self.lines += [line]
-        if self.print != print: self.print(line)
+        if not isinstance(self.interface, PlaintextInterface): 
+          self.interface.print_mkv(line)
 
     self.load()
 
