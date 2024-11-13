@@ -3,5 +3,5 @@ __pycache__
 
 _TOKEN.py
 _experiment.py
-error_log
+error_log*
 test.txt

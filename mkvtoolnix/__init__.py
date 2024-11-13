@@ -26,9 +26,9 @@ def split_mkv(
   ) as process:
     for b_line in process.stdout:
       line = b_line.decode('UTF-8').strip()
-      interface.print_sort(line)
+      interface.print(line, target='sort')
 
     process.wait()
 
   if (process.returncode > 0):
-    interface.print_sort('There was an error splitting the output file, see above')
+    interface.print('There was an error splitting the output file, see above', target='sort')

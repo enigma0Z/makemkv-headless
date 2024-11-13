@@ -37,7 +37,7 @@ def interactive_rip(
         v.casefold() in [choice.casefold() for choice in media_choices_casefold]
     )
 
-    interface.print_input('Media:', media)
+    interface.print('Media:', media, target='input')
 
     content = interface.get_input(
       'Is this a show or movie?', 
@@ -53,7 +53,7 @@ def interactive_rip(
       rip_args = {}
 
     new_dest_dir = os.path.join(dest_dir, media, 'Main', content + 's')
-    interface.print_input(new_dest_dir)
+    interface.print(new_dest_dir, target='input')
 
     if content.casefold() == 'show':
       rip_args = rip_show_interactive(

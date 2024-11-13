@@ -40,7 +40,7 @@ def clearing_line(line=''):
 
 def rsync(source, dest, interface=PlaintextInterface()):
   # Put output files into their final destinations if the rip was done locally
-  interface.print_sort(f'Copying local rip from {source} to {dest}')
+  interface.print(f'Copying local rip from {source} to {dest}', target='sort')
   notify(f'Copying local rip to {dest}')
   process = subprocess.Popen(
     [ 'rsync', '-av', f'{source}', dest ], 
@@ -53,17 +53,17 @@ def rsync(source, dest, interface=PlaintextInterface()):
     for b_line in process.stdout:
       line = b_line.decode('utf-8').strip()
       
-      interface.print_sort(line)
+      interface.print(line, target='sort')
 
   if process.returncode == 0:
     line = f'rsync completed successfully for {os.path.split(source)[-1]}'
-    interface.print_sort(line)
+    interface.print(line, target='sort')
   else:
     line = f'RSYNC FAILED FOR {dest}'
-    interface.print_sort(line)
+    interface.print(line, target='sort')
 
     for line in process.stderr.readlines():
-      interface.print_sort(line)
+      interface.print(line, target='sort')
 
 def sanitize(value: str): # Strips out non alphanumeric characters and replaces with "_"
   return re.sub(r'[^\w]', '_', value.lower())

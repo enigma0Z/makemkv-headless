@@ -9,7 +9,7 @@ import threading
 import features
 
 from disc import eject_disc, wait_for_disc_inserted
-from interface import Interface, PlaintextInterface
+from interface import Interface, PlaintextInterface, Target
 from makemkv import rip_disc
 from mkvtoolnix import split_mkv
 import tmdb
@@ -49,7 +49,7 @@ def rip_show(
     temp_dir = tempfile.mkdtemp()
     rip_path = os.path.join(temp_dir, show_name_with_id)
   else:
-    interface.print_mkv("Setting temp dir to provided source path")
+    interface.print("Setting temp dir to provided source path", target='mkv')
     temp_dir = source_path
     rip_path = os.path.join(temp_dir, show_name_with_id)
 
@@ -60,8 +60,8 @@ def rip_show(
   ), exist_ok=True)
 
   if features.DO_RIP:
-    interface.print_sort(f"These titles will be given the source name of {show_name_with_id}")
-    interface.print_sort(f"and copied to {dest_season_path}/{show_name} SxxExx.mkv")
+    interface.print(f"These titles will be given the source name of {show_name_with_id}", target='sort')
+    interface.print(f"and copied to {dest_season_path}/{show_name} SxxExx.mkv", target='sort')
 
     with open(os.path.join(rip_path, f'{toc.source.name}-makemkvcon.txt'), 'w') as file:
       for line in toc.lines:
@@ -94,8 +94,8 @@ def rip_show(
                     os.path.join(rip_path, season_dir, f"{show_name} S{season_number:02d}E{segment_index+first_ep:02d}.mkv")
                   )
               except FileNotFoundError as ex:
-                interface.print_sort('Failed to rename segment', segment_index)
-                interface.print_sort(ex)
+                interface.print('Failed to rename segment', segment_index, target='sort')
+                interface.print(ex, target='sort')
                 failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}, Segment {segment_index}\n{ex}')
             if (features.DO_CLEANUP):
               os.remove(os.path.join(rip_path, title.filename))
@@ -119,15 +119,15 @@ def rip_show(
             failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}\n{ex}')
 
         if len(failed_titles) > 0:
-          interface.print_sort("Some shows failed to rip or copy")
+          interface.print("Some shows failed to rip or copy", target='sort')
           interface.print_sort()
           for title in failed_titles:
             print(title, file=sys.stderr)
-            interface.print_sort(title)
+            interface.print(title, target='sort')
           try:
             interface.get_input("press Enter to continue or Ctrl-C to cancel")
           except KeyboardInterrupt:
-            interface.print_input("Quitting...")
+            interface.print("Quitting...", target='input')
             sys.exit(256)
 
       if features.DO_COPY:
@@ -138,7 +138,7 @@ def rip_show(
       if features.DO_CLEANUP:
         shutil.rmtree(temp_dir)
       else:
-        interface.print_sort(f"Leaving rip source at {temp_dir}")
+        interface.print(f"Leaving rip source at {temp_dir}", target='sort')
 
   threading.Thread(target=sorting_thread, daemon=True).start()
 
@@ -157,10 +157,11 @@ def rip_show_interactive(
     split_segments = True,
     batch=False, 
     source_path=None,
-    interface=PlaintextInterface()
+    interface=PlaintextInterface(),
+    **kwargs,
   ):
 
-  interface.print_input('Source Path', source_path)
+  interface.print('Source Path', source_path, target='input')
 
   while True:
     # Reset per loop
@@ -180,25 +181,26 @@ def rip_show_interactive(
     if (id is None and len(results) > 0):
       id = results[0].id
       for result in results:
-        interface.print_input(result)
+        interface.print(result, target='input')
       
-      interface.print_input(f'These came up when searching for "{show_name}" on TMDB and the first was auto-selected.')
-      interface.print_input(f'Verify at the link above or input the correct ID.')
+      interface.print(f'These came up when searching for "{show_name}" on TMDB and the first was auto-selected.', target='input')
+      interface.print(f'Verify at the link above or input the correct ID.', target='input')
     else:
-      interface.print_input('Pre-selected ID', id)
-      interface.print_input('Number of results', len(results))
+      interface.print('Pre-selected ID', id, target='input')
+      interface.print('Number of results', len(results), target='input')
       for result in results:
-        interface.print_input(result)
+        interface.print(result, target='input')
 
     id = interface.get_input(f'What is the {id_key} of this show?', id)
     season_number = int(interface.get_input(f'What season is this disc?', season_number))
     first_ep = int(interface.get_input(f'What is the first episode number on this disc?', first_ep))
 
-    interface.print_status('Waiting for TOC read to complete...')
+    interface.print('Waiting for TOC read to complete...', target='status')
+    interface.title('Waiting for TOC read to complete...', target=Target.MKV)
     thread.join()
 
-    interface.print_mkv("All Titles")
-    interface.print_mkv(toc.source)
+    interface.print("All Titles", target='mkv')
+    interface.print(toc.source, target='mkv')
 
     all_indexes = [
       title.index
@@ -210,7 +212,7 @@ def rip_show_interactive(
 
     if len(episode_indexes) == 1:
       selected_title = toc.source.titles[episode_indexes[0]]
-      interface.print_mkv(f'Segments: {selected_title.segments} Chapters: {selected_title.chapters}')
+      interface.print(f'Segments: {selected_title.segments} Chapters: {selected_title.chapters}', target='mkv')
       split_segments = interface.get_input(
         f"Only one title was selected, should this be split by segment ({selected_title.segments} total)?",
         split_segments,
@@ -236,7 +238,7 @@ def rip_show_interactive(
         # which indexes on 0, but takes the chapter number at which to split by the _START_
         # We then take all but the last index of the result since the last start point will be a chapter that does not exist
         split_segments = [v + chapters_per_segment + 1 for v in range(0, chapter_count, chapters_per_segment)][0:-1]
-        interface.print_mkv('Will split at chapters', split_segments)
+        interface.print('Will split at chapters', split_segments, target='mkv')
     else: 
       split_segments = False
 
@@ -251,10 +253,10 @@ def rip_show_interactive(
 
     rip_all = False
     if(sorted(all_indexes) == sorted(episode_indexes + extras_indexes)):
-      interface.print_mkv('Ripping all titles')
+      interface.print('Ripping all titles', target='mkv')
       rip_all = True
     else:
-      interface.print_mkv(f'Ripping main features {episode_indexes} and extras {extras_indexes}')
+      interface.print(f'Ripping main features {episode_indexes} and extras {extras_indexes}', target='mkv')
 
     rip_show(
       source, 

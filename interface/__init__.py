@@ -1,32 +1,45 @@
 #!/usr/bin/env python3
 
 from abc import ABC, abstractmethod
+from enum import StrEnum, auto, unique
 from shutil import get_terminal_size
 from typing import Callable
 
+@unique
+class Target(StrEnum):
+  MKV = auto()
+  SORT = auto()
+  INPUT = auto()
+  STATUS = auto()
+
 class Interface(ABC):
+
   @abstractmethod
-  def __enter__(self, *args):
+  def __enter__(self, *args, **kwargs):
     return self
 
   @abstractmethod
-  def __exit__(self, *args):
+  def __exit__(self, *args, **kwargs):
     return self
 
   @abstractmethod
-  def print_sort(self, *text: list[str], sep=' ', end='\n'):
+  def title(
+    self, 
+    *text: list[str], 
+    target: Target = Target.INPUT,
+    **kwargs
+  ):
     pass
 
   @abstractmethod
-  def print_mkv(self, *text: list[str], sep=' ', end='\n'):
-    pass
-
-  @abstractmethod
-  def print_status(self, *text: list[str], sep=' ', end='\n'):
-    pass
-
-  @abstractmethod
-  def print_input(self, *text: list[str], sep=' ', end='\n'):
+  def print(
+    self, 
+    *text: list[str], 
+    target: Target = Target.INPUT, 
+    sep=' ', 
+    end='\n', 
+    **kwargs
+  ):
     pass
 
   @abstractmethod
@@ -39,10 +52,12 @@ class Interface(ABC):
     pass
 
 class PlaintextInterface(Interface):
-  def __enter__(self, *args):
+  def __enter__(self, *args, **kwargs):
+    print('enter')
     return super().__enter__(*args)
 
-  def __exit__(self, *args):
+  def __exit__(self, *args, **kwargs):
+    print('exit')
     return super().__exit__(*args)
 
   def move_cursor_up(self, lines: int):
@@ -51,21 +66,30 @@ class PlaintextInterface(Interface):
   def clearing_line(self, line=''):
     return line + ' ' * (-len(line) % get_terminal_size().columns)
 
-  def print_status(self, *text, sep=' ', end='\n'):
-    self.move_cursor_up(3)
-    print(text, sep=sep, end=end)
+  def title(self, *text, **kwargs): pass # For interface purposes
 
-  def print_sort(self, *text, sep=' ', end='\n'):
-    self.move_cursor_up(4)
-    print(text, sep=sep, end=end)
-
-  def print_mkv(self, *text, sep=' ', end='\n'):
-    self.print_sort(*text, sep, end)
-
-  def print_input(self, *text, sep=' ', end='\n'):
-    self.print_sort(*text, sep, end)
+  def print(
+      self, 
+      *text, 
+      target=Target.INPUT,
+      sep=' ', 
+      end='\n', 
+      **kwargs
+  ):
+    match target:
+      # case Target.INPUT: 
+      #   self.move_cursor_up(3)
+      case Target.MKV:
+        self.move_cursor_up(4)
+        end += '\n'*3
+      case Target.SORT:
+        self.move_cursor_up(3)
+        end += '\n'*2
+      
+    print(*text, sep=sep, end=end)
 
   def get_input(
+      self,
       prompt: str, 
       value = None, 
       validation = lambda v: v != '' and v is not None

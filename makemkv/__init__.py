@@ -6,7 +6,7 @@ import subprocess
 from time import time
 
 from disc import wait_for_disc_inserted
-from interface import Interface, PlaintextInterface
+from interface import Interface, PlaintextInterface, Target
 from util import clearing_line, notify, seconds_to_hms
 
 MAKEMKVCON="/Applications/MakeMKV.app/Contents/MacOS/makemkvcon"
@@ -18,13 +18,13 @@ def rip_disc(
     interface: Interface = PlaintextInterface(),
   ):
   notify(f'Backing up {source} to {dest}')
-  interface.print_sort(f'Backing up {source} to {dest}')
+  interface.print(f'Backing up {source} to {dest}', target='sort')
 
   wait_for_disc_inserted(source, interface)
 
   # Do the actual rip + eject the disc when done
   for rip_title in [str(v) for v in rip_titles]:
-    interface.print_sort(f'Ripping title {rip_title}')
+    interface.print(f'Ripping title {rip_title}', target='sort')
     notify(f'Ripping title {rip_title}')
 
     # Current and total progress title
@@ -64,8 +64,12 @@ def rip_disc(
 
         if line.startswith('PRGC'):
           current_title = line.split(':')[1].split(',')[2]
+          current_title = re.sub(r'^"', '', current_title)
+          current_title = re.sub(r'"$', '', current_title)
         elif line.startswith('PRGT'):
           total_title = line.split(':')[1].split(',')[2]
+          total_title = re.sub(r'^"', '', total_title)
+          total_title = re.sub(r'"$', '', total_title)
         elif line.startswith('PRGV'):
           progress_value = [int(v) for v in line.split(':')[1].split(',')]
 
@@ -77,12 +81,12 @@ def rip_disc(
                 match = re.match(r'.+?:\d+?,\d+?,\d+?,"(.+?)(?<!\\)",', line)
                 msg_line = match.group(1)
 
-                interface.print_mkv(msg_line)
+                interface.print(msg_line, target='mkv')
             else:
-              interface.print_mkv('>', line)
+              interface.print('>', line, target='mkv')
           except Exception as ex:
-            interface.print_mkv(ex)
-            interface.print_mkv(line)
+            interface.print(ex, target='mkv')
+            interface.print(line, target='mkv')
 
         if None not in [current_title, total_title, progress_value]:
           total_pct = progress_value[1]/progress_value[2]
@@ -102,9 +106,12 @@ def rip_disc(
             current_remaining = current_elapsed / current_pct - current_elapsed
 
           total_line = \
-            f'Total   {total_pct*100:>6.2f}% {seconds_to_hms(total_elapsed)}s (~{seconds_to_hms(total_remaining)}s) - {total_title}'
+            f'{total_pct*100:>6.2f}% {seconds_to_hms(total_elapsed)}s (~{seconds_to_hms(total_remaining)}s) - {total_title}'
           
           current_line = \
-            f'Current {current_pct*100:>6.2f}% {seconds_to_hms(current_elapsed)}s (~{seconds_to_hms(current_remaining)}s) - {current_title}'
+            f'{current_pct*100:>6.2f}% {seconds_to_hms(current_elapsed)}s (~{seconds_to_hms(current_remaining)}s) - {current_title}'
 
-          interface.print_status(total_line, current_line, sep='\n')
+          status_line = f'{total_title}, {current_title} - {total_pct*100:>6.2f}% ~{seconds_to_hms(total_remaining)}s / {current_pct*100:>6.2f}% ~{seconds_to_hms(current_remaining)}s'
+
+          interface.print(total_line, current_line, sep='\n', target='status')
+          interface.title(status_line, target=Target.MKV)

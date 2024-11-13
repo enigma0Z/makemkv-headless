@@ -47,7 +47,7 @@ class TOC:
 
   def get_from_disc(self, source):
 
-    self.interface.print_mkv('Loading disc TOC')
+    self.interface.print('Loading disc TOC', target='mkv')
 
     # Load the disc TOC from makemkvcon output
     with subprocess.Popen(
@@ -59,7 +59,7 @@ class TOC:
         line = b_line.decode('UTF-8').strip()
         self.lines += [line]
         if not isinstance(self.interface, PlaintextInterface): 
-          self.interface.print_mkv(line)
+          self.interface.print(line, target='mkv')
 
     self.load()
 

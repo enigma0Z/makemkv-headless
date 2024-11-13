@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 
 import curses
+from enum import Enum
 import queue
+import re
 import threading
 
 from curses import ascii
 from math import floor
 from sys import stderr
 
-from interface import Interface
+from interface import Interface, Target
 
 KEY_ENTER = 10
 KEY_BACKSPACE = 127
@@ -16,6 +18,11 @@ KEY_BACKSPACE = 127
 CURSES_QUEUE = queue.Queue()
 CURSES_OUTPUT_QUEUE = queue.Queue(1)
 CURSES_SHUTDOWN = threading.Event()
+
+class Colors(Enum):
+  DEFAULT = -1
+  TITLE = 1
+  ERROR = 2
 
 def curses_queue_thread_fn():
   while not CURSES_SHUTDOWN.is_set():
@@ -29,7 +36,6 @@ def curses_queue_thread_fn():
       except KeyError:
         pass
 
-      # print('FN received', fn, args, kwargs, file=stderr)
       if kwargs == {}:
         response = fn(*args)
       else:
@@ -64,41 +70,52 @@ class WindowRegistry:
       self.windows[window].refresh()
 
 class BorderWindow:
-  def __init__(self, title, height, width, y, x, screen, scrolling=True):
+  def __init__(
+      self, 
+      title: str, 
+      height: int, 
+      width: int, 
+      y: int, 
+      x: int, 
+      screen: curses.window, 
+      scrolling=True
+    ):
     self.height = height
-    self.scroll_height = height-3
+    self.scroll_height = height-1
     self.width = width
     self.y = y
     self.x = x
     self.title = title
+    self.subtitle = ''
     self.screen = screen
-    
-    self.b_win = curses.newwin(
-      height, width, y, x
-    )
 
-    self.win = self.b_win.subwin(height-2, width-4, y+1, x+2)
-
-    self.b_win.border()
-    self.b_win.addstr(0, 2, f' {title} ')
-
+    self.win = screen.subwin(height, width, y, x)
+    self.set_title()
+  
     if (scrolling):
       self.win.scrollok(True)
-      self.win.setscrreg(0, self.scroll_height)
+      self.win.setscrreg(1, self.scroll_height)
+
+  def set_title(self, title = '', subtitle = '', color=Colors.TITLE.value):
+    if (title != ''):
+      self.title=title
+
+    if (subtitle != ''):
+      self.subtitle=title
+
+    title_str = f'  {self.title} {self.subtitle}  '
+    title_str += ' ' * (self.width - len(title_str))
+
+    _curses(self.win.addstr, 0, 0, title_str, curses.color_pair(color))
+    self.refresh()
 
   def refresh(self):
-    # self.screen.refresh()
-    # self.b_win.refresh()
-    # self.win.refresh()
-    _curses(self.b_win.refresh)
     _curses(self.win.refresh)
 
   def print(self, str='', end='\n'):
     if end is None: end = ''
     _curses(self.win.addstr, self.scroll_height, 0, f'{str}{end}')
     _curses(self.win.refresh)
-    # self.win.addstr(self.scroll_height, 0, f'{str}{end}')
-    # self.win.refresh()
 
 class CursesInterface(Interface):
   def __init__(self):
@@ -114,29 +131,28 @@ class CursesInterface(Interface):
   def __enter__(self):
     # Curses init
     self.screen = curses.initscr()
+    curses.start_color()
+    curses.use_default_colors()
+    curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
     curses.noecho()
     curses.cbreak()
     self.screen.keypad(True)
     self.screen.refresh()
+
+    self.curses_thread = threading.Thread(target=curses_queue_thread_fn)
+    self.curses_thread.start()
+
     self.window_setup()
 
-    try:
-      self.input_thread = threading.Thread(target=self.input_thread_fn)
-      self.input_thread.start()
-      self.curses_thread = threading.Thread(target=curses_queue_thread_fn)
-      self.curses_thread.start()
-
-    except KeyboardInterrupt:
-      self.shutdown.set()
+    self.input_thread = threading.Thread(target=self.input_thread_fn)
+    self.input_thread.start()
 
     return self
 
   def __exit__(self, *args):
-    self.screen.keypad(False)
     curses.nocbreak()
     curses.echo()
     curses.endwin()
-    # print('Succesfully cleaned up curses')
 
   def input_thread_fn(self):
     self.screen.refresh()
@@ -148,7 +164,7 @@ class CursesInterface(Interface):
         prompt = self.input_queue.get()
         input_complete = False
         input_str = ''
-        self.print_input(prompt, end=None)
+        self.print(prompt, target=Target.INPUT, end=None)
         _, start_x = self.input_w.win.getyx()
         while not input_complete:
           k = _curses_response(self.input_w.win.getch)
@@ -193,7 +209,6 @@ class CursesInterface(Interface):
             else:
               print('Unknown key', k, file=stderr)
 
-            # print('k:', k, 'y:', y, 'x:', x, file=stderr)
             _curses(self.input_w.win.move, y, x)
             _curses(self.input_w.refresh)
 
@@ -204,11 +219,8 @@ class CursesInterface(Interface):
   def window_setup(self):
     # Window set up
     input_section_height = 20
-    status_section_height = 5
-    fg_section_height = int(floor((curses.LINES - 1 - status_section_height - input_section_height) * (1/2)))
-    bg_section_height = curses.LINES - 1 - input_section_height - status_section_height - fg_section_height
-    # task_section_width = int(floor(curses.COLS) / 4)
-    # bg_section_width = curses.COLS - task_section_width
+    fg_section_height = int(floor((curses.LINES - 1 - input_section_height) * (2/3)))
+    bg_section_height = curses.LINES - 1 - input_section_height - fg_section_height
 
     self.sort_w = BorderWindow(
       'RSync and Sorting',
@@ -218,14 +230,6 @@ class CursesInterface(Interface):
     )
     self.sort_w.refresh()
 
-    # self.task_w = BorderWindow(
-    #   'Tasks',
-    #   bg_section_height, task_section_width,
-    #   0, bg_section_width,
-    #   self.screen
-    # )
-    # self.task_w.refresh()
-
     self.mkv_w = BorderWindow(
       'MakeMKVCon',
       fg_section_height, curses.COLS,
@@ -234,18 +238,10 @@ class CursesInterface(Interface):
     )
     self.mkv_w.refresh()
 
-    self.status_w = BorderWindow(
-      'Status',
-      status_section_height, curses.COLS,
-      fg_section_height + bg_section_height, 0,
-      self.screen,
-    )
-    self.status_w.refresh()
-
     self.input_w = BorderWindow(
       'Input',
       input_section_height, curses.COLS,
-      fg_section_height + bg_section_height + status_section_height, 0,
+      fg_section_height + bg_section_height, 0,
       self.screen
     )
     self.input_w.refresh()
@@ -292,21 +288,43 @@ class CursesInterface(Interface):
 
     return [text, sep, end]
 
-  def print_status(self, *text: list[str], sep=' ', end='\n'):
-    text, sep, end = self.sanitize_print(text, sep, end)
-    self.status_w.print(sep.join(text), end=end)
+  def get_window(self, target: Target) -> BorderWindow:
+    match target:
+      case Target.MKV:
+        return self.mkv_w
+      case Target.SORT: 
+        return self.sort_w
+      case Target.STATUS: # Deprecated
+        return None
+      case Target.INPUT:
+        return self.input_w
+      case _:
+        raise self.input_w
 
-  def print_mkv(self, *text: list[str], sep=' ', end='\n'):
-    text, sep, end = self.sanitize_print(text, sep, end)
-    self.mkv_w.print(sep.join(text), end=end)
+  def title(
+      self,
+      *text: list[str],
+      target: Target = Target.INPUT,
+      sep = ' | ',
+  ):
+    text, sep, _ = self.sanitize_print(text, sep, None)
+    target_window = self.get_window(target)
+    if target_window:
+      target_window.set_title('- ' + sep.join(text))
 
-  def print_input(self, *text: list[str], sep=' ', end='\n'):
-    text, sep, end = self.sanitize_print(text, sep, end)
-    self.input_w.print(sep.join([s if s is not None else '' for s in text]), end=end)
-
-  def print_sort(self, *text: list[str], sep=' ', end='\n'):
-    text, sep, end = self.sanitize_print(text, sep, end)
-    self.sort_w.print(sep.join(text), end=end)
+  def print(
+      self, 
+      *text: list[str], 
+      target: str = None, 
+      sep=' ', 
+      end='\n', 
+      **kwargs
+  ):
+    if target != 'status':
+      text, sep, end = self.sanitize_print(text, sep, end)
+      target_window = self.get_window(target)
+      if target_window:
+        target_window.print(sep.join(text), end=end)
 
   def get_input(
       self, 

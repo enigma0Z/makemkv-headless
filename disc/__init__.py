@@ -16,7 +16,7 @@ def wait_for_disc_inserted(
     interface=PlaintextInterface()
   ):
   if not disc_inserted(source):
-    interface.print_mkv(f'Please insert a disc into {source}')
+    interface.print(f'Please insert a disc into {source}', target='input')
     notify(f'Please insert a disc into {source}')
   while not disc_inserted(source):
     time.sleep(1)
@@ -26,10 +26,8 @@ def eject_disc(
     interface=PlaintextInterface()
   ):
   if (source.startswith('disc') or source.startswith('dev')):
-    interface.print_mkv("Ejecting Disc")
+    interface.print("Ejecting Disc", target='input')
     while(disc_inserted(source)):
       time.sleep(1)
       os.popen(shlex.join([ 'drutil', 'eject' ]))
       os.popen(shlex.join([ 'diskutil', 'eject', source ]))
-    else:
-      interface.print_mkv('Disc already ejected')
