@@ -18,18 +18,30 @@ def interactive_rip(
     source, dest_dir,
     source_path: str = None,
     interface: Interface = PlaintextInterface(),
+    **kwargs
   ):
-  media_choices = ['Blu-Ray', 'DVD']
+  library_choices = ['kids', 'main']
+  library_choices_casefold = [choice.casefold() for choice in library_choices]
+  library = 'main'
+
+  media_choices = ['blu-ray', 'dvd']
   media_choices_casefold = [choice.casefold() for choice in media_choices]
   media = None
 
-  content_choices = ['Show', 'Movie']
+  content_choices = ['show', 'movie']
   content_choices_casefold = [choice.casefold() for choice in content_choices]
   content = None
 
   rip_args = {}
 
   while True:
+    library = interface.get_input(
+      'Should this go into the Main or Kids library?', 
+      library, 
+      lambda v: 
+        v.casefold() in [choice.casefold() for choice in library_choices_casefold]
+    )
+
     media = interface.get_input(
       'Is this Blu-Ray or DVD?', 
       media, 
@@ -52,13 +64,14 @@ def interactive_rip(
     if (content != old_content):
       rip_args = {}
 
-    new_dest_dir = os.path.join(dest_dir, media, 'Main', content + 's')
+    new_dest_dir = os.path.join(dest_dir, library, content + 's', media)
     interface.print(new_dest_dir, target='input')
 
     if content.casefold() == 'show':
       rip_args = rip_show_interactive(
         source, 
         new_dest_dir, 
+        **kwargs,
         **rip_args, 
         batch=False, 
         source_path=source_path,
@@ -69,6 +82,7 @@ def interactive_rip(
       rip_args = rip_movie_interactive(
         source, 
         new_dest_dir, 
+        **kwargs,
         **rip_args, 
         batch=False,
         interface=interface
@@ -89,6 +103,7 @@ if __name__=='__main__':
   parser.add_argument('--skip-split', action='store_true')
   parser.add_argument('--source-path', action='store')
   parser.add_argument('--curses', action='store_true')
+  parser.add_argument('--temp-prefix', action='store', default=None)
 
   opts = parser.parse_args(sys.argv[1:])
 
@@ -116,17 +131,18 @@ if __name__=='__main__':
         opts.dest_dir, 
         source_path=opts.source_path,
         interface=interface,
+        temp_prefix=opts.temp_prefix
       )
   elif opts.mode.startswith('movie'):
     if opts.batch:
-      rip_movie_interactive(opts.source, opts.dest_dir, batch=True)
+      rip_movie_interactive(opts.source, opts.dest_dir, batch=True, temp_prefix=opts.temp_prefix)
     else:
-      rip_movie_interactive(opts.source, opts.dest_dir, batch=False)
+      rip_movie_interactive(opts.source, opts.dest_dir, batch=False, temp_prefix=opts.temp_prefix)
   elif opts.mode.startswith('show'):
     if opts.batch:
-      rip_show_interactive(opts.source, opts.dest_dir, batch=True)
+      rip_show_interactive(opts.source, opts.dest_dir, batch=True, temp_prefix=opts.temp_prefix)
     else:
       # TODO: If params provided to rip show immediately do it
       # Need source, dest, episode indexes, extras indexes, show name, season number, first ep, tmdb id
       # Else rip a single disc (i.e. not batch mode) interactively
-      rip_show_interactive(opts.source, opts.dest_dir, batch=False)
+      rip_show_interactive(opts.source, opts.dest_dir, batch=False, temp_prefix=opts.temp_prefix)
