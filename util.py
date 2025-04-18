@@ -54,15 +54,18 @@ def rsync(source, dest, interface=PlaintextInterface()):
       line = b_line.decode('utf-8').strip()
       
       interface.print(line, target='sort')
+    
+    stderr_lines = process.stderr.readlines()
 
   if process.returncode == 0:
     line = f'rsync completed successfully for {os.path.split(source)[-1]}'
     interface.print(line, target='sort')
   else:
-    line = f'RSYNC FAILED FOR {dest}'
+    line = f'RSYNC FAILED FOR {dest} with return code {process.returncode}'
     interface.print(line, target='sort')
 
-    for line in process.stderr.readlines():
+    for line in stderr_lines:
+      line.strip()
       interface.print(line, target='sort')
 
 def sanitize(value: str): # Strips out non alphanumeric characters and replaces with "_"
@@ -75,27 +78,37 @@ def string_to_list_int(_input):
   elif (type(_input) is None):
     return []
 
-  new_list = [
+  token_list = [
     v 
     for v 
     in re.sub(r'[^,\d-]', '', _input).split(',')
     if v != ''
   ]
 
-  for index, value in enumerate(new_list):
+  output_list = []
+
+  for index, value in enumerate(token_list):
     if type(value) is int:
       pass
 
     elif '-' in value:
       start, end = [int(v) for v in value.split('-')]
-      new_list.remove(value)
-      for inner_index, value in enumerate(range(start, end + 1)):
-        new_list.insert(index + inner_index, int(value))
+      new_list = []
+
+      if start <= end:
+        for value in range(start, end + 1):
+          new_list.append(int(value))
+      else:
+        for value in reversed(range(end, start + 1)):
+          new_list.append(int(value))
+
+      output_list.extend(new_list)
     
     else:
-      new_list[index] = int(value)
+      output_list.append(int(value))
 
-  return new_list
+  return output_list
+
 
 def input_with_default(
     prompt, 
