@@ -96,7 +96,6 @@ def rip_movie(
             sys.exit(256)
 
       if features.DO_COPY:
-        os.makedirs(dest_path, exist_ok=True)
         rsync(rip_path, dest_path, interface=interface)
     finally:
       if features.DO_CLEANUP:

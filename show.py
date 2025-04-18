@@ -141,7 +141,6 @@ def rip_show(
             sys.exit(256)
 
       if features.DO_COPY:
-        os.makedirs(dest_season_path, exist_ok=True)
         rsync(os.path.join(rip_path), dest_path, interface=interface)
 
     finally:
