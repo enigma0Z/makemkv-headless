@@ -25,7 +25,8 @@ def rip_movie(
     id: str,
     id_key="tmdbid",
     rip_all=False,
-    interface: Interface = PlaintextInterface()
+    interface: Interface = PlaintextInterface(),
+    temp_prefix: str = None,
   ):
   '''
   `<dir>/<movie_name>/Season <season_number>/<movie_name> S<season_number>E<episode_number>.mkv`
@@ -37,7 +38,7 @@ def rip_movie(
 
   # Set rip dir to a temporary file location for extraction to enable more
   # stable rips when the destination is a network location
-  temp_dir = tempfile.mkdtemp()
+  temp_dir = tempfile.mkdtemp(prefix=temp_prefix)
   rip_path = os.path.join(temp_dir, movie_name_with_id)
 
   os.makedirs(os.path.join(
@@ -59,49 +60,50 @@ def rip_movie(
       rip_disc(source, rip_path, rip_titles=extras_indexes, interface=interface)
 
   def sorting_thread():
-    failed_titles = []
-    if features.DO_SORT:
-      for index in main_indexes:
-        title = toc.source.titles[int(index)]
-        try:
-          os.rename(
-            os.path.join(rip_path, title.filename), 
-            os.path.join(rip_path, f"{movie_name_with_id} - {index}.mkv")
-          )
-        except FileNotFoundError as ex:
-          failed_titles.append(title)
+    try:
+      failed_titles = []
+      if features.DO_SORT:
+        for index in main_indexes:
+          title = toc.source.titles[int(index)]
+          try:
+            os.rename(
+              os.path.join(rip_path, title.filename), 
+              os.path.join(rip_path, f"{movie_name_with_id} - {index}.mkv")
+            )
+          except FileNotFoundError as ex:
+            failed_titles.append(title)
 
-      for index in extras_indexes:
-        title = toc.source.titles[int(index)]
-        try:
-          os.rename(
-            os.path.join(rip_path, title.filename), 
-            os.path.join(rip_path, 'extras', title.filename)
-          )
-        except FileNotFoundError as ex:
-          failed_titles.append(title)
+        for index in extras_indexes:
+          title = toc.source.titles[int(index)]
+          try:
+            os.rename(
+              os.path.join(rip_path, title.filename), 
+              os.path.join(rip_path, 'extras', title.filename)
+            )
+          except FileNotFoundError as ex:
+            failed_titles.append(title)
 
-      if len(failed_titles) > 0:
-        interface.print("Some failed to rip or copy", target='sort')
-        interface.print_sort()
-        for title in failed_titles:
-          interface.print(f'{title.index}: {title.filename}, {title.runtime}', target='sort')
-        interface.print("press Enter to continue or Ctrl-C to cancel", target='sort')
-        try:
-          interface.get_input()
-        except KeyboardInterrupt:
-          interface.print("Quitting...", target='input')
-          sys.exit(256)
+        if len(failed_titles) > 0:
+          interface.print("Some failed to rip or copy", target='sort')
+          interface.print_sort()
+          for title in failed_titles:
+            interface.print(f'{title.index}: {title.filename}, {title.runtime}', target='sort')
+          interface.print("press Enter to continue or Ctrl-C to cancel", target='sort')
+          try:
+            interface.get_input()
+          except KeyboardInterrupt:
+            interface.print("Quitting...", target='input')
+            sys.exit(256)
 
-    if features.DO_COPY:
-      os.makedirs(dest_path, exist_ok=True)
-      rsync(rip_path, dest_path, interface=interface)
-
-    if features.DO_CLEANUP:
-      interface.print(f"Cleaning up {temp_dir}", target='sort')
-      shutil.rmtree(temp_dir)
-    else:
-      interface.print(f"Leaving rip source at {temp_dir}", target='sort')
+      if features.DO_COPY:
+        os.makedirs(dest_path, exist_ok=True)
+        rsync(rip_path, dest_path, interface=interface)
+    finally:
+      if features.DO_CLEANUP:
+        interface.print(f"Cleaning up {temp_dir}", target='sort')
+        shutil.rmtree(temp_dir)
+      else:
+        interface.print(f"Leaving rip source at {temp_dir}", target='sort')
 
   threading.Thread(target=sorting_thread).start()
 
@@ -114,6 +116,8 @@ def rip_movie_interactive(
     interface: Interface = PlaintextInterface(),
     **kwargs
   ):
+  print(kwargs, file=sys.stderr)
+
   movie_name = None
   id = None
   main_indexes = None
@@ -136,14 +140,15 @@ def rip_movie_interactive(
     results = tmdb.search('movie', movie_name)
     if (id is None and len(results) > 0):
       id = results[0].id
-      for result in results:
+      interface.print(f'\nSearch results for "{movie_name}":', target='input')
+      interface.print(f'\nBest Match:\n{results[0]}', target='input')
+      interface.print(f'\nAdditional Results:', target='input')
+      for result in results[1:9]:
         interface.print(result, target='input')
       
-      interface.print(f'These came up when searching for "{movie_name}" on TMDB and the first was auto-selected.', target='input')
-      interface.print(f'Verify at the link above or input the correct ID.', target='input')
     else:
       interface.print('Pre-selected ID', id, target='input')
-      interface.print('Number of results', len(results, target='input'))
+      interface.print('Number of results', len(results), target='input')
       for result in results:
         interface.print(result, target='input')
 
@@ -199,6 +204,7 @@ def rip_movie_interactive(
       id_key,
       rip_all=rip_all,
       interface=interface,
+      temp_prefix=kwargs['temp_prefix']
     )
 
     if not batch: break
