@@ -101,9 +101,9 @@ class BorderWindow:
       self.title=title
 
     if (subtitle != ''):
-      self.subtitle=title
+      self.subtitle=subtitle
 
-    title_str = f'  {self.title} {self.subtitle}  '
+    title_str = f'  {self.title} - {self.subtitle}  '
     title_str += ' ' * (self.width - len(title_str))
 
     _curses(self.win.addstr, 0, 0, title_str, curses.color_pair(color))
@@ -165,7 +165,7 @@ class CursesInterface(Interface):
         input_complete = False
         input_str = ''
         self.print(prompt, target=Target.INPUT, end=None)
-        _, start_x = self.input_w.win.getyx()
+        _, start_x = _curses_response(self.input_w.win.getyx)
         while not input_complete:
           k = _curses_response(self.input_w.win.getch)
           if k > -1:
@@ -310,7 +310,7 @@ class CursesInterface(Interface):
     text, sep, _ = self.sanitize_print(text, sep, None)
     target_window = self.get_window(target)
     if target_window:
-      target_window.set_title('- ' + sep.join(text))
+      target_window.set_title(subtitle=sep.join(text))
 
   def print(
       self, 
