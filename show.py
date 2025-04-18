@@ -14,7 +14,9 @@ from makemkv import rip_disc
 from mkvtoolnix import split_mkv
 import tmdb
 from toc import TOC
-from util import rsync, sanitize, string_to_list_int
+from util import hms_to_seconds, rsync, sanitize, string_to_list_int
+
+EPISODE_LENGTH_TOLERANCE = 90
 
 def rip_show(
     source: str, 
@@ -30,7 +32,8 @@ def rip_show(
     rip_all=False,
     split_segments=None,
     source_path=None,
-    interface: Interface = PlaintextInterface()
+    interface: Interface = PlaintextInterface(),
+    temp_prefix: str = None,
   ):
   '''
   `<dir>/<show_name>/Season <season_number>/<show_name> S<season_number>E<episode_number>.mkv`
@@ -46,7 +49,7 @@ def rip_show(
   # Set rip dir to a temporary file location for extraction to enable more
   # stable rips when the destination is a network location
   if (source_path is None):
-    temp_dir = tempfile.mkdtemp()
+    temp_dir = tempfile.mkdtemp(prefix=temp_prefix)
     rip_path = os.path.join(temp_dir, show_name_with_id)
   else:
     interface.print("Setting temp dir to provided source path", target='mkv')
@@ -77,7 +80,13 @@ def rip_show(
     try:
       failed_titles = []
       if features.DO_SORT:
-        for i, index in enumerate(episode_indexes):
+        episode_number = first_ep
+        # episode_indexes refers to the title number on the disk.  This may be
+        # title 02, 03, 04, 05, 08, etc... for a set of sequential episodes.
+        # Enumerating here transforms this unordered non-sequential list into a
+        # sequential list of integers, which is why we discard title here in
+        # favor of _index_
+        for title_number, index in enumerate(episode_indexes):
           title = toc.source.titles[int(index)]
           if split_segments:
             if features.DO_SPLIT:
@@ -91,8 +100,9 @@ def rip_show(
               try:
                   os.rename(
                     os.path.join(rip_path, f'split-{segment_index+1}.mkv'),
-                    os.path.join(rip_path, season_dir, f"{show_name} S{season_number:02d}E{segment_index+first_ep:02d}.mkv")
+                    os.path.join(rip_path, season_dir, f"{show_name} S{season_number:04d}E{episode_number:04d}.mkv")
                   )
+                  episode_number += 1
               except FileNotFoundError as ex:
                 interface.print('Failed to rename segment', segment_index, target='sort')
                 interface.print(ex, target='sort')
@@ -103,8 +113,9 @@ def rip_show(
             try:
               os.rename(
                 os.path.join(rip_path, title.filename), 
-                os.path.join(rip_path, season_dir, f"{show_name} S{season_number:02d}E{i+first_ep:02d}.mkv")
+                os.path.join(rip_path, season_dir, f"{show_name} S{season_number:02d}E{episode_number:02d}.mkv")
               )
+              episode_number += 1
             except FileNotFoundError as ex:
               failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}\n{ex}')
 
@@ -113,14 +124,13 @@ def rip_show(
           try:
             os.rename(
               os.path.join(rip_path, title.filename), 
-              os.path.join(rip_path, season_dir, 'extras', title.filename)
+              os.path.join(rip_path, season_dir, 'extras', f'{toc.source.name} - {title.filename}')
             )
           except FileNotFoundError as ex:
             failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}\n{ex}')
 
         if len(failed_titles) > 0:
           interface.print("Some shows failed to rip or copy", target='sort')
-          interface.print_sort()
           for title in failed_titles:
             print(title, file=sys.stderr)
             interface.print(title, target='sort')
@@ -162,12 +172,9 @@ def rip_show_interactive(
   ):
 
   interface.print('Source Path', source_path, target='input')
+  next_first_ep = first_ep
 
   while True:
-    # Reset per loop
-    first_ep = None 
-    extras_indexes = None
-
     wait_for_disc_inserted(source, interface)
     toc = TOC(interface=interface)
 
@@ -180,11 +187,12 @@ def rip_show_interactive(
     results = tmdb.search('tv', show_name)
     if (id is None and len(results) > 0):
       id = results[0].id
-      for result in results:
+      interface.print(f'\nSearch results for "{show_name}":', target='input')
+      interface.print(f'\nBest Match:\n{results[0]}', target='input')
+      interface.print(f'\nAdditional Results:', target='input')
+      for result in results[1:9]:
         interface.print(result, target='input')
       
-      interface.print(f'These came up when searching for "{show_name}" on TMDB and the first was auto-selected.', target='input')
-      interface.print(f'Verify at the link above or input the correct ID.', target='input')
     else:
       interface.print('Pre-selected ID', id, target='input')
       interface.print('Number of results', len(results), target='input')
@@ -193,7 +201,7 @@ def rip_show_interactive(
 
     id = interface.get_input(f'What is the {id_key} of this show?', id)
     season_number = int(interface.get_input(f'What season is this disc?', season_number))
-    first_ep = int(interface.get_input(f'What is the first episode number on this disc?', first_ep))
+    first_ep = int(interface.get_input(f'What is the first episode number on this disc?', next_first_ep))
 
     interface.print('Waiting for TOC read to complete...', target='status')
     interface.title('Waiting for TOC read to complete...', target=Target.MKV)
@@ -207,14 +215,34 @@ def rip_show_interactive(
       for title in toc.source.titles
     ]
 
+    sorted_titles = sorted(
+      toc.source.titles, 
+      key=lambda title: hms_to_seconds(title.runtime),
+      reverse=True
+    )
+
+    # Catcher for if there's one long title with all the eps
+    for i in range(0, 2):
+      episode_indexes = [
+        title.index
+        for title in toc.source.titles
+        if hms_to_seconds(title.runtime) > hms_to_seconds(sorted_titles[i].runtime) - EPISODE_LENGTH_TOLERANCE
+        and hms_to_seconds(title.runtime) < hms_to_seconds(sorted_titles[i].runtime) + EPISODE_LENGTH_TOLERANCE
+      ]
+
+      try:
+        if len(episode_indexes) > 1: break # Break if we found more than one ep
+      except TypeError:
+        pass # TypeError if len() fails
+
     episode_indexes = interface.get_input("Which titles are episodes?", value=episode_indexes)
     episode_indexes = string_to_list_int(episode_indexes)
 
     if len(episode_indexes) == 1:
       selected_title = toc.source.titles[episode_indexes[0]]
-      interface.print(f'Segments: {selected_title.segments} Chapters: {selected_title.chapters}', target='mkv')
+      interface.print(f'Segments: {selected_title.segments} Chapters: {selected_title.chapters}', target='input')
       split_segments = interface.get_input(
-        f"Only one title was selected, should this be split by segment ({selected_title.segments} total)?",
+        f"Should this be split by chapter or segment?",
         split_segments,
         lambda v: 
           v.casefold() in ['true', 'false', 'yes', 'no', 'y', 'n']
@@ -239,7 +267,10 @@ def rip_show_interactive(
         # We then take all but the last index of the result since the last start point will be a chapter that does not exist
         split_segments = [v + chapters_per_segment + 1 for v in range(0, chapter_count, chapters_per_segment)][0:-1]
         interface.print('Will split at chapters', split_segments, target='mkv')
+        next_first_ep = first_ep + len(split_segments) + 1
     else: 
+      next_first_ep = first_ep + len(episode_indexes)
+      interface.print('The next first episode will be', next_first_ep, target=Target.INPUT)
       split_segments = False
 
     extras_indexes = [
@@ -273,6 +304,7 @@ def rip_show_interactive(
       split_segments=split_segments,
       source_path=source_path,
       interface=interface,
+      **kwargs,
     )
 
     if not batch: break
@@ -280,7 +312,7 @@ def rip_show_interactive(
   return { # Pass provided options back for batch processing
     'show_name': show_name,
     'season_number': season_number,
-    'first_ep': None,
+    'first_ep': next_first_ep,
     'id': id,
     'id_key': id_key,
     'episode_indexes': None,
