@@ -5,14 +5,12 @@ import signal
 import sys
 
 from argparse import ArgumentParser
-from curses_interface import CursesInterface
-from interface import Interface, PlaintextInterface
-from movie import rip_movie_interactive
-from show import rip_show_interactive
+from api.curses_interface import CursesInterface
+from api.interface import Interface, PlaintextInterface
+from api.movie import rip_movie_interactive
+from api.show import rip_show_interactive
 
-import features
-
-from util import input_with_default
+import api.features as features
 
 def interactive_rip(
     source, dest_dir,
