@@ -3,11 +3,10 @@
 from math import trunc
 import os
 import re
-import shlex
 import shutil
 import subprocess
 
-from interface import PlaintextInterface
+from .interface import PlaintextInterface
 
 def grep(term, lines):
   return True in [ term.casefold() in line.casefold() for line in lines ]

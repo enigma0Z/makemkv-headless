@@ -6,10 +6,8 @@ import shlex
 import subprocess
 from sys import stderr
 
-from disc import wait_for_disc_inserted
-from interface import PlaintextInterface
-from makemkv import MAKEMKVCON # TODO: move dependend functionality into makemkv module
-from util import notify
+from .interface import PlaintextInterface
+from .makemkv import MAKEMKVCON # TODO: move dependend functionality into makemkv module
 
 class BaseInfo:
   '''
