@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from _TOKEN import BEARER_TOKEN
+from api._TOKEN import BEARER_TOKEN
 from typing import Any
 import requests
 

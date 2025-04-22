@@ -7,7 +7,7 @@ import shlex
 import shutil
 import subprocess
 
-from interface import PlaintextInterface
+from api.interface import PlaintextInterface
 
 def grep(term, lines):
   return True in [ term.casefold() in line.casefold() for line in lines ]

@@ -3,7 +3,9 @@
 from abc import ABC, abstractmethod
 from enum import StrEnum, auto, unique
 from shutil import get_terminal_size
-from typing import Callable
+from typing import Any, Callable
+
+from json import dumps, loads
 
 @unique
 class Target(StrEnum):
@@ -12,8 +14,42 @@ class Target(StrEnum):
   INPUT = auto()
   STATUS = auto()
 
-class Interface(ABC):
+class BaseMessage():
+  @staticmethod
+  def from_json(json_str: str):
+    return BaseMessage(**loads(json_str))
 
+  def __init__(self, **data):
+    assert "target" in data
+    self.data = data
+    self.data['type'] = type(self).__name__
+
+  def __setattr__(self, name, value):
+    self.data[name] = value
+
+  def __getattr__(self, name):
+    return self.data.get(name)
+
+  def to_json(self):
+    return dumps(self.data)
+
+class Message(BaseMessage):
+  def __init__(self, *text, sep=' ', end="\n", **data):
+    if len(text) > 0:
+      assert "text" not in data
+      data['text'] = sep.join(text) + end
+    else:
+      assert "text" in data
+
+    super().__init__(**data)
+    
+class ProgressMessage(BaseMessage):
+  def __init__(self, **data):
+    assert "total" in data
+    assert "current" in data
+    super().__init__(**data)
+
+class Interface(ABC):
   @abstractmethod
   def __enter__(self, *args, **kwargs):
     return self
@@ -70,13 +106,12 @@ class PlaintextInterface(Interface):
 
   def print(
       self, 
-      *text, 
-      target=Target.INPUT,
-      sep=' ', 
-      end='\n', 
-      **kwargs
+      message: BaseMessage
   ):
-    match target:
+    if message.sep == None: message.sep = ' '
+    if message.end == None: message.end = '\n'
+
+    match message.target:
       # case Target.INPUT: 
       #   self.move_cursor_up(3)
       case Target.MKV:
@@ -86,8 +121,8 @@ class PlaintextInterface(Interface):
         self.move_cursor_up(3)
         end += '\n'*2
       
-    print(*text, sep=sep, end=end)
-
+    print(message.text, sep=message.sep, end=message.end)
+  
   def get_input(
       self,
       prompt: str, 

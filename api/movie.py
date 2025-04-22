@@ -6,14 +6,15 @@ import sys
 import tempfile
 import threading
 
-import features
+import api.features as features
+import api.tmdb as tmdb
 
-from disc import eject_disc, wait_for_disc_inserted
-from interface import Interface, PlaintextInterface, Target
-from makemkv import rip_disc
-import tmdb
-from toc import TOC
-from util import hms_to_seconds, rsync, sanitize, string_to_list_int
+from api.disc import eject_disc, wait_for_disc_inserted
+from api.interface import Interface, Message, PlaintextInterface, Target
+from api.makemkv import rip_disc
+
+from api.toc import TOC
+from api.util import hms_to_seconds, rsync, sanitize, string_to_list_int
 
 def rip_movie(
     source: str, 
@@ -47,8 +48,8 @@ def rip_movie(
   ), exist_ok=True)
 
   if features.DO_RIP:
-    interface.print(f"These titles will be given the source name of {movie_name_with_id}", target='sort')
-    interface.print(f"and copied to {dest_path}/{movie_name_with_id}/{movie_name_with_id}.mkv", target='sort')
+    interface.print(Message(f"These titles will be given the source name of {movie_name_with_id}", target='sort'))
+    interface.print(Message(f"and copied to {dest_path}/{movie_name_with_id}/{movie_name_with_id}.mkv", target='sort'))
 
     with open(os.path.join(rip_path, f'{toc.source.name}-makemkvcon.txt'), 'w') as file:
       file.writelines(toc.lines)
@@ -84,25 +85,25 @@ def rip_movie(
             failed_titles.append(title)
 
         if len(failed_titles) > 0:
-          interface.print("Some failed to rip or copy", target='sort')
+          interface.print(Message("Some failed to rip or copy", target='sort'))
           interface.print_sort()
           for title in failed_titles:
-            interface.print(f'{title.index}: {title.filename}, {title.runtime}', target='sort')
-          interface.print("press Enter to continue or Ctrl-C to cancel", target='sort')
+            interface.print(Message(f'{title.index}: {title.filename}, {title.runtime}', target='sort'))
+          interface.print(Message("press Enter to continue or Ctrl-C to cancel", target='sort'))
           try:
             interface.get_input()
           except KeyboardInterrupt:
-            interface.print("Quitting...", target='input')
+            interface.print(Message("Quitting...", target='input'))
             sys.exit(256)
 
       if features.DO_COPY:
         rsync(rip_path, dest_path, interface=interface)
     finally:
       if features.DO_CLEANUP:
-        interface.print(f"Cleaning up {temp_dir}", target='sort')
+        interface.print(Message(f"Cleaning up {temp_dir}", target='sort'))
         shutil.rmtree(temp_dir)
       else:
-        interface.print(f"Leaving rip source at {temp_dir}", target='sort')
+        interface.print(Message(f"Leaving rip source at {temp_dir}", target='sort'))
 
   threading.Thread(target=sorting_thread).start()
 
@@ -131,7 +132,7 @@ def rip_movie_interactive(
 
     thread = threading.Thread(target=toc.get_from_disc, args=[source])
 
-    interface.print('Getting Disc Toc...', target='mkv')
+    interface.print(Message('Getting Disc Toc...', target='mkv'))
     thread.start()
 
     movie_name = interface.get_input('What is the name of this movie?', movie_name)
@@ -139,26 +140,26 @@ def rip_movie_interactive(
     results = tmdb.search('movie', movie_name)
     if (id is None and len(results) > 0):
       id = results[0].id
-      interface.print(f'\nSearch results for "{movie_name}":', target='input')
-      interface.print(f'\nBest Match:\n{results[0]}', target='input')
-      interface.print(f'\nAdditional Results:', target='input')
+      interface.print(Message(f'\nSearch results for "{movie_name}":', target='input'))
+      interface.print(Message(f'\nBest Match:\n{results[0]}', target='input'))
+      interface.print(Message(f'\nAdditional Results:', target='input'))
       for result in results[1:9]:
-        interface.print(result, target='input')
+        interface.print(Message(result, target='input'))
       
     else:
-      interface.print('Pre-selected ID', id, target='input')
-      interface.print('Number of results', len(results), target='input')
+      interface.print(Message('Pre-selected ID', id, target='input'))
+      interface.print(Message('Number of results', len(results), target='input'))
       for result in results:
-        interface.print(result, target='input')
+        interface.print(Message(result, target='input'))
 
     id = interface.get_input(f'What is the {id_key} of this movie?', id)
 
-    interface.print('Waiting for TOC read to complete...', target='status')
+    interface.print(Message('Waiting for TOC read to complete...', target='status'))
     interface.title('Waiting for TOC read to complete...', target=Target.MKV)
     thread.join()
 
-    interface.print("All Titles", target='mkv')
-    interface.print(toc.source, target='mkv')
+    interface.print(Message("All Titles", target='mkv'))
+    interface.print(Message(toc.source, target='mkv'))
 
     all_indexes = [
       title.index
@@ -187,10 +188,10 @@ def rip_movie_interactive(
 
     rip_all = False
     if(sorted(all_indexes) == sorted(main_indexes + extras_indexes)):
-      interface.print('Ripping all titles', target='mkv')
+      interface.print(Message('Ripping all titles', target='mkv'))
       rip_all = True
     else:
-      interface.print(f'Ripping main features {main_indexes} and extras {extras_indexes}', target='mkv')
+      interface.print(Message(f'Ripping main features {main_indexes} and extras {extras_indexes}', target='mkv'))
 
     rip_movie(
       source, 

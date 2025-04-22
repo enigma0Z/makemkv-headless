@@ -6,11 +6,13 @@ import sys
 
 from argparse import ArgumentParser
 from api.curses_interface import CursesInterface
-from api.interface import Interface, PlaintextInterface
+from api.interface import Interface, Message, PlaintextInterface, Target
 from api.movie import rip_movie_interactive
 from api.show import rip_show_interactive
 
 import api.features as features
+
+from api.rest_interface.rest_api import app
 
 def interactive_rip(
     source, dest_dir,
@@ -47,7 +49,7 @@ def interactive_rip(
         v.casefold() in [choice.casefold() for choice in media_choices_casefold]
     )
 
-    interface.print('Media:', media, target='input')
+    interface.print(Message(text=f'Media: {media}', target='input'))
 
     content = interface.get_input(
       'Is this a show or movie?', 
@@ -63,7 +65,7 @@ def interactive_rip(
       rip_args = {}
 
     new_dest_dir = os.path.join(dest_dir, library, content + 's', media)
-    interface.print(new_dest_dir, target='input')
+    interface.print(Message(text=new_dest_dir, target='input'))
 
     if content.casefold() == 'show':
       rip_args = rip_show_interactive(
@@ -88,8 +90,8 @@ def interactive_rip(
 
 if __name__=='__main__':
   parser = ArgumentParser()
-  parser.add_argument('source', default="disc:0")
-  parser.add_argument('dest_dir')
+  parser.add_argument('--source', default="disc:0")
+  parser.add_argument('--dest_dir')
   parser.add_argument('--mode', action='store')
   parser.add_argument('--batch', action='store_true')
   parser.add_argument('--imdbid', action='store', default=None)
@@ -102,6 +104,7 @@ if __name__=='__main__':
   parser.add_argument('--source-path', action='store')
   parser.add_argument('--curses', action='store_true')
   parser.add_argument('--temp-prefix', action='store', default=None)
+  parser.add_argument('--api', action='store_true')
 
   opts = parser.parse_args(sys.argv[1:])
 
@@ -111,7 +114,11 @@ if __name__=='__main__':
   features.DO_CLEANUP = not opts.skip_cleanup
   features.DO_SPLIT = not opts.skip_split
 
-  if not opts.curses:
+  if (opts.api): 
+    app.run()
+    exit(0)
+
+  elif not opts.curses:
     def sigint_handler(signal, frame):
       print('Press Ctrl-Z and kill job to cancel')
 

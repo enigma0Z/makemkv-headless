@@ -1,15 +1,11 @@
 #!usr/bin/env python3
 
-import os
 import re
-import shlex
 import subprocess
 from sys import stderr
 
-from disc import wait_for_disc_inserted
-from interface import PlaintextInterface
-from makemkv import MAKEMKVCON # TODO: move dependend functionality into makemkv module
-from util import notify
+from api.interface import PlaintextInterface
+from api.makemkv import MAKEMKVCON # TODO: move dependent functionality into makemkv module
 
 class BaseInfo:
   '''

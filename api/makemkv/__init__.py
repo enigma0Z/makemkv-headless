@@ -5,9 +5,9 @@ import shutil
 import subprocess
 from time import time
 
-from disc import wait_for_disc_inserted
-from interface import Interface, PlaintextInterface, Target
-from util import clearing_line, notify, seconds_to_hms
+from ..disc import wait_for_disc_inserted
+from ..interface import Interface, PlaintextInterface, Target
+from ..util import clearing_line, notify, seconds_to_hms
 
 MAKEMKVCON="/Applications/MakeMKV.app/Contents/MacOS/makemkvcon"
 
