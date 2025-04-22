@@ -23,10 +23,11 @@ def split_mkv(
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,
     preexec_fn=os.setpgrp
-  ) as process:
+  ) as process, open('mkvtoolnix.log', 'w') as log:
     for b_line in process.stdout:
       line = b_line.decode('UTF-8').strip()
       interface.print(line, target='sort')
+      print(line, file=log)
 
     process.wait()
 

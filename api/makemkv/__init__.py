@@ -44,7 +44,7 @@ def rip_disc(
       [ MAKEMKVCON, '--robot', '--progress=-same', 'mkv', source, rip_title, dest],
       stdout=subprocess.PIPE,
       stderr=subprocess.PIPE,
-    ) as process:
+    ) as process, open('makemkv.log', 'w') as log:
       width = shutil.get_terminal_size().columns
 
       current_title=None
@@ -61,6 +61,7 @@ def rip_disc(
 
       for b_line in process.stdout:
         line = b_line.decode().strip()
+        print(line, file=log)
 
         if line.startswith('PRGC'):
           current_title = line.split(':')[1].split(',')[2]
