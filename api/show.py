@@ -6,15 +6,16 @@ import sys
 import tempfile
 import threading
 
-import api.features as features
-import api.tmdb as tmdb
+from .disc import eject_disc, wait_for_disc_inserted
+from .interface import Interface, PlaintextInterface, Target
+from .makemkv import rip_disc
+from .mkvtoolnix import split_mkv
+from .toc import TOC
+from .util import hms_to_seconds, rsync, sanitize, string_to_list_int
 
-from api.disc import eject_disc, wait_for_disc_inserted
-from api.interface import Interface, PlaintextInterface, Target
-from api.makemkv import rip_disc
-from api.mkvtoolnix import split_mkv
-from api.toc import TOC
-from api.util import hms_to_seconds, rsync, sanitize, string_to_list_int
+from . import tmdb
+from . import features
+
 
 EPISODE_LENGTH_TOLERANCE = 90
 

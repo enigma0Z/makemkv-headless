@@ -3,11 +3,10 @@
 from math import trunc
 import os
 import re
-import shlex
 import shutil
 import subprocess
 
-from api.interface import PlaintextInterface
+from .interface import PlaintextInterface
 
 def grep(term, lines):
   return True in [ term.casefold() in line.casefold() for line in lines ]
@@ -49,17 +48,19 @@ def rsync(source, dest, interface=PlaintextInterface()):
     preexec_fn=os.setpgrp,
   )
 
-  with process:
+  with process, open('rsync.log', 'w') as log:
     for b_line in process.stdout:
       line = b_line.decode('utf-8').strip()
       
       interface.print(line, target='sort')
+      print(line, file=log)
     
     stderr_lines = process.stderr.readlines()
 
   if process.returncode == 0:
     line = f'rsync completed successfully for {os.path.split(source)[-1]}'
     interface.print(line, target='sort')
+    print(line, file=log)
   else:
     line = f'RSYNC FAILED FOR {dest} with return code {process.returncode}'
     interface.print(line, target='sort')
@@ -67,6 +68,7 @@ def rsync(source, dest, interface=PlaintextInterface()):
     for line in stderr_lines:
       line.strip()
       interface.print(line, target='sort')
+      print(line, file=log)
 
 def sanitize(value: str): # Strips out non alphanumeric characters and replaces with "_"
   return re.sub(r'[^\w]', '_', value.lower())

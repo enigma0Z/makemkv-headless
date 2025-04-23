@@ -3,7 +3,6 @@
 import curses
 from enum import Enum
 import queue
-import re
 import threading
 
 from curses import ascii
