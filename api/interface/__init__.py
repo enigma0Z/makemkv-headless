@@ -106,12 +106,13 @@ class PlaintextInterface(Interface):
 
   def print(
       self, 
-      message: BaseMessage
+      *text, 
+      target=Target.INPUT,
+      sep=' ', 
+      end='\n', 
+      **kwargs
   ):
-    if message.sep == None: message.sep = ' '
-    if message.end == None: message.end = '\n'
-
-    match message.target:
+    match target:
       # case Target.INPUT: 
       #   self.move_cursor_up(3)
       case Target.MKV:
@@ -121,8 +122,8 @@ class PlaintextInterface(Interface):
         self.move_cursor_up(3)
         end += '\n'*2
       
-    print(message.text, sep=message.sep, end=message.end)
-  
+    print(*text, sep=sep, end=end)
+
   def get_input(
       self,
       prompt: str, 
