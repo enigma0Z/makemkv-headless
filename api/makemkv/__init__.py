@@ -45,8 +45,6 @@ def rip_disc(
       stdout=subprocess.PIPE,
       stderr=subprocess.PIPE,
     ) as process, open('makemkv.log', 'w') as log:
-      width = shutil.get_terminal_size().columns
-
       current_title=None
       current_start = None
       current_elapsed = 0
