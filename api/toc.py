@@ -4,36 +4,8 @@ import re
 import subprocess
 from sys import stderr
 
-from .interface import PlaintextInterface
-from .makemkv import MAKEMKVCON # TODO: move dependend functionality into makemkv module
-
-class BaseInfo:
-  '''
-  Base metadata class.  Includes accessor for undefined attributes based on
-  static _field_lookup member provided by subclasses.  This enables the numeric
-  fields pulled from the disc to be referenced by name, such as CDATA field
-  "0,2" referring to the source name
-  '''
-  def __init__(self, records, k, l = 2):
-    self.fields = {}
-    for record in records:
-      index = ','.join(record[k:k+l])
-      value = ','.join(record[k+l:])
-      self.fields[index] = value
-  
-  def __getattr__(self, name: str):
-    if name == 'index': 
-      return self.fields['index']
-    else:
-      try:
-        return re.sub(
-          r'^"', '', re.sub(
-            r'"\n?$', '', self.fields[self._field_lookup[name]]
-          )
-        )
-      except Exception as ex:
-        print('Failed to look up', name, self.fields, file=stderr)
-        raise(ex)
+from interface import PlaintextInterface
+from makemkv import MAKEMKVCON # TODO: move dependend functionality into makemkv module
 
 class TOC:
   def __init__(self, interface=PlaintextInterface()):
@@ -90,6 +62,35 @@ class TOC:
 
     self.source.add_titles(records)
     self.source.add_tracks(records)
+
+class BaseInfo:
+  '''
+  Base metadata class.  Includes accessor for undefined attributes based on
+  static _field_lookup member provided by subclasses.  This enables the numeric
+  fields pulled from the disc to be referenced by name, such as CDATA field
+  "0,2" referring to the source name
+  '''
+  def __init__(self, records, k, l = 2):
+    self.fields = {}
+    for record in records:
+      index = ','.join(record[k:k+l])
+      value = ','.join(record[k+l:])
+      self.fields[index] = value
+  
+  def __getattr__(self, name: str):
+    if name == 'index': 
+      return self.fields['index']
+    else:
+      try:
+        return re.sub(
+          r'^"', '', re.sub(
+            r'"\n?$', '', self.fields[self._field_lookup[name]]
+          )
+        )
+      except Exception as ex:
+        print('Failed to look up', name, self.fields, file=stderr)
+        raise(ex)
+
 
 class SourceInfo (BaseInfo):
   '''

@@ -3,7 +3,7 @@
 import os
 import subprocess
 
-from ..interface import Interface, PlaintextInterface
+from interface import Interface, PlaintextInterface
 
 MKVMERGE='/opt/homebrew/bin/mkvmerge'
 

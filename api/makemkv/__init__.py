@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
 import re
-import shutil
 import subprocess
 from time import time
 
-from ..disc import wait_for_disc_inserted
-from ..interface import Interface, PlaintextInterface, Target
-from ..util import notify, seconds_to_hms
+from disc import wait_for_disc_inserted
+from interface import Interface, PlaintextInterface, ProgressMessage, Target
+from util import notify, seconds_to_hms
+
+import disc
+import util
 
 MAKEMKVCON="/Applications/MakeMKV.app/Contents/MacOS/makemkvcon"
 
@@ -111,6 +113,15 @@ def rip_disc(
             f'{current_pct*100:>6.2f}% {seconds_to_hms(current_elapsed)}s (~{seconds_to_hms(current_remaining)}s) - {current_title}'
 
           status_line = f'{total_title}, {current_title} - {total_pct*100:>6.2f}% ~{seconds_to_hms(total_remaining)}s / {current_pct*100:>6.2f}% ~{seconds_to_hms(current_remaining)}s'
+
+          interface.send(ProgressMessage(
+            total=total_pct,
+            total_elapsed=total_elapsed,
+            total_remaining=total_remaining,
+            current=current_pct,
+            current_elapsed=current_elapsed,
+            current_remaining=current_remaining
+          ))
 
           interface.print(total_line, current_line, sep='\n', target='status')
           interface.title(status_line, target=Target.MKV)

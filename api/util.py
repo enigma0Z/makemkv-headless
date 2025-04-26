@@ -6,7 +6,7 @@ import re
 import shutil
 import subprocess
 
-from .interface import PlaintextInterface
+from interface import PlaintextInterface, Message
 
 def grep(term, lines):
   return True in [ term.casefold() in line.casefold() for line in lines ]
@@ -34,7 +34,8 @@ def notify(message):
     stderr=subprocess.PIPE,
   )
 
-def clearing_line(line=''):
+def clearing_line(line=' '):
+  if len(line) == 0: line = ' '
   return line + ' ' * (-len(line) % shutil.get_terminal_size().columns)
 
 def rsync(source, dest, interface=PlaintextInterface()):
@@ -60,7 +61,6 @@ def rsync(source, dest, interface=PlaintextInterface()):
   if process.returncode == 0:
     line = f'rsync completed successfully for {os.path.split(source)[-1]}'
     interface.print(line, target='sort')
-    print(line, file=log)
   else:
     line = f'RSYNC FAILED FOR {dest} with return code {process.returncode}'
     interface.print(line, target='sort')
@@ -68,7 +68,6 @@ def rsync(source, dest, interface=PlaintextInterface()):
     for line in stderr_lines:
       line.strip()
       interface.print(line, target='sort')
-      print(line, file=log)
 
 def sanitize(value: str): # Strips out non alphanumeric characters and replaces with "_"
   return re.sub(r'[^\w]', '_', value.lower())

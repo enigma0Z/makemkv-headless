@@ -9,7 +9,7 @@ from curses import ascii
 from math import floor
 from sys import stderr
 
-from ..interface import Interface, Target
+from interface import Interface, Target
 
 KEY_ENTER = 10
 KEY_BACKSPACE = 127

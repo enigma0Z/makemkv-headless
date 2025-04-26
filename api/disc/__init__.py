@@ -4,8 +4,8 @@ import os
 import shlex
 import time
 
-from ..interface import PlaintextInterface
-from ..util import grep, notify
+from interface import PlaintextInterface
+from util import grep, notify
 
 def disc_inserted(source):
   if (source.startswith('dev') or source.startswith('disc')):

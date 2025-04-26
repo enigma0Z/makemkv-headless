@@ -17,18 +17,30 @@ class Target(StrEnum):
 class BaseMessage():
   @staticmethod
   def from_json(json_str: str):
-    return BaseMessage(**loads(json_str))
+    data = loads(json_str)
+    match data['type']:
+      case 'Message':
+        return Message(**data)
+      case 'ProgressMessage':
+        return ProgressMessage(**data)
+      case _:
+        return BaseMessage(**data)
 
   def __init__(self, **data):
-    assert "target" in data
     self.data = data
     self.data['type'] = type(self).__name__
 
   def __setattr__(self, name, value):
-    self.data[name] = value
+    if (name == 'data'):
+      self.__dict__['data'] = value
+    else:
+      self.data[name] = value
 
   def __getattr__(self, name):
-    return self.data.get(name)
+    if (name == 'data'):
+      return self.data
+    else:
+      return self.data.get(name)
 
   def to_json(self):
     return dumps(self.data)
@@ -79,6 +91,13 @@ class Interface(ABC):
     pass
 
   @abstractmethod
+  def send(
+      self,
+      message: BaseMessage
+  ):
+    pass
+
+  @abstractmethod
   def get_input(
     self, 
     prompt: str,
@@ -98,9 +117,6 @@ class PlaintextInterface(Interface):
 
   def move_cursor_up(self, lines: int):
     print('\033[F'*lines, end=None)
-
-  def clearing_line(self, line=''):
-    return line + ' ' * (-len(line) % get_terminal_size().columns)
 
   def title(self, *text, **kwargs): pass # For interface purposes
 
@@ -123,6 +139,22 @@ class PlaintextInterface(Interface):
         end += '\n'*2
       
     print(*text, sep=sep, end=end)
+
+  def send(self, message: BaseMessage):
+    if type(message) == Message:
+      end = ''
+      match message.target:
+        case Target.MKV:
+          self.move_cursor_up(4)
+          end += '\n'*3
+        case Target.SORT:
+          self.move_cursor_up(3)
+          end += '\n'*2
+      print(message.text, end=end)
+    elif type(message) == ProgressMessage:
+      print('Progress:', message.to_json())
+    else:
+      print(message.to_json())
 
   def get_input(
       self,
