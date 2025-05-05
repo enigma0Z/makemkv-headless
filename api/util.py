@@ -6,7 +6,7 @@ import re
 import shutil
 import subprocess
 
-from interface import PlaintextInterface, Message
+from interface import PlaintextInterface, Target
 
 def grep(term, lines):
   return True in [ term.casefold() in line.casefold() for line in lines ]
