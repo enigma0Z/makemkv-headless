@@ -91,7 +91,7 @@ def interactive_rip(
 if __name__=='__main__':
   parser = ArgumentParser()
   parser.add_argument('--source', default="disc:0")
-  parser.add_argument('--dest_dir')
+  parser.add_argument('--dest-dir')
   parser.add_argument('--mode', action='store')
   parser.add_argument('--batch', action='store_true')
   parser.add_argument('--imdbid', action='store', default=None)
