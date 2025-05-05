@@ -66,7 +66,7 @@ class MakeMKVTest(TestCase):
     # Calculates current and total percentages
     # Calculates current and total estimated time remaining
     rip_disc('source', 'dest', interface=mock_interface)
-    self.assertEqual(15, len(mock_interface_print.calls), 'Percentage updates are printed as they are read')
+    self.assertEqual(15, mock_interface_print.call_count, 'Percentage updates are printed as they are read')
 
     # Rips specified titles
 
