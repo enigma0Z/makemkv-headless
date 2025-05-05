@@ -4,7 +4,7 @@ import re
 import subprocess
 from sys import stderr
 
-from interface import PlaintextInterface
+from interface import PlaintextInterface, Target
 from makemkv import MAKEMKVCON # TODO: move dependend functionality into makemkv module
 
 def format_records(lines):
