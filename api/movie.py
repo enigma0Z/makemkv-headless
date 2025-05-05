@@ -85,7 +85,7 @@ def rip_movie(
             failed_titles.append(title)
 
         if len(failed_titles) > 0:
-          interface.print("Some failed to rip or copy", target='sort'))
+          interface.print("Some failed to rip or copy", target='sort')
           interface.print_sort()
           for title in failed_titles:
             interface.print(f'{title.index}: {title.filename}, {title.runtime}', target='sort')
