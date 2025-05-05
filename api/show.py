@@ -112,6 +112,7 @@ def rip_show(
               os.remove(os.path.join(rip_path, title.filename))
           else:
             try:
+              interface.print(f'Sorting Episode {show_name} S{season_number:02d}E{episode_number:02d}', target=Target.SORT)
               os.rename(
                 os.path.join(rip_path, title.filename), 
                 os.path.join(rip_path, season_dir, f"{show_name} S{season_number:02d}E{episode_number:02d}.mkv")
@@ -123,6 +124,7 @@ def rip_show(
         for index in extras_indexes:
           title = toc.source.titles[int(index)]
           try:
+            interface.print(f'Sorting Extra {toc.source.name} - {title.filename}', target=Target.SORT)
             os.rename(
               os.path.join(rip_path, title.filename), 
               os.path.join(rip_path, season_dir, 'extras', f'{toc.source.name} - {title.filename}')
@@ -135,11 +137,6 @@ def rip_show(
           for title in failed_titles:
             print(title, file=sys.stderr)
             interface.print(title, target='sort')
-          try:
-            interface.get_input("press Enter to continue or Ctrl-C to cancel")
-          except KeyboardInterrupt:
-            interface.print("Quitting...", target='input')
-            sys.exit(256)
 
       if features.DO_COPY:
         rsync(os.path.join(rip_path), dest_path, interface=interface)

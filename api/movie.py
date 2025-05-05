@@ -160,6 +160,8 @@ def rip_movie_interactive(
 
     interface.print(Message("All Titles", target='mkv'))
     interface.print(Message(toc.source, target='mkv'))
+    with open ('toc.log', 'a') as log:
+      print(toc.source, file=log)
 
     all_indexes = [
       title.index
