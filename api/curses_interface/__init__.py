@@ -325,6 +325,10 @@ class CursesInterface(Interface):
       if target_window:
         target_window.print(sep.join(text), end=end)
 
+  # Not implemented for curses
+  def send(self, message):
+    pass
+
   def get_input(
       self, 
       prompt: str, 
