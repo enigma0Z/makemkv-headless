@@ -7,6 +7,20 @@ from sys import stderr
 from interface import PlaintextInterface
 from makemkv import MAKEMKVCON # TODO: move dependend functionality into makemkv module
 
+def format_records(lines):
+  return [
+    [line[0]] + line[1].split(',')
+    for line in [
+      # Safety for colons in following fields
+      [line.split(':')[0], ':'.join(line.split(':')[1:])]
+      for line 
+      in lines 
+      if line.startswith('CINFO')
+        or line.startswith('TINFO')
+        or line.startswith('SINFO')
+    ]
+  ]
+
 class TOC:
   def __init__(self, interface=PlaintextInterface()):
     self.lines = []
@@ -41,18 +55,7 @@ class TOC:
     '''
     Loads disc TOC from input array of lines from `makemkvcon --robot` output
     '''
-    records = [
-      [line[0]] + line[1].split(',')
-      for line in [
-        # Safety for colons in following fields
-        [line.split(':')[0], ':'.join(line.split(':')[1:])]
-        for line 
-        in self.lines 
-        if line.startswith('CINFO')
-          or line.startswith('TINFO')
-          or line.startswith('SINFO')
-      ]
-    ]
+    records = format_records(self.lines)
 
     self.source = SourceInfo([
       record
@@ -69,12 +72,22 @@ class BaseInfo:
   static _field_lookup member provided by subclasses.  This enables the numeric
   fields pulled from the disc to be referenced by name, such as CDATA field
   "0,2" referring to the source name
+
+  Records are formatted like this: <IDENTIFIER>:<INDEXES>?:<IDENTIFIER>:<DATA>
+
+  <INDEXES> are an optional list of indexes for which item in the list it this
+  is (if applicable), followed by the two field identifier for the data type.
+  `key_start` identifies where in <INDEXES> the field identifier digits start.
+
+  It's all hierarchical, so Sources ("CINFO") have Titles ("TINFO"), which have
+  Tracks or Streams ("SINFO"), and as you descend the layers, an additional
+  index is added on.  SINFO 7,2 means this is stream 2 of title 7, for instance.
   '''
-  def __init__(self, records, k, l = 2):
+  def __init__(self, records, key_start, key_length = 2):
     self.fields = {}
     for record in records:
-      index = ','.join(record[k:k+l])
-      value = ','.join(record[k+l:])
+      index = ','.join(record[key_start:key_start+key_length])
+      value = ','.join(record[key_start+key_length:])
       self.fields[index] = value
   
   def __getattr__(self, name: str):
@@ -82,19 +95,19 @@ class BaseInfo:
       return self.fields['index']
     else:
       try:
-        return re.sub(
+        return re.sub( # Strip leading and trailing quotes off if they exist
           r'^"', '', re.sub(
             r'"\n?$', '', self.fields[self._field_lookup[name]]
           )
         )
       except Exception as ex:
-        print('Failed to look up', name, self.fields, file=stderr)
-        raise(ex)
+        raise(AttributeError(self, name=name, obj=ex))
 
 
 class SourceInfo (BaseInfo):
   '''
   Source Information
+  Example - CINFO:2,0,"STARGATE_SG1_SEASON_10_D5_US"
   '''
   key = "CINFO"
 
@@ -102,12 +115,16 @@ class SourceInfo (BaseInfo):
     "name": "2,0",
     "name1": "2,0",
     "name2": "30,0",
-    "name3": "32,0"
+    "name3": "32,0",
+    "media": "1,6206"
   }
 
   def __init__(self, records):
     super().__init__(records, 1)
     self.titles = []
+
+  def __str__(self):
+    return f'SourceInfo({self.media}: {self.name})'
 
   def add_titles(self, records):
       title_numbers = []
@@ -151,6 +168,7 @@ class SourceInfo (BaseInfo):
 class TitleInfo (BaseInfo):
   '''
   Title Information
+  Example - TINFO:7,30,0,"2 chapter(s) , 44.9 MB (A1)"
   '''
   key = 'TINFO'
 
@@ -160,21 +178,38 @@ class TitleInfo (BaseInfo):
     'size': '10,0',
     'segments': '25,0',
     'segments_map': '26,0',
-    'filename': '27,0'
+    'filename': '27,0',
+    'summary': '30,0'
   }
 
   def __init__(self, records):
     super().__init__(records, 2)
     self.tracks = []
 
+  def __str__(self):
+    return f'{self.runtime} - {self.filename} - {self.summary}'
+
 class TrackInfo (BaseInfo):
   '''
   Track Information
+  Example - SINFO:7,2,3,0,"eng"
   '''
   _key = 'SINFO'
 
   _field_lookup = {
+    'stream_type': '1,6201',
+    'stream_format': '5,0',
+    'stream_conversion_type': '42,5088',
+    'stream_bitrate': '13,0',
+    'stream_language_code': '3,0',
+    'stream_language': '4,0',
+    'stream_detail': '30,0',
 
+    'audio_format': '2,5091',
+
+    'video_resolution': '19,0',
+    'video_aspect_ratio': '20,0',
+    'video_framerate': '21,0'
   }
 
   def __init__(self, records):
