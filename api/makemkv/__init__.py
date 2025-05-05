@@ -114,14 +114,14 @@ def rip_disc(
 
           status_line = f'{total_title}, {current_title} - {total_pct*100:>6.2f}% ~{seconds_to_hms(total_remaining)}s / {current_pct*100:>6.2f}% ~{seconds_to_hms(current_remaining)}s'
 
-          interface.send(ProgressMessage(
-            total=total_pct,
-            total_elapsed=total_elapsed,
-            total_remaining=total_remaining,
-            current=current_pct,
-            current_elapsed=current_elapsed,
-            current_remaining=current_remaining
-          ))
+          # interface.send(ProgressMessage(
+          #   total=total_pct,
+          #   total_elapsed=total_elapsed,
+          #   total_remaining=total_remaining,
+          #   current=current_pct,
+          #   current_elapsed=current_elapsed,
+          #   current_remaining=current_remaining
+          # ))
 
           interface.print(total_line, current_line, sep='\n', target=Target.STATUS)
           interface.title(status_line, target=Target.MKV)

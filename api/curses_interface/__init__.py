@@ -170,14 +170,14 @@ class CursesInterface(Interface):
           if k > -1:
             y, x = _curses_response(self.input_w.win.getyx)
             if (k == KEY_ENTER): # keyboard enter key
-              print(
-                'enter key', 
-                'k:', k, 
-                'height:', height, 
-                'y:', y, 
-                'x:', x, 
-                file=stderr
-              )
+              # print(
+              #   'enter key', 
+              #   'k:', k, 
+              #   'height:', height, 
+              #   'y:', y, 
+              #   'x:', x, 
+              #   file=stderr
+              # )
               if y == height-1:
                 _curses(self.input_w.win.scroll)
                 x = start_x 
@@ -190,7 +190,7 @@ class CursesInterface(Interface):
               input_str = ''
 
             elif (k == KEY_BACKSPACE): # keyboard backspace key
-              print('backspace, y:', y, 'x:', x, file=stderr)
+              # print('backspace, y:', y, 'x:', x, file=stderr)
               input_str = input_str[0:-1]
               if len(input_str) == 0:
                 x = start_x
@@ -200,13 +200,13 @@ class CursesInterface(Interface):
               _curses(self.input_w.win.addstr, y, x, ' ')
 
             elif ascii.isprint(k):
-              print('k:', k, 'y:', y, 'x:', x, file=stderr)
+              # print('k:', k, 'y:', y, 'x:', x, file=stderr)
               input_str += chr(k)
               _curses(self.input_w.win.addch, y, x, k)
               x += 1
 
-            else:
-              print('Unknown key', k, file=stderr)
+            # else:
+            #   print('Unknown key', k, file=stderr)
 
             _curses(self.input_w.win.move, y, x)
             _curses(self.input_w.refresh)
