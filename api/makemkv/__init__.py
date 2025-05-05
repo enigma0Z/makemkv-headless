@@ -20,13 +20,13 @@ def rip_disc(
     interface: Interface = PlaintextInterface(),
   ):
   notify(f'Backing up {source} to {dest}')
-  interface.print(f'Backing up {source} to {dest}', target='sort')
+  interface.print(f'Backing up {source} to {dest}', target=Target.SORT)
 
   wait_for_disc_inserted(source, interface)
 
   # Do the actual rip + eject the disc when done
   for rip_title in [str(v) for v in rip_titles]:
-    interface.print(f'Ripping title {rip_title}', target='sort')
+    interface.print(f'Ripping title {rip_title}', target=Target.SORT)
     notify(f'Ripping title {rip_title}')
 
     # Current and total progress title
@@ -82,12 +82,12 @@ def rip_disc(
                 match = re.match(r'.+?:\d+?,\d+?,\d+?,"(.+?)(?<!\\)",', line)
                 msg_line = match.group(1)
 
-                interface.print(msg_line, target='mkv')
+                interface.print(msg_line, target=Target.MKV)
             else:
-              interface.print('>', line, target='mkv')
+              interface.print('>', line, target=Target.MKV)
           except Exception as ex:
-            interface.print(ex, target='mkv')
-            interface.print(line, target='mkv')
+            interface.print(ex, target=Target.MKV)
+            interface.print(line, target=Target.MKV)
 
         if None not in [current_title, total_title, progress_value]:
           total_pct = progress_value[1]/progress_value[2]
@@ -123,5 +123,5 @@ def rip_disc(
             current_remaining=current_remaining
           ))
 
-          interface.print(total_line, current_line, sep='\n', target='status')
+          interface.print(total_line, current_line, sep='\n', target=Target.STATUS)
           interface.title(status_line, target=Target.MKV)

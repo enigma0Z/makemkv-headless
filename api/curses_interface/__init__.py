@@ -298,7 +298,7 @@ class CursesInterface(Interface):
       case Target.INPUT:
         return self.input_w
       case _:
-        raise self.input_w
+        return self.input_w
 
   def title(
       self,

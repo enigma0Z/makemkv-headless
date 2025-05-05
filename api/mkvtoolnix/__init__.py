@@ -26,10 +26,10 @@ def split_mkv(
   ) as process, open('mkvtoolnix.log', 'w') as log:
     for b_line in process.stdout:
       line = b_line.decode('UTF-8').strip()
-      interface.print(line, target='sort')
+      interface.print(line, target=Target.SORT)
       print(line, file=log)
 
     process.wait()
 
   if (process.returncode > 0):
-    interface.print('There was an error splitting the output file, see above', target='sort')
+    interface.print('There was an error splitting the output file, see above', target=Target.SORT)
