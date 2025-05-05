@@ -30,7 +30,7 @@ class MakeMKVTest(TestCase):
       'makemkvcon defaults to all titles when no titles are given'
     )
 
-  def test_rip_disc_makemkv_output(
+  def test_rip_disc_makemkv_output_progress(
       self,
       Popen: MagicMock,
       wait_for_disc_inserted: MagicMock,
@@ -68,6 +68,17 @@ class MakeMKVTest(TestCase):
     rip_disc('source', 'dest', interface=mock_interface)
     self.assertEqual(15, mock_interface_print.call_count, 'Percentage updates are printed as they are read')
 
-    # Rips specified titles
 
-    pass
+  def test_rip_disk_makemkv_specific_titles(
+      self,
+      Popen: MagicMock,
+      wait_for_disc_inserted: MagicMock,
+      notify: MagicMock,
+      open: MagicMock,
+  ):
+    mock_interface = MagicMock()
+    mock_interface_print = MagicMock()
+    mock_interface.print = mock_interface_print
+
+    rip_disc('source', 'dest', rip_titles=[1, 3, 5], interface=mock_interface)
+    self.assertEqual(['1', '3', '5'], [call.args[0][5] for call in Popen.call_args_list], 'Individual titles are ripped')
