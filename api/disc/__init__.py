@@ -4,7 +4,7 @@ import os
 import shlex
 import time
 
-from interface import PlaintextInterface
+from interface import PlaintextInterface, Target
 from util import grep, notify
 
 def disc_inserted(source):
