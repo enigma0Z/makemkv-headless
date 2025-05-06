@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from typing import Callable
-from ..interface import Interface, Target
+from ..interface import Interface, Target, Message
 
 class JsonInterface(Interface):
   def title(
@@ -18,7 +18,7 @@ class JsonInterface(Interface):
       target: Target = Target.INPUT,
       **kwargs
   ):
-    pass
+    self.send(Message(*text, **kwargs))
 
   def get_input(
     self,
@@ -27,3 +27,6 @@ class JsonInterface(Interface):
     validation: Callable[[any], bool]
   ) -> str:
     pass
+
+  def send(self, message):
+    return super().send(message)
