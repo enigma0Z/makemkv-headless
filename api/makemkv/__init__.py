@@ -22,14 +22,14 @@ def rip_disc(
     rip_titles=['all'],
     interface: Interface = PlaintextInterface(),
   ):
-  logger.info(f'Backing up {source} to {dest}', target=Target.SORT)
+  logger.info(f'Backing up {source} to {dest}')
   interface.print(f'Backing up {source} to {dest}', target=Target.SORT)
 
   wait_for_disc_inserted(source, interface)
 
   # Do the actual rip + eject the disc when done
   for rip_title in [str(v) for v in rip_titles]:
-    logger.info(f'Ripping title {rip_title}', target=Target.SORT)
+    logger.info(f'Ripping title {rip_title}')
     interface.print(f'Ripping title {rip_title}', target=Target.SORT)
 
     # Current and total progress title

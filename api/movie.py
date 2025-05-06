@@ -89,7 +89,6 @@ def rip_movie(
 
         if len(failed_titles) > 0:
           interface.print("Some failed to rip or copy", target=Target.SORT)
-          interface.print_sort()
           for title in failed_titles:
             interface.print(f'{title.index}: {title.filename}, {title.runtime}', target=Target.SORT)
           interface.print("press Enter to continue or Ctrl-C to cancel", target=Target.SORT)
