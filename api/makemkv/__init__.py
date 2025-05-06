@@ -22,15 +22,15 @@ def rip_disc(
     rip_titles=['all'],
     interface: Interface = PlaintextInterface(),
   ):
-  notify(f'Backing up {source} to {dest}')
+  logger.info(f'Backing up {source} to {dest}', target=Target.SORT)
   interface.print(f'Backing up {source} to {dest}', target=Target.SORT)
 
   wait_for_disc_inserted(source, interface)
 
   # Do the actual rip + eject the disc when done
   for rip_title in [str(v) for v in rip_titles]:
+    logger.info(f'Ripping title {rip_title}', target=Target.SORT)
     interface.print(f'Ripping title {rip_title}', target=Target.SORT)
-    notify(f'Ripping title {rip_title}')
 
     # Current and total progress title
     # PRGC:code,id,name (Current)
@@ -64,7 +64,7 @@ def rip_disc(
 
       for b_line in process.stdout:
         line = b_line.decode().strip()
-        logger.debug(line)
+        logger.debug(f'makemkvcon - {line}')
 
         if line.startswith('PRGC'):
           current_title = line.split(':')[1].split(',')[2]
@@ -77,20 +77,20 @@ def rip_disc(
         elif line.startswith('PRGV'):
           progress_value = [int(v) for v in line.split(':')[1].split(',')]
 
-        elif (
-          not line.startswith('PRGV') 
-        ):
+        else:
           try:
             if (line.startswith('MSG')):
                 match = re.match(r'.+?:\d+?,\d+?,\d+?,"(.+?)(?<!\\)",', line)
                 msg_line = match.group(1)
 
                 interface.print(msg_line, target=Target.MKV)
+                logger.info(msg_line)
             else:
               interface.print('>', line, target=Target.MKV)
           except Exception as ex:
             interface.print(ex, target=Target.MKV)
             interface.print(line, target=Target.MKV)
+            logger.error('Could not format line', ex)
 
         if None not in [current_title, total_title, progress_value]:
           total_pct = progress_value[1]/progress_value[2]

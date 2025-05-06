@@ -52,6 +52,7 @@ def rip_movie(
   if features.DO_RIP:
     interface.print(f"These titles will be given the source name of {movie_name_with_id}", target=Target.SORT)
     interface.print(f"and copied to {dest_path}/{movie_name_with_id}/{movie_name_with_id}.mkv", target=Target.SORT)
+    logger.info(f"Title will be copied to {dest_path}/{movie_name_with_id}")
 
     with open(os.path.join(rip_path, f'{toc.source.name}-makemkvcon.txt'), 'w') as file:
       file.writelines(toc.lines)
