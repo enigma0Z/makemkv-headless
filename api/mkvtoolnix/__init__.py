@@ -3,6 +3,9 @@
 import os
 import subprocess
 
+import logging
+logger = logging.getLogger(__name__)
+
 from interface import Interface, PlaintextInterface
 
 MKVMERGE='/opt/homebrew/bin/mkvmerge'
@@ -27,7 +30,7 @@ def split_mkv(
     for b_line in process.stdout:
       line = b_line.decode('UTF-8').strip()
       interface.print(line, target=Target.SORT)
-      print(line, file=log)
+      logger.info(line)
 
     process.wait()
 

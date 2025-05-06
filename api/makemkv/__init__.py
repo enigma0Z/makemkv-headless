@@ -4,6 +4,9 @@ import re
 import subprocess
 from time import time
 
+import logging
+logger = logging.getLogger(__name__)
+
 from disc import wait_for_disc_inserted
 from interface import Interface, PlaintextInterface, ProgressMessage, Target
 from util import notify, seconds_to_hms
@@ -61,7 +64,7 @@ def rip_disc(
 
       for b_line in process.stdout:
         line = b_line.decode().strip()
-        print(line, file=log)
+        logger.debug(line)
 
         if line.startswith('PRGC'):
           current_title = line.split(':')[1].split(',')[2]

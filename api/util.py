@@ -6,6 +6,9 @@ import re
 import shutil
 import subprocess
 
+import logging
+logger = logging.getLogger(__name__)
+
 from interface import PlaintextInterface, Target
 
 def grep(term, lines):
@@ -49,14 +52,18 @@ def rsync(source, dest, interface=PlaintextInterface()):
     preexec_fn=os.setpgrp,
   )
 
-  with process, open('rsync.log', 'w') as log:
-    for b_line in process.stdout:
-      line = b_line.decode('utf-8').strip()
-      
-      interface.print(line, target=Target.SORT)
-      print(line, file=log)
+  for b_line in process.stdout:
+    line = b_line.decode('utf-8').strip()
     
-    stderr_lines = process.stderr.readlines()
+    interface.print(line, target=Target.SORT)
+    logger.info(line)
+  
+  stderr_lines = []
+
+  for b_line in process.stderr:
+    line = b_line.decode('utf-8').strip()
+    logger.error(line)
+    stderr_lines.append(line)
 
   if process.returncode == 0:
     line = f'rsync completed successfully for {os.path.split(source)[-1]}'

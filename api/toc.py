@@ -4,6 +4,9 @@ import re
 import subprocess
 from sys import stderr
 
+import logging
+logger = logging.getLogger(__name__)
+
 from interface import PlaintextInterface, Target
 from makemkv import MAKEMKVCON # TODO: move dependend functionality into makemkv module
 
@@ -36,14 +39,14 @@ class TOC:
       [MAKEMKVCON, 'info', source, '--robot'],
       stdout=subprocess.PIPE,
       stderr=subprocess.PIPE,
-    ) as process, open('toc.log', 'w') as log:
+    ) as process:
       for b_line in process.stdout:
         line = b_line.decode('UTF-8').strip()
         self.lines += [line]
         if not isinstance(self.interface, PlaintextInterface): 
           self.interface.print(line, target=Target.MKV)
 
-        print(line, file=log)
+        logger.debug(line)
 
     self.load()
 

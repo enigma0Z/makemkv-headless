@@ -6,6 +6,9 @@ import sys
 import tempfile
 import threading
 
+import logging
+logger = logging.getLogger(__name__)
+
 from disc import eject_disc, wait_for_disc_inserted
 from interface import Interface, PlaintextInterface, Target
 from makemkv import rip_disc
@@ -133,9 +136,9 @@ def rip_show(
             failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}\n{ex}')
 
         if len(failed_titles) > 0:
+          logger.error(f"Some shows failed to rip or copy, {failed_titles}")
           interface.print("Some shows failed to rip or copy", target=Target.SORT)
           for title in failed_titles:
-            print(title, file=sys.stderr)
             interface.print(title, target=Target.SORT)
 
       if features.DO_COPY:

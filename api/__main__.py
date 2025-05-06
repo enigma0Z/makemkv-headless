@@ -4,6 +4,9 @@ import os
 import signal
 import sys
 
+import logging
+logger = logging.getLogger(__name__)
+
 from argparse import ArgumentParser
 from curses_interface import CursesInterface
 from interface import Interface, Message, PlaintextInterface, Target
@@ -105,8 +108,25 @@ if __name__=='__main__':
   parser.add_argument('--curses', action='store_true')
   parser.add_argument('--temp-prefix', action='store', default=None)
   parser.add_argument('--api', action='store_true')
+  parser.add_argument('--log-level', action='store', default='INFO', choices=['INFO', 'DEBUG', 'WARNING', 'ERROR'])
 
   opts = parser.parse_args(sys.argv[1:])
+
+  if opts.log_level == 'ERROR': 
+    log_level = logging.ERROR
+  elif opts.log_level == 'WARNING': 
+    log_level = logging.WARNING
+  elif opts.log_level == 'INFO': 
+    log_level = logging.INFO
+  elif opts.log_level == 'DEBUG': 
+    log_level = logging.DEBUG
+
+  logging.basicConfig(
+    filename='app.log', 
+    style='{', 
+    format='{asctime} [{levelname}] {filename}:{lineno} {threadName} - {message}', 
+    level=log_level
+  )
 
   features.DO_SORT = not opts.skip_sort
   features.DO_RIP = not opts.skip_rip
@@ -114,40 +134,44 @@ if __name__=='__main__':
   features.DO_CLEANUP = not opts.skip_cleanup
   features.DO_SPLIT = not opts.skip_split
 
-  if (opts.api): 
-    app.run()
-    exit(0)
+  try:
+    if (opts.api): 
+      app.run()
+      exit(0)
 
-  elif not opts.curses:
-    def sigint_handler(signal, frame):
-      print('Press Ctrl-Z and kill job to cancel')
+    elif not opts.curses:
+      def sigint_handler(signal, frame):
+        print('Press Ctrl-Z and kill job to cancel')
 
-    signal.signal(signal.SIGINT, sigint_handler)
-    os.setpgrp() # Blocks sub-processes from receiving ctrl-c
+      signal.signal(signal.SIGINT, sigint_handler)
+      os.setpgrp() # Blocks sub-processes from receiving ctrl-c
 
-  interface = PlaintextInterface()
-  if opts.curses:
-    interface = CursesInterface()
+    interface = PlaintextInterface()
+    if opts.curses:
+      interface = CursesInterface()
 
-  if opts.mode is None:
-    with interface:
-      interactive_rip(
-        opts.source, 
-        opts.dest_dir, 
-        source_path=opts.source_path,
-        interface=interface,
-        temp_prefix=opts.temp_prefix
-      )
-  elif opts.mode.startswith('movie'):
-    if opts.batch:
-      rip_movie_interactive(opts.source, opts.dest_dir, batch=True, temp_prefix=opts.temp_prefix)
-    else:
-      rip_movie_interactive(opts.source, opts.dest_dir, batch=False, temp_prefix=opts.temp_prefix)
-  elif opts.mode.startswith('show'):
-    if opts.batch:
-      rip_show_interactive(opts.source, opts.dest_dir, batch=True, temp_prefix=opts.temp_prefix)
-    else:
-      # TODO: If params provided to rip show immediately do it
-      # Need source, dest, episode indexes, extras indexes, show name, season number, first ep, tmdb id
-      # Else rip a single disc (i.e. not batch mode) interactively
-      rip_show_interactive(opts.source, opts.dest_dir, batch=False, temp_prefix=opts.temp_prefix)
+    if opts.mode is None:
+      with interface:
+        interactive_rip(
+          opts.source, 
+          opts.dest_dir, 
+          source_path=opts.source_path,
+          interface=interface,
+          temp_prefix=opts.temp_prefix
+        )
+    elif opts.mode.startswith('movie'):
+      if opts.batch:
+        rip_movie_interactive(opts.source, opts.dest_dir, batch=True, temp_prefix=opts.temp_prefix)
+      else:
+        rip_movie_interactive(opts.source, opts.dest_dir, batch=False, temp_prefix=opts.temp_prefix)
+    elif opts.mode.startswith('show'):
+      if opts.batch:
+        rip_show_interactive(opts.source, opts.dest_dir, batch=True, temp_prefix=opts.temp_prefix)
+      else:
+        # TODO: If params provided to rip show immediately do it
+        # Need source, dest, episode indexes, extras indexes, show name, season number, first ep, tmdb id
+        # Else rip a single disc (i.e. not batch mode) interactively
+        rip_show_interactive(opts.source, opts.dest_dir, batch=False, temp_prefix=opts.temp_prefix)
+  except Exception as ex:
+    logger.error(ex)
+    raise ex

@@ -6,6 +6,8 @@ import sys
 import tempfile
 import threading
 
+import logging
+logger = logging.getLogger(__name__)
 
 from disc import eject_disc, wait_for_disc_inserted
 from interface import Interface, PlaintextInterface, Target
@@ -116,7 +118,7 @@ def rip_movie_interactive(
     interface: Interface = PlaintextInterface(),
     **kwargs
   ):
-  print(kwargs, file=sys.stderr)
+  logging.debug(f'called with {kwargs}')
 
   movie_name = None
   id = None
@@ -160,8 +162,9 @@ def rip_movie_interactive(
 
     interface.print("All Titles", target=Target.MKV)
     interface.print(toc.source, target=Target.MKV)
-    with open ('toc.log', 'a') as log:
-      print(toc.source, file=log)
+
+    logger.info('Processed table of contents')
+    logger.info(toc.source)
 
     all_indexes = [
       title.index

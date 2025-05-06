@@ -5,6 +5,9 @@ from enum import Enum
 import queue
 import threading
 
+import logging
+logger = logging.getLogger(__name__)
+
 from curses import ascii
 from math import floor
 from sys import stderr
