@@ -128,6 +128,8 @@ if __name__=='__main__':
     level=log_level
   )
 
+  logging.info('Starting makemkv-batch starting')
+
   features.DO_SORT = not opts.skip_sort
   features.DO_RIP = not opts.skip_rip
   features.DO_COPY = not opts.skip_copy
