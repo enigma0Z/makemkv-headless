@@ -45,9 +45,9 @@ def rsync(source, dest, interface=PlaintextInterface()):
   logger.debug(' '.join([
     'rsync() called with args:',
     ', '.join([
-      f'source: {source}'
-      f'dest: {dest}'
-      f'interface: {interface}'
+      f'source: {source}',
+      f'dest: {dest}',
+      f'interface: {interface}',
     ])
   ]))
   # Put output files into their final destinations if the rip was done locally

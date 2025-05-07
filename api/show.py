@@ -68,6 +68,8 @@ def rip_show(
     rip_path_base = source_path
     rip_path = os.path.join(rip_path_base, sort_info.path())
 
+  logger.debug('rip_show() computed rip_path: {rip_path}')
+
   os.makedirs(os.path.join(
     rip_path,
     'extras'
