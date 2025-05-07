@@ -119,6 +119,7 @@ def sort_titles(
           try:
             sort_file = sort_info.next_file()
             interface.print(f'Sorting Title {sort_file}', target=Target.SORT)
+            logger.debug(f'Sorting {path.join(rip_path, title.filename)} to {path.join(rip_path, sort_file)}')
             rename(
               path.join(rip_path, title.filename), 
               path.join(rip_path, sort_file)

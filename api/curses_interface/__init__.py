@@ -322,6 +322,7 @@ class CursesInterface(Interface):
       end='\n', 
       **kwargs
   ):
+    super().print(text, target=target, sep=sep, end=end)
     if target != 'status':
       text, sep, end = self.sanitize_print(text, sep, end)
       target_window = self.get_window(target)
