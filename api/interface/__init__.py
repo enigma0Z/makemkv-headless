@@ -5,6 +5,9 @@ from enum import StrEnum, auto, unique
 from shutil import get_terminal_size
 from typing import Any, Callable
 
+import logging
+logger = logging.getLogger(__name__)
+
 from json import dumps, loads
 
 @unique
@@ -88,13 +91,17 @@ class Interface(ABC):
     end='\n', 
     **kwargs
   ):
-    pass
+    logger.debug('interface.print() called with args', {
+      'text': text,
+      'target': target,
+    })
 
   @abstractmethod
   def send(
       self,
       message: BaseMessage
   ):
+    logger.debug('interface.send() message', message)
     pass
 
   @abstractmethod
@@ -128,6 +135,7 @@ class PlaintextInterface(Interface):
       end='\n', 
       **kwargs
   ):
+    super().print(*text, target=target, sep=sep, end=end, **kwargs)
     match target:
       # case Target.INPUT: 
       #   self.move_cursor_up(3)
@@ -141,6 +149,7 @@ class PlaintextInterface(Interface):
     print(*text, sep=sep, end=end)
 
   def send(self, message: BaseMessage):
+    super().send(message)
     if type(message) == Message:
       end = ''
       match message.target:
