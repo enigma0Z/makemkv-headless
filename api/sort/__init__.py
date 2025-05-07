@@ -73,6 +73,13 @@ def sort_titles(
     sort_info: SortInfo,
     interface: Interface,
 ):
+  logger.debug('sort_titles() called with args', {
+    'toc': toc,
+    'rip_path_base': rip_path_base,
+    'dest_path_base': dest_path_base,
+    'sort_info': sort_info, 
+    'interface': interface
+  })
   failed_titles = []
   rip_path = path.join(rip_path_base, sort_info.path())
 
