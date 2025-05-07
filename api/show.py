@@ -7,9 +7,9 @@ import tempfile
 import threading
 
 import logging
+logger = logging.getLogger(__name__)
 
 from sort import ShowInfo, SortInfo, sort_titles
-logger = logging.getLogger(__name__)
 
 from disc import eject_disc, wait_for_disc_inserted
 from interface import Interface, PlaintextInterface, Target
@@ -46,6 +46,16 @@ def rip_show(
   '''
   `<dir>/<show_name>/Season <season_number>/<show_name> S<season_number>E<episode_number>.mkv`
   '''
+  logger.debug('rip_show() called with args', {
+    'source': source,
+    'dest_path': dest_path,
+    'toc': toc,
+    'sort_info': sort_info,
+    'rip_all': rip_all,
+    'source_path': source_path,
+    'interface': interface,
+    'temp_prefix': temp_prefix
+  })
 
   # Set rip dir to a temporary file location for extraction to enable more
   # stable rips when the destination is a network location
