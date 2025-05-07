@@ -74,11 +74,11 @@ def sort_titles(
     interface: Interface,
 ):
   logger.debug(
-    'sort_titles() called with args;', 
-    f'toc: {toc}', 
-    f'rip_path_base: {rip_path_base}', 
-    f'dest_path_base: {dest_path_base}', 
-    f'sort_info: {sort_info}', 
+    'sort_titles() called with args; ' 
+    f'toc: {toc}, ' 
+    f'rip_path_base: {rip_path_base}, ' 
+    f'dest_path_base: {dest_path_base}, '
+    f'sort_info: {sort_info}, ' 
     f'interface: {interface}'
   )
   failed_titles = []
@@ -147,7 +147,7 @@ def sort_titles(
     if features.DO_COPY:
       rsync(
         path.join(rip_path_base, sort_info.base_path()), 
-        path.join(dest_path_base, sort_info.base_path()), 
+        dest_path_base, 
         interface=interface
       )
 
