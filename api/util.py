@@ -42,11 +42,19 @@ def clearing_line(line=' '):
   return line + ' ' * (-len(line) % shutil.get_terminal_size().columns)
 
 def rsync(source, dest, interface=PlaintextInterface()):
+  logger.debug(' '.join([
+    'rsync() called with args:',
+    ', '.join([
+      f'source: {source}'
+      f'dest: {dest}'
+      f'interface: {interface}'
+    ])
+  ]))
   # Put output files into their final destinations if the rip was done locally
   interface.print(f'Copying local rip from {source} to {dest}', target=Target.SORT)
   notify(f'Copying local rip to {dest}')
   process = subprocess.Popen(
-    [ 'rsync', '-av', f'{source}', dest ], 
+    [ 'rsync', '-av', source, dest ], 
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,
     preexec_fn=os.setpgrp,
