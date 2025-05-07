@@ -46,7 +46,7 @@ def rip_show(
   '''
   `<dir>/<show_name>/Season <season_number>/<show_name> S<season_number>E<episode_number>.mkv`
   '''
-  logger.debug(
+  logger.debug(' '.join([
     'rip_show() called with args', 
     f'source: {source}',
     f'dest_path: {dest_path}',
@@ -56,7 +56,7 @@ def rip_show(
     f'source_path: {source_path}',
     f'interface: {interface}',
     f'temp_prefix: {temp_prefix}'
-  )
+  ]))
 
   # Set rip dir to a temporary file location for extraction to enable more
   # stable rips when the destination is a network location

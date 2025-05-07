@@ -91,11 +91,11 @@ class Interface(ABC):
     end='\n', 
     **kwargs
   ):
-    logger.debug(
+    logger.debug(' '.join([
       'interface.print() called with args', 
       f'text: {text}',
       f'target: {target}',
-    )
+    ]))
 
   @abstractmethod
   def send(
