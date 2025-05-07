@@ -7,6 +7,8 @@ import tempfile
 import threading
 
 import logging
+
+from sort import ShowInfo, SortInfo, sort_titles
 logger = logging.getLogger(__name__)
 
 from disc import eject_disc, wait_for_disc_inserted
@@ -22,19 +24,21 @@ import features
 
 EPISODE_LENGTH_TOLERANCE = 90
 
+      # source, 
+      # dest_path_base, 
+      # toc, 
+      # sort_info=sort_info,
+      # rip_all=rip_all,
+      # source_path=source_path,
+      # interface=interface,
+      # **kwargs,
+
 def rip_show(
     source: str, 
     dest_path: str, 
     toc: TOC,
-    episode_indexes: list[int],
-    extras_indexes: list[int],
-    show_name: str,
-    season_number: int,
-    first_ep: int,
-    id: str,
-    id_key="tmdbid",
+    sort_info: SortInfo,
     rip_all=False,
-    split_segments=None,
     source_path=None,
     interface: Interface = PlaintextInterface(),
     temp_prefix: str = None,
@@ -43,33 +47,23 @@ def rip_show(
   `<dir>/<show_name>/Season <season_number>/<show_name> S<season_number>E<episode_number>.mkv`
   '''
 
-  # For naming episodes
-  show_name = sanitize(show_name) # Show files
-  show_name_with_id = f"{show_name} [{id_key}-{id}]" # Show folder
-
-  season_dir = f'Season {season_number:02d}'
-  dest_season_path = os.path.join(dest_path, show_name_with_id, season_dir)
-
   # Set rip dir to a temporary file location for extraction to enable more
   # stable rips when the destination is a network location
   if (source_path is None):
-    temp_dir = tempfile.mkdtemp(prefix=temp_prefix)
-    rip_path = os.path.join(temp_dir, show_name_with_id)
+    rip_path_base = tempfile.mkdtemp(prefix=temp_prefix)
+    rip_path = os.path.join(rip_path_base, sort_info.path())
   else:
     interface.print("Setting temp dir to provided source path", target=Target.MKV)
-    temp_dir = source_path
-    rip_path = os.path.join(temp_dir, show_name_with_id)
+    rip_path_base = source_path
+    rip_path = os.path.join(rip_path_base, sort_info.path())
 
   os.makedirs(os.path.join(
     rip_path,
-    season_dir, 
     'extras'
   ), exist_ok=True)
 
   if features.DO_RIP:
-    interface.print(f"These titles will be given the source name of {show_name_with_id}", target=Target.SORT)
-    interface.print(f"and copied to {dest_season_path}/{show_name} SxxExx.mkv", target=Target.SORT)
-    logger.info(f"Titles will be copied to {dest_season_path}/{show_name} SxxExx.mkv")
+    interface.print(f"These titles will be copied to {sort_info.base_path()}", target=Target.SORT)
 
     with open(os.path.join(rip_path, f'{toc.source.name}-makemkvcon.txt'), 'w') as file:
       for line in toc.lines:
@@ -78,86 +72,27 @@ def rip_show(
     if rip_all:
       rip_disc(source, rip_path, rip_titles=['all'], interface=interface)
     else:
-      rip_disc(source, rip_path, rip_titles=episode_indexes, interface=interface)
-      rip_disc(source, rip_path, rip_titles=extras_indexes, interface=interface)
+      rip_disc(source, rip_path, rip_titles=sort_info.episode_indexes, interface=interface)
+      rip_disc(source, rip_path, rip_titles=sort_info.extras_indexes, interface=interface)
 
-  def sorting_thread():
-    try:
-      failed_titles = []
-      if features.DO_SORT:
-        episode_number = first_ep
-        # episode_indexes refers to the title number on the disk.  This may be
-        # title 02, 03, 04, 05, 08, etc... for a set of sequential episodes.
-        # Enumerating here transforms this unordered non-sequential list into a
-        # sequential list of integers, which is why we discard title here in
-        # favor of _index_
-        for title_number, index in enumerate(episode_indexes):
-          title = toc.source.titles[int(index)]
-          if split_segments:
-            if features.DO_SPLIT:
-              split_mkv(
-                os.path.join(rip_path, title.filename), 
-                os.path.join(rip_path, 'split-%d.mkv'),
-                split_segments,
-                interface=interface
-              )
-            for segment_index in range(0, len(split_segments)+1):
-              try:
-                  os.rename(
-                    os.path.join(rip_path, f'split-{segment_index+1}.mkv'),
-                    os.path.join(rip_path, season_dir, f"{show_name} S{season_number:04d}E{episode_number:04d}.mkv")
-                  )
-                  episode_number += 1
-              except FileNotFoundError as ex:
-                interface.print('Failed to rename segment', segment_index, target=Target.SORT)
-                interface.print(ex, target=Target.SORT)
-                failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}, Segment {segment_index}\n{ex}')
-            if (features.DO_CLEANUP):
-              os.remove(os.path.join(rip_path, title.filename))
-          else:
-            try:
-              interface.print(f'Sorting Episode {show_name} S{season_number:02d}E{episode_number:02d}', target=Target.SORT)
-              os.rename(
-                os.path.join(rip_path, title.filename), 
-                os.path.join(rip_path, season_dir, f"{show_name} S{season_number:02d}E{episode_number:02d}.mkv")
-              )
-              episode_number += 1
-            except FileNotFoundError as ex:
-              failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}\n{ex}')
-
-        for index in extras_indexes:
-          title = toc.source.titles[int(index)]
-          try:
-            interface.print(f'Sorting Extra {toc.source.name} - {title.filename}', target=Target.SORT)
-            os.rename(
-              os.path.join(rip_path, title.filename), 
-              os.path.join(rip_path, season_dir, 'extras', f'{toc.source.name} - {title.filename}')
-            )
-          except FileNotFoundError as ex:
-            failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}\n{ex}')
-
-        if len(failed_titles) > 0:
-          logger.error(f"Some shows failed to rip or copy, {failed_titles}")
-          interface.print("Some shows failed to rip or copy", target=Target.SORT)
-          for title in failed_titles:
-            interface.print(title, target=Target.SORT)
-
-      if features.DO_COPY:
-        rsync(os.path.join(rip_path), dest_path, interface=interface)
-
-    finally:
-      if features.DO_CLEANUP:
-        shutil.rmtree(temp_dir)
-      else:
-        interface.print(f"Leaving rip source at {temp_dir}", target=Target.SORT)
-
-  threading.Thread(target=sorting_thread, daemon=True).start()
+  # Run sort and copy in its own thread
+  threading.Thread(
+    kwargs={
+      'toc': toc,
+      'rip_path_base': rip_path_base,
+      'dest_path_base': dest_path,
+      'sort_info': sort_info,
+      'interface': interface
+    },
+    target=sort_titles,
+    daemon=True
+  ).start()
 
   eject_disc(source, interface=interface)
 
 def rip_show_interactive(
     source, 
-    dest_path, 
+    dest_path_base, 
     show_name = None,
     season_number = None,
     first_ep = None,
@@ -290,19 +225,23 @@ def rip_show_interactive(
     else:
       interface.print(f'Ripping main features {episode_indexes} and extras {extras_indexes}', target=Target.MKV)
 
+    sort_info = ShowInfo(
+      name=show_name,
+      id=id,
+      id_db=id_key,
+      main_indexes=episode_indexes,
+      extra_indexes=extras_indexes,
+      split_segments=split_segments,
+      season_number=season_number,
+      first_episode=first_ep
+    )
+
     rip_show(
       source, 
-      dest_path, 
+      dest_path_base, 
       toc, 
-      episode_indexes, 
-      extras_indexes, 
-      show_name, 
-      season_number, 
-      first_ep, 
-      id, 
-      id_key,
+      sort_info=sort_info,
       rip_all=rip_all,
-      split_segments=split_segments,
       source_path=source_path,
       interface=interface,
       **kwargs,
