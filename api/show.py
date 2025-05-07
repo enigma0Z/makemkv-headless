@@ -85,8 +85,8 @@ def rip_show(
     if rip_all:
       rip_disc(source, rip_path, rip_titles=['all'], interface=interface)
     else:
-      rip_disc(source, rip_path, rip_titles=sort_info.episode_indexes, interface=interface)
-      rip_disc(source, rip_path, rip_titles=sort_info.extras_indexes, interface=interface)
+      rip_disc(source, rip_path, rip_titles=sort_info.main_indexes, interface=interface)
+      rip_disc(source, rip_path, rip_titles=sort_info.extra_indexes, interface=interface)
 
   # Run sort and copy in its own thread
   threading.Thread(
