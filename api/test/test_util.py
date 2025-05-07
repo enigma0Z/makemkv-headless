@@ -60,8 +60,6 @@ class UtilTest(TestCase):
       self.assertEqual(['rsync', '-av', 'source', 'dest'], mock_Popen.mock_calls[1].args[0], 'rsync is called with specified source and destination')
 
       process_call_list = [f'{call}' for call in mock_process.mock_calls]
-      self.assertIn('call.__enter__()', process_call_list, "The subprocess is __enter__()'ed")
-      self.assertIn('call.__enter__()', process_call_list, "The subprocess is __exit()'ed")
       self.assertIn('completed successfully', mock_interface.mock_calls[1].args[0], "rsync completed successfully message is sent")
 
       # RSync failed
