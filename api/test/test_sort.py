@@ -28,6 +28,33 @@ mock_interface = MagicMock()
   rsync=DEFAULT
 )
 class SortTest(TestCase):
+  def test_SortInfo(self, **mock):
+    test_sort_info = SortInfo(
+      name='movie name',
+      id='movie_id',
+      main_indexes=[0],
+      extra_indexes=[1,2,3]
+    )
+
+    self.assertEqual('movie_name [tmdbid-movie_id]', test_sort_info.base_path())
+    self.assertEqual('movie_name [tmdbid-movie_id] - 0.mkv', test_sort_info.next_file())
+    self.assertEqual('movie_name [tmdbid-movie_id] - 1.mkv', test_sort_info.next_file())
+
+  def test_ShowInfo(self, **mock):
+    test_sort_info = ShowInfo(
+      name='show name',
+      id='show_id',
+      main_indexes=[0],
+      extra_indexes=[1,2,3],
+      season_number=1,
+      first_episode=1
+    )
+
+    self.assertEqual('show_name [tmdbid-show_id]', test_sort_info.base_path())
+    self.assertEqual('show_name [tmdbid-show_id]/Season 01', test_sort_info.path())
+    self.assertEqual('show_name S01E01.mkv', test_sort_info.next_file())
+    self.assertEqual('show_name S01E02.mkv', test_sort_info.next_file())
+
   def test_sort_show(self, **mock):
     sort_info = ShowInfo(
       name='show_name',
