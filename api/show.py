@@ -78,7 +78,7 @@ def rip_show(
   if features.DO_RIP:
     interface.print(f"These titles will be copied to {sort_info.base_path()}", target=Target.SORT)
 
-    with open(os.path.join(rip_path, f'{toc.source.name}-makemkvcon.txt'), 'w') as file:
+    with open(os.path.join(rip_path, sanitize(f'{toc.source.name}-makemkvcon.txt')), 'w') as file:
       for line in toc.lines:
         file.write(line + '\n')
 

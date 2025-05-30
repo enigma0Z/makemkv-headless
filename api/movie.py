@@ -58,7 +58,7 @@ def rip_movie(
     interface.print(f"These titles will be copied to {sort_info.base_path()}", target=Target.SORT)
     logger.info(f"These titles will be copied to {sort_info.base_path()}")
 
-    with open(os.path.join(rip_path, f'{toc.source.name}-makemkvcon.txt'), 'w') as file:
+    with open(os.path.join(rip_path, sanitize(f'{toc.source.name}-makemkvcon.txt')), 'w') as file:
       file.writelines(toc.lines)
 
     if rip_all:
