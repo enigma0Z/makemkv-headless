@@ -60,6 +60,7 @@ def rip_titles(
 
     with open(os.path.join(rip_path, f'{toc.source.name}-makemkvcon.txt'), 'w') as file:
       file.writelines(toc.lines)
+      file.write(toc.source)
 
     if rip_all:
       rip_disc(source, rip_path, rip_titles=['all'], interface=interface)
