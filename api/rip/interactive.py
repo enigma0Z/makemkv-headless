@@ -135,12 +135,10 @@ def rip_show_interactive(
     extras_indexes = None,
     split_segments = True,
     batch=False, 
-    source_path=None,
     interface=PlaintextInterface(),
     **kwargs,
   ):
 
-  interface.print('Source Path', source_path, target=Target.INPUT)
   next_first_ep = first_ep
 
   while True:
@@ -275,7 +273,6 @@ def rip_show_interactive(
       toc, 
       sort_info=sort_info,
       rip_all=rip_all,
-      source_path=source_path,
       interface=interface,
       **kwargs,
     )

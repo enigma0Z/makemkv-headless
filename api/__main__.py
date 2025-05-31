@@ -19,7 +19,6 @@ from rest_interface.rest_api import app
 
 def interactive_rip(
     source, dest_dir,
-    source_path: str = None,
     interface: Interface = PlaintextInterface(),
     **kwargs
   ):
@@ -77,7 +76,6 @@ def interactive_rip(
         **kwargs,
         **rip_args, 
         batch=False, 
-        source_path=source_path,
         interface=interface
       )
 
@@ -104,7 +102,6 @@ if __name__=='__main__':
   parser.add_argument('--skip-copy', action='store_true')
   parser.add_argument('--skip-cleanup', action='store_true')
   parser.add_argument('--skip-split', action='store_true')
-  parser.add_argument('--source-path', action='store')
   parser.add_argument('--curses', action='store_true')
   parser.add_argument('--temp-prefix', action='store', default=None)
   parser.add_argument('--api', action='store_true')
@@ -157,7 +154,6 @@ if __name__=='__main__':
         interactive_rip(
           opts.source, 
           opts.dest_dir, 
-          source_path=opts.source_path,
           interface=interface,
           temp_prefix=opts.temp_prefix
         )
