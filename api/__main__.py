@@ -5,13 +5,13 @@ import signal
 import sys
 
 import logging
+
+from rip.interactive import rip_movie_interactive, rip_show_interactive
 logger = logging.getLogger(__name__)
 
 from argparse import ArgumentParser
 from curses_interface import CursesInterface
 from interface import Interface, Message, PlaintextInterface, Target
-from movie import rip_movie_interactive
-from show import rip_show_interactive
 
 import features
 

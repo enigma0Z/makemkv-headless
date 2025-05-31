@@ -4,7 +4,8 @@ from argparse import Namespace
 from unittest import TestCase
 from unittest.mock import DEFAULT, MagicMock, Mock, patch
 
-from movie import rip_movie, rip_movie_interactive
+from rip import rip_titles
+from sort import SortInfo
 from test.data.toc_test_data import generate_CINFO, generate_SINFO, generate_TINFO
 from toc import TOC
 
@@ -14,13 +15,10 @@ from toc import TOC
 @patch.multiple('tempfile', mkdtemp=DEFAULT)
 @patch.multiple('sys', exit=DEFAULT)
 @patch.multiple(
-  'movie', 
+  'rip', 
+  sort_titles=DEFAULT,
   eject_disc=DEFAULT, 
-  wait_for_disc_inserted=DEFAULT, 
-  # sanitize=DEFAULT,
   rip_disc=DEFAULT,
-  # hms_to_seconds=DEFAULT
-  rsync=DEFAULT
 )
 class MovieTest(TestCase):
   def test_rip_movie(self, *args, **kwargs: dict[str, MagicMock]):
@@ -42,13 +40,12 @@ class MovieTest(TestCase):
 
     mock_interface = MagicMock()
 
-    rip_movie(
+    mock_sort_info=SortInfo('movie name unsanitary', 'movie_id', [0], [1,2]),
+
+    rip_titles(
       'source', 'dest',
       toc=mock_toc,
-      main_indexes=[0],
-      extras_indexes=[1,2],
-      movie_name='movie_name unsanitary',
-      id='movie_id',
+      sort_info=SortInfo('movie name unsanitary', 'movie_id', [0], [1,2]),
       interface=mock_interface
     )
 
@@ -71,37 +68,4 @@ class MovieTest(TestCase):
     self.assertEqual(('source', 'temp_dir/movie_name_unsanitary [tmdbid-movie_id]'), mock['rip_disc'].call_args_list[1].args)
     self.assertEqual([1,2], mock['rip_disc'].call_args_list[1].kwargs['rip_titles'])
 
-    # Files are renamed (os.rename) to the right paths
-    self.assertEqual(3, mock['rename'].call_count) # Once per title
-    self.assertEqual(
-      (
-        'temp_dir/movie_name_unsanitary [tmdbid-movie_id]/filename.mkv', 
-        'temp_dir/movie_name_unsanitary [tmdbid-movie_id]/movie_name_unsanitary [tmdbid-movie_id] - 0.mkv'
-      ), 
-      mock['rename'].call_args_list[0].args
-    )
-    self.assertEqual(
-      (
-        'temp_dir/movie_name_unsanitary [tmdbid-movie_id]/filename.mkv', 
-        'temp_dir/movie_name_unsanitary [tmdbid-movie_id]/extras/filename.mkv'
-      ), 
-      mock['rename'].call_args_list[1].args
-    )
-    self.assertEqual(
-      (
-        'temp_dir/movie_name_unsanitary [tmdbid-movie_id]/filename.mkv', 
-        'temp_dir/movie_name_unsanitary [tmdbid-movie_id]/extras/filename.mkv'
-      ), 
-      mock['rename'].call_args_list[2].args
-    )
-
-    # Files are rsync'ed to the destination
-    mock['rsync'].assert_called_once()
-
-    # Files are cleaned up
-    mock['rmtree'].assert_called_once()
-
-    # The disc is ejected
-    mock['eject_disc'].assert_called_once()
-
-
+    mock['sort_titles'].assert_called_once()

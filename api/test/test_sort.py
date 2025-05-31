@@ -100,7 +100,7 @@ class SortTest(TestCase):
     self.assertEqual(
       (
         'rip_path_base/show_name [tmdbid-show_id]', 
-        'user@host:dest_path_base/show_name [tmdbid-show_id]'
+        'user@host:dest_path_base'
       ),
       mock['rsync'].call_args[0]
     )
