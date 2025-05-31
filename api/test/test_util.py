@@ -60,7 +60,7 @@ class UtilTest(TestCase):
       self.assertEqual(['rsync', '-av', 'source', 'dest'], mock_Popen.mock_calls[1].args[0], 'rsync is called with specified source and destination')
 
       process_call_list = [f'{call}' for call in mock_process.mock_calls]
-      self.assertIn('completed successfully', mock_interface.mock_calls[1].args[0], "rsync completed successfully message is sent")
+      self.assertIn('completed successfully', mock_interface.mock_calls[2].args[0], "rsync completed successfully message is sent")
 
       # RSync failed
       mock_process.reset_mock()
@@ -68,7 +68,7 @@ class UtilTest(TestCase):
       mock_process.returncode = 1
       util.rsync('source', 'dest', interface=mock_interface)
 
-      self.assertIn('RSYNC FAILED', mock_interface.mock_calls[1].args[0])
+      self.assertIn('RSYNC FAILED', mock_interface.mock_calls[2].args[0])
 
   def test_sanitize(self):
     self.assertEqual('foo__bar___baz__', util.sanitize('foo: bar | baz "'), 'Unsafe (non word) filesystem characters are stripped out of the sanitized string')
