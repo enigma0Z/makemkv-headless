@@ -5,7 +5,7 @@ import threading
 import logging
 
 from rip import rip_titles
-from sort import SortInfo
+from sort import ShowInfo, SortInfo
 logger = logging.getLogger(__name__)
 
 from disc import wait_for_disc_inserted
