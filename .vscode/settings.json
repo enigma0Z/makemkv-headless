@@ -1,8 +1,11 @@
 {
   "cSpell.words": [
     "CINFO",
+    "imdbid",
+    "levelname",
     "makemkv",
     "MAKEMKVCON",
+    "mkvmerge",
     "mkvtoolnix",
     "preexec",
     "setpgrp",
