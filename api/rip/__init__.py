@@ -5,6 +5,8 @@ import tempfile
 import threading
 
 import logging
+
+from util import sanitize
 logger = logging.getLogger(__name__)
 
 from sort import SortInfo, sort_titles
@@ -58,7 +60,7 @@ def rip_titles(
     interface.print(f"These titles will be copied to {sort_info.base_path()}", target=Target.SORT)
     logger.info(f"These titles will be copied to {sort_info.base_path()}")
 
-    with open(os.path.join(rip_path, f'{toc.source.name}-makemkvcon.txt'), 'w') as file:
+    with open(os.path.join(rip_path, sanitize(f'{toc.source.name}-makemkvcon.txt')), 'w') as file:
       file.writelines(toc.lines)
       file.write(toc.source)
 
