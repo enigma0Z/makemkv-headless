@@ -4,6 +4,7 @@
     "makemkv",
     "MAKEMKVCON",
     "mkvtoolnix",
+    "preexec",
     "setpgrp",
     "SINFO",
     "TINFO",
