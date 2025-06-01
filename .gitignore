@@ -4,3 +4,4 @@ __pycache__
 _TOKEN.py
 config.json
 application.log
+app.log

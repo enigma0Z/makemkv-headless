@@ -5,7 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from api.json_serializable import JSONSerializable
+from json_serializable import JSONSerializable
 
 import features
 

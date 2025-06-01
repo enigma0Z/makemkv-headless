@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from queue import Queue
+from re import match
 from threading import Lock
 from typing import Callable
 from interface import Interface, Target, Message
@@ -30,4 +31,10 @@ class ThreadQueueInterface(Interface):
     return super().send(message)
 
   def print(self, *text, **kwargs):
-    self.send(Message(*text, **kwargs))
+    if 'target' in kwargs and kwargs['target'] == 'mkv' and len(text) == 1:
+      if (text[0].startswith("MSG")):
+        message_text = match(r'.+?,"(.+?)".*', text[0]).groups()[0]
+        self.send(Message(message_text, **kwargs, end=''))
+        return 
+
+    self.send(Message(*text, **kwargs, end=''))

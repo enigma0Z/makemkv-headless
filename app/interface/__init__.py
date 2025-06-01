@@ -102,7 +102,7 @@ class Interface(ABC):
       self,
       message: BaseMessage
   ):
-    logger.debug('interface.send() message', message)
+    # logger.debug('interface.send() message', message)
     pass
 
   @abstractmethod

@@ -4,7 +4,7 @@ from argparse import Namespace
 from unittest import TestCase
 from unittest.mock import DEFAULT, MagicMock, Mock, patch
 
-from rip import rip_titles
+from rip_titles.rip_titles import rip_titles
 from sort import SortInfo
 from test.data.toc_test_data import generate_CINFO, generate_SINFO, generate_TINFO
 from toc import TOC

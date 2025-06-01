@@ -6,14 +6,14 @@ import sys
 
 import logging
 
-from rip.interactive import rip_movie_interactive, rip_show_interactive
+from rip_titles.interactive import rip_movie_interactive, rip_show_interactive
 logger = logging.getLogger(__name__)
 
 from argparse import ArgumentParser
 from curses_interface import CursesInterface
 from interface import Interface, Message, PlaintextInterface, Target
 
-from api import app
+from api.singletons import API
 from config import CONFIG
 
 import features
@@ -92,8 +92,8 @@ def interactive_rip(
 
 if __name__=='__main__':
   parser = ArgumentParser()
-  parser.add_argument('--source', default="disc:0")
-  parser.add_argument('--dest')
+  parser.add_argument('-s', '--source', default="disc:0")
+  parser.add_argument('-d', '--destination')
   parser.add_argument('--config-file', default="./config.json")
   parser.add_argument('--mode', action='store')
   parser.add_argument('--batch', action='store_true')
@@ -112,7 +112,7 @@ if __name__=='__main__':
   opts = parser.parse_args(sys.argv[1:])
 
   CONFIG.update_from_json(opts.config_file)
-
+  
   if opts.log_level:
     CONFIG.update(log_level = opts.log_level)
 
@@ -154,7 +154,7 @@ if __name__=='__main__':
 
   try:
     if (opts.api): 
-      app.run()
+      API.run()
       exit(0)
 
     elif not opts.curses:

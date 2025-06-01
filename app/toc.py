@@ -8,7 +8,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from api.json_serializable import JSONSerializable
+from json_serializable import JSONSerializable
 
 from interface import PlaintextInterface, Target
 from makemkv import MAKEMKVCON # TODO: move dependend functionality into makemkv module

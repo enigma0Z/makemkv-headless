@@ -18,7 +18,6 @@ from toc import TOC
 
 import features
 
-
 EPISODE_LENGTH_TOLERANCE = 90
 
 def rip_titles(

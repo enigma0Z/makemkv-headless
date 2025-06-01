@@ -1,9 +1,11 @@
 import logging
 from threading import Thread
 from flask import request
-from app.api import app, interface
-from rip import rip_titles
-from sort import ShowInfo, SortInfo
+from api.singletons import API, INTERFACE
+
+# from rip_titles import rip_titles
+from rip_titles.rip_titles import rip_titles
+from sort import *
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +23,8 @@ class Request:
         
         raise(Exception(exceptions))
 
-@app.post('/api/v1/rip')
-def rip():
+@API.post('/api/v1/rip')
+def post_rip():
     # extract SortInfo from post data
     data = Request(**request.json)
 
@@ -34,7 +36,7 @@ def rip():
             "sort_info": data.sort_info, # From post data
             "toc": None,                 # Not sending this
             "rip_all": data.rip_all,     # From post data
-            "interface": interface,      # From singletons
+            "interface": INTERFACE,      # From singletons
             "temp_prefix": None          # From config
         },
         target=rip_titles,

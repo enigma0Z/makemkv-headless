@@ -1,6 +1,8 @@
-from json import loads
+from json import dumps, loads
 
-class Config:
+from json_serializable import JSONSerializable
+
+class Config(JSONSerializable):
   keys: list[str] = []
 
   def __init__(self):
@@ -12,9 +14,13 @@ class Config:
     self.makemkvcon_path: str = None
     self.source: str = None
     self.destination: str  = None
+    self.log_level: str = None
     self.temp_prefix: str = None
 
     Config.keys = self.__dict__.keys()
+
+  def __str__(self):
+    return dumps(self.__dict__)
 
   def overwrite(
       self, **kwargs
@@ -28,7 +34,8 @@ class Config:
   ):
     '''Sets the specified config values'''
     for key in Config.keys:
-      self.__dict__[key] = kwargs[key] if key in kwargs else None
+      if key in kwargs:
+        self.__dict__[key] = kwargs[key]
 
   def update_from_json(self, filename: str):
     with open(filename, 'r') as file:

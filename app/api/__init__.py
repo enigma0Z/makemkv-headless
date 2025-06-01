@@ -11,40 +11,12 @@ Endpoints
 '''
 
 import json
-import logging
-from threading import Thread
-from flask import Flask, request
 
-from api.thread_queue_interface import ThreadQueueInterface
-from toc import TOC
+from .json_api import json_api
+from .singletons import *
+from .v1 import *
 
-logger = logging.getLogger(__name__)
-interface = ThreadQueueInterface()
-
-class State:
-    def __init__(self):
-        self.ripping = False
-        self.sorting = False
-        self.copying = False 
-    
-state = State()
-
-app = Flask(__name__)
-
-@app.route('/')
+@API.route('/')
+@json_api
 def index():
     return json.dumps({'foo': 'bar', 'bin': 'baz'})
-
-@app.route('/api/v1/toc')
-def get_toc():
-    toc = TOC(interface=interface)
-    toc.get_from_disc()
-    return toc.to_json()
-
-@app.route('/api/v1/tmdb/show')
-def get_tmdb_show():
-    pass
-
-@app.route('/api/v1/tmdb/movie')
-def get_tmdb_movie():
-    pass

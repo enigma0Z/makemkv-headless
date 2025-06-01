@@ -4,7 +4,7 @@ import threading
 
 import logging
 
-from rip import rip_titles
+from rip_titles.rip_titles import rip_titles
 from sort import ShowInfo, SortInfo
 logger = logging.getLogger(__name__)
 
