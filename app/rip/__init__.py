@@ -24,8 +24,8 @@ EPISODE_LENGTH_TOLERANCE = 90
 def rip_titles(
     source: str, 
     dest_path: str, 
-    toc: TOC,
     sort_info: SortInfo,
+    toc: TOC = None,
     rip_all=False,
     interface: Interface = PlaintextInterface(),
     temp_prefix: str = None,
@@ -60,9 +60,10 @@ def rip_titles(
     interface.print(f"These titles will be copied to {sort_info.base_path()}", target=Target.SORT)
     logger.info(f"These titles will be copied to {sort_info.base_path()}")
 
-    with open(os.path.join(rip_path, sanitize(f'{toc.source.name}-makemkvcon.txt')), 'w') as file:
-      file.writelines(toc.lines)
-      file.write(f'{toc.source}')
+    if (toc != None):
+      with open(os.path.join(rip_path, sanitize(f'{toc.source.name}-makemkvcon.txt')), 'w') as file:
+        file.writelines(toc.lines)
+        file.write(f'{toc.source}')
 
     if rip_all:
       rip_disc(source, rip_path, rip_titles=['all'], interface=interface)

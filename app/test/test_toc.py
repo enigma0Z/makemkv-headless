@@ -46,3 +46,6 @@ class TOCTest(TestCase):
     self.assertEqual('29.97 (30000/1001)', list_toc.source.titles[0].tracks[0].video_framerate)
 
     self.assertEqual('Stereo', list_toc.source.titles[0].tracks[1].audio_format)
+
+    # TOC serializes to JSON w/ exception
+    self.assertTrue(list_toc.to_json != '', 'TOC serializes to JSON')

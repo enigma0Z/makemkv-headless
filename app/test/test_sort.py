@@ -1,3 +1,4 @@
+import json
 from unittest import TestCase
 from unittest.mock import DEFAULT, MagicMock, patch
 
@@ -17,7 +18,6 @@ mock_toc.get_from_list(
 )
 
 mock_interface = MagicMock()
-    
 
 @patch.multiple(
   'sort',
@@ -39,6 +39,17 @@ class SortTest(TestCase):
     self.assertEqual('movie_name [tmdbid-movie_id]', test_sort_info.base_path())
     self.assertEqual('movie_name [tmdbid-movie_id] - 0.mkv', test_sort_info.next_file())
     self.assertEqual('movie_name [tmdbid-movie_id] - 1.mkv', test_sort_info.next_file())
+
+    # SortInfo serializes to JSON
+    self.assertEqual(json.dumps({
+      "name": "movie name", 
+      "id": "movie_id", 
+      "main_indexes": [0], 
+      "extra_indexes": [1, 2, 3], 
+      "split_segments": [], 
+      "id_db": "tmdbid", 
+      "index": 1
+    }), test_sort_info.to_json())
 
   def test_ShowInfo(self, **mock):
     test_sort_info = ShowInfo(

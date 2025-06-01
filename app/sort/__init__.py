@@ -2,7 +2,10 @@ from os import path, remove, rename, makedirs
 from shutil import rmtree
 
 import logging
+
 logger = logging.getLogger(__name__)
+
+from api.json_serializable import JSONSerializable
 
 import features
 
@@ -11,7 +14,9 @@ from mkvtoolnix import split_mkv
 from toc import TOC
 from util import rsync, sanitize
 
-class SortInfo:
+import json
+
+class SortInfo(JSONSerializable):
   def __init__(
       self,
       name: str,

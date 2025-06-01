@@ -5,7 +5,10 @@ import subprocess
 from sys import stderr
 
 import logging
+
 logger = logging.getLogger(__name__)
+
+from api.json_serializable import JSONSerializable
 
 from interface import PlaintextInterface, Target
 from makemkv import MAKEMKVCON # TODO: move dependend functionality into makemkv module
@@ -24,7 +27,7 @@ def format_records(lines):
     ]
   ]
 
-class TOC:
+class TOC(JSONSerializable):
   def __init__(self, interface=PlaintextInterface()):
     self.lines = []
     self.source = None
@@ -69,7 +72,7 @@ class TOC:
     self.source.add_titles(records)
     self.source.add_tracks(records)
 
-class BaseInfo:
+class BaseInfo(JSONSerializable):
   '''
   Base metadata class.  Includes accessor for undefined attributes based on
   static _field_lookup member provided by subclasses.  This enables the numeric
@@ -107,7 +110,7 @@ class BaseInfo:
         raise(AttributeError(self, name=name, obj=ex))
 
 
-class SourceInfo (BaseInfo):
+class SourceInfo(BaseInfo):
   '''
   Source Information
   Example - CINFO:2,0,"STARGATE_SG1_SEASON_10_D5_US"

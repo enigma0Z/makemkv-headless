@@ -13,9 +13,9 @@ from argparse import ArgumentParser
 from curses_interface import CursesInterface
 from interface import Interface, Message, PlaintextInterface, Target
 
-import features
+from app.api import app
 
-from rest_interface.rest_api import app
+import features
 
 def interactive_rip(
     source, dest_dir,
