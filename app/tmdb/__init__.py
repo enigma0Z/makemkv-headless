@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-import _TOKEN
-
-from _TOKEN import BEARER_TOKEN
-
 from typing import Any
 import requests
+
+from config import CONFIG
 
 API_HOST_NAME = 'api.themoviedb.org'
 WEB_HOST_NAME = 'www.themoviedb.org'
@@ -39,7 +37,7 @@ def search(content, query):
   url = f'https://{API_HOST_NAME}/{API_VERSION}/search/{content.lower()}'
   response = requests.get(
     url = url,
-    headers = { 'Authorization': f'Bearer {BEARER_TOKEN}' },
+    headers = { 'Authorization': f'Bearer {CONFIG.tmdb_token}' },
     params = { 'query': query }
   )
 

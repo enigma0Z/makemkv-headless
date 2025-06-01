@@ -1,35 +1,37 @@
 from json import loads
 
 class Config:
+  keys: list[str] = []
+
   def __init__(self):
-    '''Initialize a config object'''
+    '''Initialize a blank config object'''
+    if (len(Config.keys) > 0):
+      raise Exception("Config has already been initialized")
 
-    self.tmdb_token = None
-    self.makemkvcon_path = None
-    self.source_drive = None
-    self.dest_path = None
-    self.temp_prefix = None
-    self.loaded = False
+    self.tmdb_token: str = None
+    self.makemkvcon_path: str = None
+    self.source: str = None
+    self.destination: str  = None
+    self.temp_prefix: str = None
 
-  def load(
-      self, 
-      tmdb_token: str, 
-      makemkvcon_path: str, 
-      source_drive: str, 
-      dest_path: str, 
-      temp_prefix: str | None = None
+    Config.keys = self.__dict__.keys()
+
+  def overwrite(
+      self, **kwargs
   ):
-    '''Initialize a config object'''
+    '''Initialize all config values specified, set unspecified values to None'''
+    for key in Config.keys:
+      self.__dict__[key] = kwargs[key] if key in kwargs else None
 
-    self.tmdb_token = tmdb_token
-    self.makemkvcon_path = makemkvcon_path
-    self.source_drive = source_drive
-    self.dest_path = dest_path
-    self.temp_prefix = temp_prefix
-    self.loaded = True
+  def update(
+      self, **kwargs
+  ):
+    '''Sets the specified config values'''
+    for key in Config.keys:
+      self.__dict__[key] = kwargs[key] if key in kwargs else None
 
-  def from_json_file(self, filename: str):
+  def update_from_json(self, filename: str):
     with open(filename, 'r') as file:
-      self.load(**loads(file.read()))
+      self.update(**loads(file.read()))
 
-CONFIG: Config = None
+CONFIG = Config()

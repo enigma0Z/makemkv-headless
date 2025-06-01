@@ -19,7 +19,7 @@ EPISODE_LENGTH_TOLERANCE = 90
 
 def rip_movie_interactive(
     source, 
-    dest_path, 
+    destination, 
     batch=False,
     interface: Interface = PlaintextInterface(),
     **kwargs
@@ -111,7 +111,7 @@ def rip_movie_interactive(
 
     rip_titles(
       source, 
-      dest_path, 
+      destination, 
       toc, 
       sort_info=sort_info,
       rip_all=rip_all,
@@ -125,7 +125,7 @@ def rip_movie_interactive(
 
 def rip_show_interactive(
     source, 
-    dest_path_base, 
+    destination, 
     show_name = None,
     season_number = None,
     first_ep = None,
@@ -269,7 +269,7 @@ def rip_show_interactive(
 
     rip_titles(
       source, 
-      dest_path_base, 
+      destination, 
       toc, 
       sort_info=sort_info,
       rip_all=rip_all,

@@ -15,9 +15,7 @@ import logging
 from threading import Thread
 from flask import Flask, request
 
-from app.api.interface import ThreadQueueInterface
-from rip import rip_titles
-from sort import ShowInfo, SortInfo
+from api.thread_queue_interface import ThreadQueueInterface
 from toc import TOC
 
 logger = logging.getLogger(__name__)

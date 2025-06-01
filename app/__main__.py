@@ -13,12 +13,13 @@ from argparse import ArgumentParser
 from curses_interface import CursesInterface
 from interface import Interface, Message, PlaintextInterface, Target
 
-from app.api import app
+from api import app
+from config import CONFIG
 
 import features
 
 def interactive_rip(
-    source, dest_dir,
+    source, destination,
     interface: Interface = PlaintextInterface(),
     **kwargs
   ):
@@ -66,7 +67,7 @@ def interactive_rip(
     if (content != old_content):
       rip_args = {}
 
-    new_dest_dir = os.path.join(dest_dir, library, content + 's', media)
+    new_dest_dir = os.path.join(destination, library, content + 's', media)
     interface.print(new_dest_dir, target=Target.INPUT)
 
     if content.casefold() == 'show':
@@ -92,7 +93,8 @@ def interactive_rip(
 if __name__=='__main__':
   parser = ArgumentParser()
   parser.add_argument('--source', default="disc:0")
-  parser.add_argument('--dest-dir')
+  parser.add_argument('--dest')
+  parser.add_argument('--config-file', default="./config.json")
   parser.add_argument('--mode', action='store')
   parser.add_argument('--batch', action='store_true')
   parser.add_argument('--imdbid', action='store', default=None)
@@ -105,18 +107,26 @@ if __name__=='__main__':
   parser.add_argument('--curses', action='store_true')
   parser.add_argument('--temp-prefix', action='store', default=None)
   parser.add_argument('--api', action='store_true')
-  parser.add_argument('--log-level', action='store', default='INFO', choices=['INFO', 'DEBUG', 'WARNING', 'ERROR'])
+  parser.add_argument('--log-level', action='store', choices=['INFO', 'DEBUG', 'WARNING', 'ERROR'])
 
   opts = parser.parse_args(sys.argv[1:])
 
-  if opts.log_level == 'ERROR': 
-    log_level = logging.ERROR
-  elif opts.log_level == 'WARNING': 
-    log_level = logging.WARNING
-  elif opts.log_level == 'INFO': 
-    log_level = logging.INFO
-  elif opts.log_level == 'DEBUG': 
-    log_level = logging.DEBUG
+  CONFIG.update_from_json(opts.config_file)
+
+  if opts.log_level:
+    CONFIG.update(log_level = opts.log_level)
+
+  match CONFIG.log_level:
+    case 'ERROR':
+      log_level = logging.ERROR
+    case 'WARNING': 
+      log_level = logging.WARNING
+    case 'INFO': 
+      log_level = logging.INFO
+    case 'DEBUG': 
+      log_level = logging.DEBUG
+    case _:
+      log_level = logging.INFO
 
   logging.basicConfig(
     filename='app.log', 
@@ -125,7 +135,16 @@ if __name__=='__main__':
     level=log_level
   )
 
-  logging.info('Starting makemkv-batch starting')
+  if opts.source:
+    CONFIG.update(source=opts.source)
+
+  if opts.destination:
+    CONFIG.update(destination=opts.destination)
+
+  if opts.temp_prefix:
+    CONFIG.update(temp_prefix=opts.temp_prefix)
+
+  logging.info('Starting makemkv-batch')
 
   features.DO_SORT = not opts.skip_sort
   features.DO_RIP = not opts.skip_rip
@@ -153,23 +172,23 @@ if __name__=='__main__':
       with interface:
         interactive_rip(
           opts.source, 
-          opts.dest_dir, 
+          opts.destination, 
           interface=interface,
           temp_prefix=opts.temp_prefix
         )
     elif opts.mode.startswith('movie'):
       if opts.batch:
-        rip_movie_interactive(opts.source, opts.dest_dir, batch=True, temp_prefix=opts.temp_prefix)
+        rip_movie_interactive(opts.source, opts.destination, batch=True, temp_prefix=opts.temp_prefix)
       else:
-        rip_movie_interactive(opts.source, opts.dest_dir, batch=False, temp_prefix=opts.temp_prefix)
+        rip_movie_interactive(opts.source, opts.destination, batch=False, temp_prefix=opts.temp_prefix)
     elif opts.mode.startswith('show'):
       if opts.batch:
-        rip_show_interactive(opts.source, opts.dest_dir, batch=True, temp_prefix=opts.temp_prefix)
+        rip_show_interactive(opts.source, opts.destination, batch=True, temp_prefix=opts.temp_prefix)
       else:
         # TODO: If params provided to rip show immediately do it
         # Need source, dest, episode indexes, extras indexes, show name, season number, first ep, tmdb id
         # Else rip a single disc (i.e. not batch mode) interactively
-        rip_show_interactive(opts.source, opts.dest_dir, batch=False, temp_prefix=opts.temp_prefix)
+        rip_show_interactive(opts.source, opts.destination, batch=False, temp_prefix=opts.temp_prefix)
   except Exception as ex:
     logger.error(ex)
     raise ex
