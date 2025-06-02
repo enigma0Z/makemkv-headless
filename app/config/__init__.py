@@ -1,4 +1,5 @@
-from json import dumps, loads
+import json
+import yaml
 
 from json_serializable import JSONSerializable
 
@@ -10,6 +11,7 @@ class Config(JSONSerializable):
     if (len(Config.keys) > 0):
       raise Exception("Config has already been initialized")
 
+    self.filename: str = None
     self.tmdb_token: str = None
     self.makemkvcon_path: str = None
     self.source: str = None
@@ -20,7 +22,7 @@ class Config(JSONSerializable):
     Config.keys = self.__dict__.keys()
 
   def __str__(self):
-    return dumps(self.__dict__)
+    return json.dumps(self.__dict__)
 
   def overwrite(
       self, **kwargs
@@ -37,8 +39,23 @@ class Config(JSONSerializable):
       if key in kwargs:
         self.__dict__[key] = kwargs[key]
 
+  def update_from_file(self, filename: str = None):
+    if (filename == None):
+      filename = self.filename
+    else:
+      self.filename = filename
+
+    if filename.endswith('.json'):
+      self.update_from_json(filename)
+    elif filename.endswith('.yaml'):
+      self.update_from_yaml(filename)
+
   def update_from_json(self, filename: str):
     with open(filename, 'r') as file:
-      self.update(**loads(file.read()))
+      self.update(**json.loads(file.read()))
+
+  def update_from_yaml(self, filename: str):
+    with open(filename, 'r') as file:
+      self.update(**yaml.safe_load(file)) 
 
 CONFIG = Config()
