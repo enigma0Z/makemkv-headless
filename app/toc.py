@@ -8,10 +8,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+from config import CONFIG
 from json_serializable import JSONSerializable
 
 from interface import PlaintextInterface, Target
-from makemkv import MAKEMKVCON # TODO: move dependend functionality into makemkv module
 
 def format_records(lines):
   return [
@@ -39,7 +39,7 @@ class TOC(JSONSerializable):
 
     # Load the disc TOC from makemkvcon output
     with subprocess.Popen(
-      [MAKEMKVCON, 'info', source, '--robot'],
+      [CONFIG.makemkvcon_path, '--noscan', '--robot', 'info', source],
       stdout=subprocess.PIPE,
       stderr=subprocess.PIPE,
     ) as process:

@@ -7,14 +7,13 @@ from time import time
 import logging
 logger = logging.getLogger(__name__)
 
+from config import CONFIG
 from disc import wait_for_disc_inserted
 from interface import Interface, PlaintextInterface, ProgressMessage, Target
 from util import notify, seconds_to_hms
 
 import disc
 import util
-
-MAKEMKVCON="/Applications/MakeMKV.app/Contents/MacOS/makemkvcon"
 
 def rip_disc(
     source, 
@@ -46,7 +45,7 @@ def rip_disc(
     # max - maximum possible value for a progress bar, constant 
 
     with subprocess.Popen(
-      [ MAKEMKVCON, '--robot', '--progress=-same', 'mkv', source, rip_title, dest],
+      [ CONFIG.makemkvcon_path, '--noscan', '--robot', '--progress=-same', 'mkv', source, rip_title, dest],
       stdout=subprocess.PIPE,
       stderr=subprocess.PIPE,
     ) as process, open('makemkv.log', 'w') as log:
