@@ -92,9 +92,9 @@ def interactive_rip(
 
 if __name__=='__main__':
   parser = ArgumentParser()
-  parser.add_argument('-s', '--source', default="disc:0")
+  parser.add_argument('-s', '--source')
   parser.add_argument('-d', '--destination')
-  parser.add_argument('--config-file', default="./config.json")
+  parser.add_argument('--config-file', default="./config.yaml")
   parser.add_argument('--mode', action='store')
   parser.add_argument('--batch', action='store_true')
   parser.add_argument('--imdbid', action='store', default=None)
@@ -111,7 +111,7 @@ if __name__=='__main__':
 
   opts = parser.parse_args(sys.argv[1:])
 
-  CONFIG.update_from_json(opts.config_file)
+  CONFIG.update_from_file(opts.config_file)
   
   if opts.log_level:
     CONFIG.update(log_level = opts.log_level)
