@@ -1,18 +1,26 @@
 import logging
+import os
 from threading import Thread
 from flask import request
 from api.singletons import API, INTERFACE
 
 # from rip_titles import rip_titles
+from config import CONFIG
 from rip_titles.rip_titles import rip_titles
 from sort import *
 
 logger = logging.getLogger(__name__)
 
 class Request:
-    def __init__(self, rip_all: bool, sort_info: dict[str, str]):
+    def __init__(self, destination: str, rip_all: bool, sort_info: dict[str, str]):
+        '''
+        * `destination`: Library path where this rip will go. ex:
+          `"main/dvd/movies"`. Automatically concatenated onto the end of the
+          configured base path
+        '''
         self.rip_all = rip_all
         self.sort_info: SortInfo | ShowInfo
+        self.destination: str = destination
         exceptions: list[Exception] = []
         for clazz in [ShowInfo, SortInfo]: # type: ignore
           try: 
@@ -32,7 +40,7 @@ def post_rip():
     Thread(
         kwargs={
             "source": None,              # From config
-            "dest_path": None,           # From config
+            "dest_path": os.path.join(CONFIG.destination, data.destination),
             "sort_info": data.sort_info, # From post data
             "toc": None,                 # Not sending this
             "rip_all": data.rip_all,     # From post data
