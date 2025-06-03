@@ -22,4 +22,9 @@
   ],
   "python.testing.pytestEnabled": false,
   "python.testing.unittestEnabled": true,
+  "vite.base": "",
+  "vite.devCommand": "cd web && npm run dev",
+  "vite.port": 3000,
+  "vite.vitepress": false,
+  "vite.buildCommand": "cd web && npm run build",
 }
