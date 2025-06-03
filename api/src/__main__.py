@@ -108,6 +108,7 @@ if __name__=='__main__':
   parser.add_argument('--temp-prefix', action='store', default=None)
   parser.add_argument('--api', action='store_true')
   parser.add_argument('--log-level', action='store', choices=['INFO', 'DEBUG', 'WARNING', 'ERROR'])
+  parser.add_argument('--log-file', default=None)
 
   opts = parser.parse_args(sys.argv[1:])
 
@@ -129,7 +130,7 @@ if __name__=='__main__':
       log_level = logging.INFO
 
   logging.basicConfig(
-    filename='app.log', 
+    filename=opts.log_file, 
     style='{', 
     format='{asctime} [{levelname}] {filename}:{lineno} {threadName} - {message}', 
     level=log_level
