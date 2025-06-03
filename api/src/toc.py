@@ -1,11 +1,11 @@
 #!usr/bin/env python3
 
+from json import dumps
 import re
 import subprocess
 from sys import stderr
 
 import logging
-
 logger = logging.getLogger(__name__)
 
 from config import CONFIG
@@ -49,8 +49,6 @@ class TOC(JSONSerializable):
         if not isinstance(self.interface, PlaintextInterface): 
           self.interface.print(line, target=Target.MKV)
 
-        logger.debug(line)
-
     self.load()
 
   def get_from_list(self, lines):
@@ -89,6 +87,8 @@ class BaseInfo(JSONSerializable):
   Tracks or Streams ("SINFO"), and as you descend the layers, an additional
   index is added on.  SINFO 7,2 means this is stream 2 of title 7, for instance.
   '''
+  _field_lookup = {}
+
   def __init__(self, records, key_start, key_length = 2):
     self.fields = {}
     for record in records:
@@ -107,13 +107,31 @@ class BaseInfo(JSONSerializable):
           )
         )
       except Exception as ex:
-        raise(AttributeError(self, name=name, obj=ex))
+        logger.error(f"Could not find key {name} in fields, {ex}")
+        return None
+
+  def json_encoder(self):
+    '''
+    Translate the auto-field work that __getattr__ does to pseudo attributes 
+    that are returned in the JSON stream
+    '''
+    logger.debug('BaseInfo.json_encoder()')
+    field_values = { 
+      key: value
+      for key, value in [ 
+        (key, self.__getattr__(key))
+        for key in self._field_lookup.keys()
+      ]
+      if value != None
+    }
+    return {**self.__dict__, **field_values}
 
 
 class SourceInfo(BaseInfo):
   '''
   Source Information
-  Example - CINFO:2,0,"STARGATE_SG1_SEASON_10_D5_US"
+
+  Example: `CINFO:2,0,"STARGATE_SG1_SEASON_10_D5_US"`
   '''
   key = "CINFO"
 
