@@ -118,11 +118,13 @@ export const TOCTable = () => {
 
   const handleLoadTocClick = () => {
     console.info('Fetching TOC')
+    setTocLoading(true)
     fetch("http://localhost:5000/api/v1/toc", { method: 'GET' })
       .then(response => response.json())
       .then(json => {
         console.log('response json', json)
         setTocData(json)
+        setTocLoading(false)
       })
   }
 
@@ -176,7 +178,13 @@ export const TOCTable = () => {
   }
 
   return (<>
-    <Button onClick={handleLoadTocClick}>Load TOC</Button>
+    <Button 
+      loading={tocLoading} 
+      loadingPosition="end"
+      onClick={handleLoadTocClick}
+    >
+      Load TOC
+    </Button>
     <Card>
       <TableContainer>
         <Table>
