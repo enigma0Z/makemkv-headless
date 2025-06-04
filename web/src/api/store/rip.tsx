@@ -5,7 +5,7 @@ import { uniqueFilter } from "@/util/array";
 interface RipState {
   destination: RipStateDestination;
   rip_all: boolean;
-  sort_info: SortInfo | ShowInfo;
+  sort_info: SortInfo & ShowInfo;
   toc_length?: number
 }
 
@@ -24,6 +24,8 @@ const initialState: RipState = {
   sort_info: {
     name: undefined,
     id: undefined,
+    first_episode: undefined,
+    season_number: undefined,
     main_indexes: [],
     extra_indexes: [],
     split_segments: undefined,
@@ -85,6 +87,13 @@ const ripSlice = createSlice({
     },
     setTocLength: (state, action: PayloadAction<number | undefined>) => {
       state.toc_length = action.payload
+    },
+    setFirstEpisode: (state, action: PayloadAction<number>) => {
+      console.log('setFirstEpisode(), action.payload', action.payload)
+      state.sort_info.first_episode = action.payload
+    },
+    setSeasonNumber: (state, action: PayloadAction<number>) => {
+      state.sort_info.season_number = action.payload
     }
   }
 })

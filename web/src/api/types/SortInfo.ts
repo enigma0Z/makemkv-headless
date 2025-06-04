@@ -7,7 +7,7 @@ export type SortInfo = {
   id_db?: string;
 }
 
-export type ShowInfo = SortInfo & {
-  season_number: number;
-  first_episode: number;
+export type ShowInfo = {
+  season_number?: number;
+  first_episode?: number;
 }
