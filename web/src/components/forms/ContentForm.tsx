@@ -1,6 +1,6 @@
 import { useAppSelector } from "@/api/store"
 import { ripActions } from "@/api/store/rip"
-import { FormControl, FormGroup, InputLabel, MenuItem, Select } from "@mui/material"
+import { FormControl, FormGroup, InputLabel, MenuItem, Select, TextField } from "@mui/material"
 import { useDispatch } from "react-redux"
 
 export const CombinedShowMovieForm = () => {
@@ -11,6 +11,8 @@ export const CombinedShowMovieForm = () => {
   const library = useAppSelector((state) => state.rip.destination?.library)
   const media = useAppSelector((state) => state.rip.destination?.media)
   const content = useAppSelector((state) => state.rip.destination?.content)
+  const seasonNumber = useAppSelector((state) => state.rip.sort_info.season_number)
+  const firstEpisode = useAppSelector((state) => state.rip.sort_info.first_episode)
   const dispatch = useDispatch();
 
   return <>
@@ -57,7 +59,6 @@ export const CombinedShowMovieForm = () => {
         </Select>
       </FormControl>
       <FormControl>
-
         <InputLabel id="select-content-label">Content</InputLabel>
         <Select
           labelId="select-content-label"
@@ -72,6 +73,39 @@ export const CombinedShowMovieForm = () => {
           <MenuItem value={"show"}>Show</MenuItem>
           <MenuItem value={"movie"}>Movie</MenuItem>
         </Select>
+      </FormControl>
+      <FormControl
+        disabled={ content !== "show" }
+      >
+        <TextField 
+          disabled={ content !== "show" }
+          label="Season Number"
+          type="number"
+          value={seasonNumber}
+          onChange={({target: {value}}) => {
+            console.log(value)
+            if (value.match(/^\d*$/)) {
+              console.log("matches")
+              dispatch(ripActions.setSeasonNumber(parseInt(value)))
+            }
+          }}
+        />
+      </FormControl>
+      <FormControl
+        disabled={ content !== "show" }
+      >
+        <TextField 
+          disabled={ content !== "show" }
+          label="First Episode"
+          type="number"
+          value={firstEpisode}
+          onChange={({target: {value}}) => {
+            console.log(value)
+            if (value.match(/^\d*$/)) {
+              dispatch(ripActions.setFirstEpisode(parseInt(value)))
+            }
+          }}
+        />
       </FormControl>
     </FormGroup>
   </>
