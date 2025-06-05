@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 from config import CONFIG
 from disc import wait_for_disc_inserted
-from interface import Interface, PlaintextInterface, ProgressMessage, Target
+from interface import BaseInterface, PlaintextInterface, Target
 from util import notify, seconds_to_hms
 
 import disc
@@ -19,7 +19,7 @@ def rip_disc(
     source, 
     dest,
     rip_titles=['all'],
-    interface: Interface = PlaintextInterface(),
+    interface: BaseInterface = PlaintextInterface(),
   ):
   logger.info(f'Backing up {source} to {dest}')
   interface.print(f'Backing up {source} to {dest}', target=Target.SORT)

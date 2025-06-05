@@ -12,7 +12,7 @@ from sort import SortInfo, sort_titles
 logger = logging.getLogger(__name__)
 
 from disc import eject_disc, wait_for_disc_inserted
-from interface import Interface, PlaintextInterface, Target
+from interface import BaseInterface, PlaintextInterface, Target
 from makemkv import rip_disc
 from toc import TOC
 from util import hms_to_seconds, rsync, sanitize, string_to_list_int
@@ -26,7 +26,7 @@ def rip_movie(
     toc: TOC,
     sort_info: SortInfo,
     rip_all=False,
-    interface: Interface = PlaintextInterface(),
+    interface: BaseInterface = PlaintextInterface(),
     temp_prefix: str = None,
   ):
   '''
@@ -85,7 +85,7 @@ def rip_movie_interactive(
     source, 
     dest_path, 
     batch=False,
-    interface: Interface = PlaintextInterface(),
+    interface: BaseInterface = PlaintextInterface(),
     **kwargs
   ):
   logging.debug(f'called with {kwargs}')

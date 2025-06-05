@@ -12,7 +12,7 @@ from curses import ascii
 from math import floor
 from sys import stderr
 
-from interface import Interface, Target
+from interface import BaseInterface, Target
 
 KEY_ENTER = 10
 KEY_BACKSPACE = 127
@@ -119,7 +119,7 @@ class BorderWindow:
     _curses(self.win.addstr, self.scroll_height, 0, f'{str}{end}')
     _curses(self.win.refresh)
 
-class CursesInterface(Interface):
+class CursesInterface(BaseInterface):
   def __init__(self):
     self.win = WindowRegistry()
     self.shutdown = threading.Event()

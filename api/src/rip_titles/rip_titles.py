@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 from sort import SortInfo, sort_titles
 
 from disc import eject_disc
-from interface import Interface, PlaintextInterface, Target
+from interface import BaseInterface, PlaintextInterface, Target
 from makemkv import rip_disc
 from toc import TOC
 
@@ -26,7 +26,7 @@ def rip_titles(
     sort_info: SortInfo,
     toc: TOC = None,
     rip_all=False,
-    interface: Interface = PlaintextInterface(),
+    interface: BaseInterface = PlaintextInterface(),
     temp_prefix: str = None,
   ):
   '''

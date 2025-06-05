@@ -6,7 +6,7 @@ import subprocess
 import logging
 logger = logging.getLogger(__name__)
 
-from interface import Interface, PlaintextInterface
+from interface import BaseInterface, PlaintextInterface
 
 MKVMERGE='/opt/homebrew/bin/mkvmerge'
 
@@ -14,7 +14,7 @@ def split_mkv(
     input: str, 
     output: str, 
     chapters: list[int], 
-    interface: Interface = PlaintextInterface()
+    interface: BaseInterface = PlaintextInterface()
   ):
   with subprocess.Popen(
     [

@@ -9,7 +9,7 @@ from sort import ShowInfo, SortInfo
 logger = logging.getLogger(__name__)
 
 from disc import wait_for_disc_inserted
-from interface import Interface, PlaintextInterface, Target
+from interface import BaseInterface, PlaintextInterface, Target
 from toc import TOC
 from util import hms_to_seconds, string_to_list_int
 
@@ -21,7 +21,7 @@ def rip_movie_interactive(
     source, 
     destination, 
     batch=False,
-    interface: Interface = PlaintextInterface(),
+    interface: BaseInterface = PlaintextInterface(),
     **kwargs
   ):
   logging.debug(f'called with {kwargs}')

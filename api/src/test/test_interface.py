@@ -3,7 +3,8 @@
 
 from unittest import TestCase
 from unittest.mock import patch
-from interface import BaseMessage, Message, PlaintextInterface, ProgressMessage, Target
+from api.src.interface.message import BaseMessage, Message, ProgressMessage
+from interface import PlaintextInterface, Target
 
 class InterfaceTest(TestCase):
   def test_BaseMessage(self):

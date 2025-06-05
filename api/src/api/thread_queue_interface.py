@@ -2,11 +2,10 @@
 
 from queue import Queue
 from re import match
-from threading import Lock
-from typing import Callable
-from interface import Interface, Target, Message
+from interface.message import Message
+from interface import BaseInterface
 
-class ThreadQueueInterface(Interface):
+class ThreadQueueInterface(BaseInterface):
   def __init__(self):
     self.queue = Queue()
 

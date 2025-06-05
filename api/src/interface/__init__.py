@@ -2,10 +2,11 @@
 
 from abc import ABC, abstractmethod
 from enum import StrEnum, auto, unique
-from shutil import get_terminal_size
 from typing import Any, Callable
 
 import logging
+
+from interface.message import BaseMessage, Message, ProgressMessage
 logger = logging.getLogger(__name__)
 
 from json import dumps, loads
@@ -17,54 +18,8 @@ class Target(StrEnum):
   INPUT = auto()
   STATUS = auto()
 
-class BaseMessage():
-  @staticmethod
-  def from_json(json_str: str):
-    data = loads(json_str)
-    match data['type']:
-      case 'Message':
-        return Message(**data)
-      case 'ProgressMessage':
-        return ProgressMessage(**data)
-      case _:
-        return BaseMessage(**data)
 
-  def __init__(self, **data):
-    self.data = data
-    self.data['type'] = type(self).__name__
-
-  def __setattr__(self, name, value):
-    if (name == 'data'):
-      self.__dict__['data'] = value
-    else:
-      self.data[name] = value
-
-  def __getattr__(self, name):
-    if (name == 'data'):
-      return self.data
-    else:
-      return self.data.get(name)
-
-  def to_json(self):
-    return dumps(self.data)
-
-class Message(BaseMessage):
-  def __init__(self, *text, sep=' ', end="\n", **data):
-    if len(text) > 0:
-      assert "text" not in data
-      data['text'] = sep.join(text) + end
-    else:
-      assert "text" in data
-
-    super().__init__(**data)
-    
-class ProgressMessage(BaseMessage):
-  def __init__(self, **data):
-    assert "total" in data
-    assert "current" in data
-    super().__init__(**data)
-
-class Interface(ABC):
+class BaseInterface(ABC):
   @abstractmethod
   def __enter__(self, *args, **kwargs):
     return self
@@ -114,7 +69,7 @@ class Interface(ABC):
   ) -> str:
     pass
 
-class PlaintextInterface(Interface):
+class PlaintextInterface(BaseInterface):
   def __enter__(self, *args, **kwargs):
     print('enter')
     return super().__enter__(*args)

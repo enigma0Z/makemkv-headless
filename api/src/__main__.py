@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 from argparse import ArgumentParser
 from curses_interface import CursesInterface
-from interface import Interface, Message, PlaintextInterface, Target
+from interface import BaseInterface, PlaintextInterface, Target
 
 from api.singletons import API
 from config import CONFIG
@@ -20,7 +20,7 @@ import features
 
 def interactive_rip(
     source, destination,
-    interface: Interface = PlaintextInterface(),
+    interface: BaseInterface = PlaintextInterface(),
     **kwargs
   ):
   library_choices = ['kids', 'main']

@@ -9,7 +9,7 @@ from json_serializable import JSONSerializable
 
 import features
 
-from interface import Interface, Target
+from interface import BaseInterface, Target
 from mkvtoolnix import split_mkv
 from toc import TOC
 from util import rsync, sanitize
@@ -76,7 +76,7 @@ def sort_titles(
     rip_path_base: str,  # /tmp/XXXXXX
     dest_path_base: str, # user@host:/path/to/media/library
     sort_info: SortInfo,
-    interface: Interface,
+    interface: BaseInterface,
 ):
   logger.debug(
     'sort_titles() called with args; ' 
