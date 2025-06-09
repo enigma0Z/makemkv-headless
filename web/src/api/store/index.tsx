@@ -14,3 +14,11 @@ export type AppDispatch = typeof store.dispatch
 
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>()
 export const useAppSelector = useSelector.withTypes<RootState>()
+
+export type ValidationEntry<T, S> = Record<string, (value: T, state?: S) => boolean>
+
+export type StateValidationEntryTypes<T> = (
+  ValidationEntry<string, T> |
+  ValidationEntry<number, T>
+)
+export type StateValidation<T> = { [key: string]: StateValidationEntryTypes<T> | StateValidation<T> }

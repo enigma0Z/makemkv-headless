@@ -64,6 +64,8 @@ def rip_titles(
         file.writelines(toc.lines)
         file.write(f'{toc.source}')
 
+    interface.send()
+
     if rip_all:
       rip_disc(source, rip_path, rip_titles=['all'], interface=interface)
     else:

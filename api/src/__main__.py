@@ -13,7 +13,7 @@ from argparse import ArgumentParser
 from curses_interface import CursesInterface
 from interface import BaseInterface, PlaintextInterface, Target
 
-from api.singletons import API
+from api.singletons import start_api
 from config import CONFIG
 
 import features
@@ -155,7 +155,7 @@ if __name__=='__main__':
 
   try:
     if (opts.api): 
-      API.run()
+      start_api()
       exit(0)
 
     elif not opts.curses:

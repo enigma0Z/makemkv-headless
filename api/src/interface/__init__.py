@@ -6,7 +6,7 @@ from typing import Any, Callable
 
 import logging
 
-from interface.message import BaseMessage, Message, ProgressMessage
+from interface.message import BaseMessageEvent, MessageEvent, ProgressMessageEvent
 logger = logging.getLogger(__name__)
 
 from json import dumps, loads
@@ -55,7 +55,7 @@ class BaseInterface(ABC):
   @abstractmethod
   def send(
       self,
-      message: BaseMessage
+      message: BaseMessageEvent
   ):
     # logger.debug('interface.send() message', message)
     pass
@@ -104,9 +104,9 @@ class PlaintextInterface(BaseInterface):
       
     print(*text, sep=sep, end=end)
 
-  def send(self, message: BaseMessage):
+  def send(self, message: BaseMessageEvent):
     super().send(message)
-    if type(message) == Message:
+    if type(message) == MessageEvent:
       end = ''
       match message.target:
         case Target.MKV:
@@ -116,7 +116,7 @@ class PlaintextInterface(BaseInterface):
           self.move_cursor_up(3)
           end += '\n'*2
       print(message.text, end=end)
-    elif type(message) == ProgressMessage:
+    elif type(message) == ProgressMessageEvent:
       print('Progress:', message.to_json())
     else:
       print(message.to_json())

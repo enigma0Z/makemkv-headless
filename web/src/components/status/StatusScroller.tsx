@@ -1,0 +1,57 @@
+import endpoints from "@/api/endpoints";
+import type { StatusResponse } from "@/api/types/status";
+import { Card, IconButton, LinearProgress } from "@mui/material";
+import { useContext, useEffect, useState } from "react"
+import { StatusScrollerWrapper } from "./StatusScroller.styles";
+
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Context as SocketContext } from "../socket/Context";
+
+export const StatusScroller = () => {
+  const { connected, messageEvents } = useContext(SocketContext)
+
+  const [isMinimized, setIsMinimized] = useState<boolean>(true)
+
+  const messages = messageEvents?.map((event) => event.text)
+
+  const handleOnScroll = () => { };
+
+  useEffect(() => {
+    const scroller = document.getElementById('status-scroller')
+    scroller?.scrollTo({top: scroller.scrollHeight})
+  }, [messages])
+
+  return <Card sx={{ position: "relative" }}>
+    <IconButton 
+      disableRipple
+      sx={{ 
+        display: "flex",
+        position: "absolute",
+        top: "0",
+        right: "0"
+      }} 
+      onClick={() => {
+        setIsMinimized((prev) => !prev)
+      }}
+    >
+      { isMinimized 
+        ? <ExpandMoreIcon />
+        : <ExpandLessIcon />
+      }
+    </IconButton>
+    <StatusScrollerWrapper 
+      id="status-scroller"
+      onScroll={handleOnScroll}
+      style={ isMinimized ? { height: "4.5em" } : {} }
+    >
+      {messages?.map(message => (
+        <div>{message}</div>
+      ))}
+    </StatusScrollerWrapper>
+    { connected
+      ? <LinearProgress /> 
+      : <LinearProgress variant="determinate" color="error" value={0} />
+    }
+  </Card>
+}

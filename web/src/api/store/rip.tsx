@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { ShowInfo, SortInfo } from "../types/SortInfo";
 import { uniqueFilter } from "@/util/array";
+import type { StateValidation } from ".";
 
 interface RipState {
   destination: RipStateDestination;
@@ -33,6 +34,16 @@ const initialState: RipState = {
   },
   rip_all: false,
   toc_length: 0
+}
+
+const ripStateValidation: StateValidation<RipState> = {
+  destination: {
+    library: (value: string) => value === "kids" || value === "main",
+    media: (value: string) => value === "dvd" || value === "blu-ray",
+    content: (value: string) => value === "movie" || value === "show"
+  },
+  sort_info: {
+  }
 }
 
 const ripSlice = createSlice({
@@ -88,8 +99,13 @@ const ripSlice = createSlice({
     setTocLength: (state, action: PayloadAction<number | undefined>) => {
       state.toc_length = action.payload
     },
+    setName: (state, action: PayloadAction<string>) => {
+      state.sort_info.name = action.payload
+    },
+    setId: (state, action: PayloadAction<string>) => {
+      state.sort_info.id = action.payload
+    },
     setFirstEpisode: (state, action: PayloadAction<number>) => {
-      console.log('setFirstEpisode(), action.payload', action.payload)
       state.sort_info.first_episode = action.payload
     },
     setSeasonNumber: (state, action: PayloadAction<number>) => {

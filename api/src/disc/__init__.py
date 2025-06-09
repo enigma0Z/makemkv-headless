@@ -10,6 +10,8 @@ from util import grep, notify
 def disc_inserted(source):
   if (source.startswith('dev') or source.startswith('disc')):
     return not grep('please insert', os.popen(shlex.join(['drutil', 'discinfo'])).readlines())
+  else:
+    return True
 
 def wait_for_disc_inserted(
     source, 

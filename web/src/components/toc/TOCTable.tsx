@@ -2,11 +2,15 @@ import { useAppDispatch, useAppSelector } from "@/api/store"
 import { ripActions } from "@/api/store/rip"
 import type { TitleInfo, Toc } from "@/api/types/Toc"
 import { hmsToSeconds } from "@/util/string"
-import { Button, Card, Checkbox, FormControlLabel, Radio, RadioGroup, Table, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
-import { useEffect, useState } from "react"
+import { Card, Checkbox, FormControlLabel, LinearProgress, Radio, RadioGroup, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
+import { useContext, useEffect, useState } from "react"
+import { MainExtrasRadioGroup, StatusWrapper, WidgetCell, WidgetWrapper } from "./TOCTable.styles"
+import { Context, type RipStartMessageEvent } from "../socket/Context"
+import { takeGreater } from "@/util/number"
 
-type TableProps = {
-  content?: "show" | "movie"
+type Props = {
+  data?: Toc
+  loading?: boolean
 }
 
 type TitleGroup = {
@@ -17,22 +21,94 @@ type TitleGroup = {
 
 const EPISODE_LENGTH_TOLERANCE_SECONDS = 120
 
-export const TOCTable = () => {
+export const TOCTable = ({ data = undefined, loading = false }: Props) => {
   const dispatch = useAppDispatch()
+
+  const { 
+    progressMessageEvents, setProgressMessageEvents,
+    progressValueMessageEvents, setProgressValueMessageEvents,
+    ripStartMessageEvents, setRipStartMessageEvents
+  } = useContext(Context)
 
   const mainIndexes = useAppSelector((state) => state.rip.sort_info.main_indexes)
   const extraIndexes = useAppSelector((state) => state.rip.sort_info.extra_indexes)
   const content = useAppSelector((state) => state.rip.destination.content)
 
-  const [tocData, setTocData] = useState<Toc>()
-  const [tocLoading, setTocLoading] = useState<boolean>(false)
   const [oldMainIndexes, setOldMainIndexes] = useState<number[]>([])
   const [oldExtraIndexes, setOldExtraIndexes] = useState<number[]>([])
+
+  const [completedIndexes, setCompletedIndexes] = useState<number[]>([])
+  const [previousIndex, setPreviousIndex] = useState<number>()
+
+  const [completed, setCompleted] = useState<boolean>(false)
+
+  const currentProgressEvents = (progressMessageEvents && progressMessageEvents.filter((event) => event.progressType === "Current")) ?? []
+  const totalProgressEvents = (progressMessageEvents && progressMessageEvents.filter((event) => event.progressType === "Total")) ?? []
+
+  const latestProgressValueEvent = progressValueMessageEvents && progressValueMessageEvents[progressValueMessageEvents.length-1]
+
+  const latestCurrentProgressEvent = currentProgressEvents[currentProgressEvents.length-1]
+  const latestTotalProgressEvent = totalProgressEvents[totalProgressEvents.length-1]
+
+  const latestRipStartEvent: RipStartMessageEvent | undefined = ripStartMessageEvents?.[ripStartMessageEvents.length-1]
+
+  let currentIndex: number | undefined = undefined
+
+  if (
+    ( latestRipStartEvent === undefined 
+      && latestTotalProgressEvent?.name === "Saving all titles to MKV files"
+    ) || loading
+  ) {
+    console.log("Resetting rip status", latestRipStartEvent, latestTotalProgressEvent, loading)
+    if (completedIndexes.length !== 0) setCompletedIndexes([]);
+    if (previousIndex !== undefined) setPreviousIndex(undefined);
+    if (completed) setCompleted(false);
+
+    if (
+      setRipStartMessageEvents 
+      && (ripStartMessageEvents?.length ?? -1) > 0
+    ) setRipStartMessageEvents(() => [])
+
+    if (
+      setProgressMessageEvents 
+      && (progressMessageEvents?.length ?? -1) > 0
+    ) setProgressMessageEvents(() => [])
+
+    if (
+      setProgressValueMessageEvents 
+      && (progressValueMessageEvents?.length ?? -1) > 0
+    ) setProgressValueMessageEvents(() => [])
+  } else if(
+    latestCurrentProgressEvent?.name === "Analyzing seamless segments" 
+    || latestCurrentProgressEvent?.name === "Saving to MKV file" 
+  ) {
+    currentIndex = takeGreater(latestRipStartEvent?.index, latestCurrentProgressEvent?.index)
+    console.log("Current Index", currentIndex)
+    if (
+      currentIndex !== undefined
+      && completedIndexes.indexOf(currentIndex) === -1
+      && latestCurrentProgressEvent.name === "Saving to MKV file" 
+      && ((
+        latestProgressValueEvent
+        && latestProgressValueEvent.current / latestProgressValueEvent.max > 0.98
+      ) || (
+        previousIndex !== currentIndex
+      ))
+    ) {
+      setCompletedIndexes((prev) => 
+        currentIndex !== undefined ? [...prev, currentIndex] : prev
+      )
+    }
+
+    if (previousIndex !== currentIndex) {
+      setPreviousIndex(currentIndex)
+    }
+  }
 
   const getLongestTitle = () => {
     let longestTitleIndex = 0
     let longestTitleLength = 0
-    tocData?.source.titles.forEach((title, index) => {
+    data?.source.titles.forEach((title, index) => {
       const outerTitleLength = hmsToSeconds(title.runtime)
       if (outerTitleLength > longestTitleLength) {
         longestTitleLength = outerTitleLength
@@ -60,10 +136,10 @@ export const TOCTable = () => {
       titleGroup.matches
     )).flat())
 
-    tocData?.source.titles.forEach((outerTitle, outerIndex) => {
+    data?.source.titles.forEach((outerTitle, outerIndex) => {
       const newTitleGroup: TitleGroup = { title: outerTitle, index: outerIndex, matches: [] }
       const outerTitleLength = hmsToSeconds(outerTitle.runtime)
-      tocData.source.titles.forEach((innerTitle, innerIndex) => {
+      data.source.titles.forEach((innerTitle, innerIndex) => {
         if (
           !(innerIndex in matchedIndexes())
           && hmsToSeconds(innerTitle.runtime) > outerTitleLength - EPISODE_LENGTH_TOLERANCE_SECONDS
@@ -92,7 +168,7 @@ export const TOCTable = () => {
     const { longestTitleIndex } = getLongestTitle()
     const mainIndexes = []
     const extraIndexes = []
-    for (let i=0; i < (tocData?.source.titles.length ?? 0); i++) {
+    for (let i=0; i < (data?.source.titles.length ?? 0); i++) {
       if (i == longestTitleIndex) {
         mainIndexes.push(i)
       } else {
@@ -106,7 +182,7 @@ export const TOCTable = () => {
     const {longestTitleGroup} = getLongestTitleGroup()
     const mainIndexes = []
     const extraIndexes = []
-    for (let i=0; i < (tocData?.source.titles.length ?? 0); i++) {
+    for (let i=0; i < (data?.source.titles.length ?? 0); i++) {
       if (longestTitleGroup.matches.indexOf(i) > -1) {
         mainIndexes.push(i)
       } else {
@@ -116,34 +192,19 @@ export const TOCTable = () => {
     return {mainIndexes, extraIndexes}
   }
 
-  const handleLoadTocClick = () => {
-    console.info('Fetching TOC')
-    setTocLoading(true)
-    fetch("http://localhost:5000/api/v1/toc", { method: 'GET' })
-      .then(response => response.json())
-      .then(json => {
-        console.log('response json', json)
-        setTocData(json)
-        setTocLoading(false)
-      })
-  }
-
   useEffect(() => {
-    if (tocData) {
-      dispatch(ripActions.setTocLength(tocData.source.titles.length))
+    if (data) {
+      dispatch(ripActions.setTocLength(data.source.titles.length))
 
       let longestTitleIndex = 0
       let longestTitleLength = 0
-      tocData.source.titles.forEach((title, index) => {
+      data.source.titles.forEach((title, index) => {
         const outerTitleLength = hmsToSeconds(title.runtime)
         if (outerTitleLength > longestTitleLength) {
           longestTitleLength = outerTitleLength
           longestTitleIndex = index
         }
       })
-
-      console.debug('longestTitleIndex', longestTitleIndex)
-      console.debug('longestTitleLength', longestTitleLength)
 
       let getIndexes: () => { mainIndexes: number[], extraIndexes: number[] }
       if (content === "movie") getIndexes = getMovieIndexes
@@ -153,11 +214,11 @@ export const TOCTable = () => {
       dispatch(ripActions.setMainIndexes(mainIndexes))
       dispatch(ripActions.setExtraIndexes(extraIndexes))
     }
-  }, [tocData]) 
+  }, [data]) 
 
   const handleSelectAllOnClick = (event: React.ChangeEvent, checked: boolean) => {
     if (checked) {
-      tocData?.source.titles.forEach((value, index) => {
+      data?.source.titles.forEach((value, index) => {
         const isInMainIndexes = (mainIndexes.indexOf(index) > -1)
         const isInExtraIndexes = (extraIndexes.indexOf(index) > -1)
         const wasInMainIndexes = (oldMainIndexes.indexOf(index) > -1)
@@ -178,33 +239,62 @@ export const TOCTable = () => {
   }
 
   return (<>
-    <Button 
-      loading={tocLoading} 
-      loadingPosition="end"
-      onClick={handleLoadTocClick}
-    >
-      Load TOC
-    </Button>
     <Card>
       <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{width: "1px"}}><Checkbox 
+              <TableCell
+                padding="checkbox"
+                size="small"
+              ><Checkbox 
                 onChange={handleSelectAllOnClick}
               /></TableCell>
-              <TableCell sx={{width: "1px"}}>#</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Runtime</TableCell>
-              <TableCell>Filename</TableCell>
+              <WidgetCell>#</WidgetCell>
+              <TableCell width="75%">Type</TableCell>
+              <TableCell width="10%">Runtime</TableCell>
+              <TableCell width="15%">Filename</TableCell>
             </TableRow>
           </TableHead>
-          { tocData 
-            ? tocData.source.titles.map((title, index) => <TOCRow key={index} index={index} data={title} />)
-            : <TableRow>
-                <TableCell colSpan={4}>No data</TableCell>
-              </TableRow>
-          }
+          <TableBody>
+            { data 
+              ? (
+                data.source.titles.map((title, index) => {
+                  let progress: number = 0
+                  let buffer: number | undefined
+                  let statusText: string | undefined
+                  if (completedIndexes.indexOf(index) > -1) {
+                    progress = 100
+                  } else if (
+                    index === currentIndex
+                    && latestProgressValueEvent !== undefined
+                    && latestCurrentProgressEvent 
+                  ) {
+                    statusText = latestCurrentProgressEvent.name
+                    if (latestCurrentProgressEvent.name === "Saving to MKV file") {
+                      progress = (latestProgressValueEvent.current / latestProgressValueEvent.max) * 100
+                    } else {
+                      buffer = (latestProgressValueEvent.current / latestProgressValueEvent.max) * 100
+                    }
+                  }
+                  return (
+                    <TOCRow 
+                      key={index} 
+                      index={index} 
+                      data={title} 
+                      progress={progress}
+                      buffer={buffer}
+                      statusText={statusText}
+                    />
+                  )
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5}>No data</TableCell>
+                </TableRow>
+              )
+            }
+          </TableBody>
         </Table>
       </TableContainer>
     </Card>
@@ -214,9 +304,12 @@ export const TOCTable = () => {
 type RowProps = {
   index: number;
   data: TitleInfo;
+  progress?: number;
+  buffer?: number;
+  statusText?: string;
 }
 
-export const TOCRow = ({ index, data }: RowProps) => {
+export const TOCRow = ({ index, data, progress = 0, buffer, statusText }: RowProps) => {
   const dispatch = useAppDispatch()
 
   const mainIndexes = useAppSelector((state) => state.rip.sort_info.main_indexes)
@@ -258,27 +351,42 @@ export const TOCRow = ({ index, data }: RowProps) => {
   }
 
   return <TableRow>
-    <TableCell><Checkbox 
+    <TableCell
+      padding="checkbox"
+
+    ><Checkbox 
       checked={isSelected}
       onChange={handleCheckboxOnChange}
     /></TableCell>
     <TableCell>{index}</TableCell>
     <TableCell>
-      <RadioGroup
-        row
-        aria-labelledby="demo-radio-buttons-group-label"
-        value={
-          isSelected 
-          ? (isMain ? "main" : "extra") 
-          : null
-        }
-        name="radio-buttons-group"
-        onChange={handleRadioButtonChange}
-        aria-disabled={!isSelected}
-      >
-        <FormControlLabel disabled={!isSelected} value="main" control={<Radio />} label="Main" />
-        <FormControlLabel disabled={!isSelected} value="extra" control={<Radio />} label="Extra" />
-      </RadioGroup>
+      <WidgetWrapper>
+        <div>
+          <MainExtrasRadioGroup
+            row
+            aria-labelledby="demo-radio-buttons-group-label"
+            value={
+              isSelected 
+              ? (isMain ? "main" : "extra") 
+              : null
+            }
+            name="radio-buttons-group"
+            onChange={handleRadioButtonChange}
+            aria-disabled={!isSelected}
+            sx={{display: "inline-block"}}
+          >
+            <FormControlLabel disabled={!isSelected} value="main" control={<Radio />} label="Main" />
+            <FormControlLabel disabled={!isSelected} value="extra" control={<Radio />} label="Extra" />
+          </MainExtrasRadioGroup>
+        </div>
+        <StatusWrapper>
+          <div>{statusText ?? ''}</div>
+          { isSelected
+            ? <LinearProgress variant={buffer !== undefined ? "buffer" : "determinate"} value={progress ?? 0} valueBuffer={buffer} />
+            : <LinearProgress variant="determinate" value={0} color="secondary" />
+          }
+        </StatusWrapper>
+      </WidgetWrapper>
     </TableCell>
     <TableCell>{data.runtime}</TableCell>
     <TableCell>{data.filename}</TableCell>

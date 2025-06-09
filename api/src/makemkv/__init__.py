@@ -7,6 +7,7 @@ from time import time
 import logging
 logger = logging.getLogger(__name__)
 
+from interface.message import RipStartMessageEvent, build_message
 from config import CONFIG
 from disc import wait_for_disc_inserted
 from interface import BaseInterface, PlaintextInterface, Target
@@ -30,6 +31,7 @@ def rip_disc(
   for rip_title in [str(v) for v in rip_titles]:
     logger.info(f'Ripping title {rip_title}')
     interface.print(f'Ripping title {rip_title}', target=Target.SORT)
+    interface.send(RipStartMessageEvent(index=rip_title))
 
     # Current and total progress title
     # PRGC:code,id,name (Current)
@@ -65,16 +67,18 @@ def rip_disc(
         line = b_line.decode().strip()
         logger.debug(f'makemkvcon - {line}')
 
-        if line.startswith('PRGC'):
-          current_title = line.split(':')[1].split(',')[2]
-          current_title = re.sub(r'^"', '', current_title)
-          current_title = re.sub(r'"$', '', current_title)
-        elif line.startswith('PRGT'):
-          total_title = line.split(':')[1].split(',')[2]
-          total_title = re.sub(r'^"', '', total_title)
-          total_title = re.sub(r'"$', '', total_title)
-        elif line.startswith('PRGV'):
-          progress_value = [int(v) for v in line.split(':')[1].split(',')]
+        if not line.startswith('MSG'):
+          interface.send(build_message(raw=line))
+          if line.startswith('PRGC'):
+            current_title = line.split(':')[1].split(',')[2]
+            current_title = re.sub(r'^"', '', current_title)
+            current_title = re.sub(r'"$', '', current_title)
+          elif line.startswith('PRGT'):
+            total_title = line.split(':')[1].split(',')[2]
+            total_title = re.sub(r'^"', '', total_title)
+            total_title = re.sub(r'"$', '', total_title)
+          elif line.startswith('PRGV'):
+            progress_value = [int(v) for v in line.split(':')[1].split(',')]
 
         else:
           try:
@@ -116,7 +120,7 @@ def rip_disc(
 
           status_line = f'{total_title}, {current_title} - {total_pct*100:>6.2f}% ~{seconds_to_hms(total_remaining)}s / {current_pct*100:>6.2f}% ~{seconds_to_hms(current_remaining)}s'
 
-          # interface.send(ProgressMessage(
+          # interface.send(ProgressMessageEvent(
           #   total=total_pct,
           #   total_elapsed=total_elapsed,
           #   total_remaining=total_remaining,

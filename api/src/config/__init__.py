@@ -18,6 +18,7 @@ class Config(JSONSerializable):
     self.destination: str  = None
     self.log_level: str = None
     self.temp_prefix: str = None
+    self.frontend: str = None
 
     Config.keys = self.__dict__.keys()
 
