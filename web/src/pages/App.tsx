@@ -3,14 +3,16 @@ import { CombinedShowMovieForm } from '@/components/forms/ContentForm'
 import { StatusScroller } from '@/components/status/StatusScroller'
 import { AppContainer } from './App.styles'
 import { ButtonBar } from '@/components/ButtonBar'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import endpoints from '@/api/endpoints'
 import type { Toc } from '@/api/types/Toc'
 import { useAppSelector } from '@/api/store'
+import { Context } from '@/components/socket/Context'
 
 function App() {
+  const { setRipState } = useContext(Context)
+
   const [tocLoading, setTocLoading] = useState<boolean>()
-  const [ripping, setRipping] = useState<boolean>()
   const [tocData, setTocData] = useState<Toc>()
 
   const sortInfo = useAppSelector((state) => state.rip.sort_info)
@@ -22,6 +24,7 @@ function App() {
   const handleLoadTocClick = () => {
     console.info('Fetching TOC')
     setTocLoading(true)
+    setRipState && setRipState({})
     fetch(endpoints.toc(), { method: 'GET' })
       .then(response => response.json())
       .then(json => {

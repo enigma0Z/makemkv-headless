@@ -17,7 +17,7 @@ from makemkv import rip_disc
 from toc import TOC
 from util import hms_to_seconds, rsync, sanitize, string_to_list_int
 
-import tmdb
+import api.src.tmdb_search.search as search
 import features
 
 def rip_movie(
@@ -109,7 +109,7 @@ def rip_movie_interactive(
 
     movie_name = interface.get_input('What is the name of this movie?', movie_name)
 
-    results = tmdb.search('movie', movie_name)
+    results = search.search('movie', movie_name)
     if (id is None and len(results) > 0):
       id = results[0].id
       interface.print(f'\nSearch results for "{movie_name}":', target=Target.INPUT)

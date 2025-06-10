@@ -1,12 +1,20 @@
 
 
+import json
+from flask import request
 from api.singletons import API
+from api.json_api import json_serializable_api
+from api import json_api
+from tmdb.search import search
 
-
-@API.route('/api/v1/tmdb/show')
+@API.get('/api/v1/tmdb/show')
+@json_serializable_api
 def get_tmdb_show():
-    pass
+    response = search('tv', request.args['q'])
+    return response
 
-@API.route('/api/v1/tmdb/movie')
+@API.get('/api/v1/tmdb/movie')
+@json_serializable_api
 def get_tmdb_movie():
-    pass
+    response = search('movie', request.args['q'])
+    return response

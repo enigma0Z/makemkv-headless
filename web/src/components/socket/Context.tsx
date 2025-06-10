@@ -29,15 +29,16 @@ export type MessageEvent = BaseMessageEventData & {
   text: string
 }
 
-export type RipStartMessageEvent = BaseMessageEventData & {
-  index: number | null
+export type RipStartStopMessageEvent = BaseMessageEventData & {
+  index: number | null;
+  state: "start" | "stop";
 }
 
 export interface ServerToClientEvents {
   ProgressMessageEvent: (value: ProgressMessageEvent) => void;
   ProgressValueMessageEvent: (value: ProgressValueMessageEvent) => void;
   MessageEvent: (value: MessageEvent) => void;
-  RipStartMessageEvent: (value: RipStartMessageEvent) => void;
+  RipStartStopMessageEvent: (value: RipStartStopMessageEvent) => void;
 }
 
 export interface ClientToServerEvents { }
@@ -46,10 +47,11 @@ export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>
 
 type RipState = {
   currentTitle?: number;
-  currentProgress?: {buffer: number, progress: number}[];
+  currentProgress?: {buffer?: number, progress: number}[];
   totalProgress?: {buffer: number, progress: number};
   currentStatus?: ProgressMessageEvent["name"];
   totalStatus?: string;
+  ripStarted?: boolean;
 }
 
 type ContextProps = {
@@ -65,11 +67,11 @@ type ContextProps = {
   messageEvents?: (MessageEvent)[];
   setMessageEvents?: SetStateCallback<MessageEvent[] | undefined>;
 
-  ripStartMessageEvents?: (RipStartMessageEvent)[];
-  setRipStartMessageEvents?: SetStateCallback<RipStartMessageEvent[] | undefined>;
+  ripStartStopMessageEvents?: (RipStartStopMessageEvent)[];
+  setRipStartStopMessageEvents?: SetStateCallback<RipStartStopMessageEvent[] | undefined>;
 
   ripState?: RipState;
-  setRipState?: SetStateCallback<RipState>;
+  setRipState?: SetStateCallback<RipState | undefined>;
 }
 
 export const Context = createContext<ContextProps>({
@@ -86,7 +88,7 @@ const SocketContext = ({ children }: SocketContextProps) => {
   const [progressMessageEvents, setProgressMessageEvents] = useState<(ProgressMessageEvent)[]>()
   const [progressValueMessageEvents, setProgressValueMessageEvents] = useState<(ProgressValueMessageEvent)[]>()
   const [messageEvents, setMessageEvents] = useState<(MessageEvent)[]>()
-  const [ripStartMessageEvents, setRipStartMessageEvents] = useState<(RipStartMessageEvent)[]>()
+  const [ripStartStopMessageEvents, setRipStartStopMessageEvents] = useState<(RipStartStopMessageEvent)[]>()
   const [ripState, setRipState] = useState<RipState>()
 
   return <Context value={{
@@ -94,7 +96,8 @@ const SocketContext = ({ children }: SocketContextProps) => {
     progressMessageEvents, setProgressMessageEvents,
     progressValueMessageEvents, setProgressValueMessageEvents,
     messageEvents, setMessageEvents,
-    ripStartMessageEvents, setRipStartMessageEvents,
+    ripStartStopMessageEvents, setRipStartStopMessageEvents,
+    ripState, setRipState
   }}>
     {children}
   </Context>

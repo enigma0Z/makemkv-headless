@@ -58,7 +58,7 @@ class ProgressValueMessageEvent(BaseMessageEvent):
       in data['raw'].split(':')[1].split(',') 
     ]
 
-class RipStartMessageEvent(BaseMessageEvent):
+class RipStartStopMessageEvent(BaseMessageEvent):
   def __init__(self, **data):
     assert 'index' in data
     try: 
@@ -69,17 +69,9 @@ class RipStartMessageEvent(BaseMessageEvent):
       except ValueError:
         data['index'] = None
 
-    super().__init__(**data)
-
-class ProcessStartStopEvent(BaseMessageEvent):
-  '''
-  * `state`: Whether the process is starting or stopping,  `start` or `stop`
-  * `name`: The name of the process
-  '''
-  def __init__(self, **data):
     assert 'state' in data
     assert data['state'] in ['start', 'stop']
-    assert 'name' in data
+
     super().__init__(**data)
 
 def build_message(**data):

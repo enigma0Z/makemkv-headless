@@ -1,4 +1,5 @@
 from functools import wraps
+import json
 from typing import Callable
 
 from flask import Response
@@ -11,17 +12,21 @@ def json_serializable_api(function: Callable[[], JSONSerializable | tuple[JSONSe
   def decorated_function():
     api_response = function()
     if isinstance(api_response, tuple):
-      json, response = api_response
-      assert json is not None
+      json_data, response = api_response
+      assert json_data is not None
       assert response is not None
 
-      response.response = json.to_json()
+      response.response = json_data.to_json()
       response.content_type = JSON_CONTENT_TYPE
       return response
     else:
-      json = api_response
+      json_data = None
+      if isinstance(api_response, list):
+        json_data = json.dumps([value.json_encoder() for value in api_response])
+      else:
+        json_data = api_response.to_json()
       return Response(
-        response=json.to_json(),
+        response=json_data,
         content_type=JSON_CONTENT_TYPE
       )
 

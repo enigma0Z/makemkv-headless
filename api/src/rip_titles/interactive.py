@@ -13,7 +13,7 @@ from interface import BaseInterface, PlaintextInterface, Target
 from toc import TOC
 from util import hms_to_seconds, string_to_list_int
 
-import tmdb
+import tmdb.search as search
 
 EPISODE_LENGTH_TOLERANCE = 90
 
@@ -42,7 +42,7 @@ def rip_movie_interactive(
 
     movie_name = interface.get_input('What is the name of this movie?', movie_name)
 
-    results = tmdb.search('movie', movie_name)
+    results = search.search('movie', movie_name)
     if (id is None and len(results) > 0):
       id = results[0].id
       interface.print(f'\nSearch results for "{movie_name}":', target=Target.INPUT)
@@ -151,7 +151,7 @@ def rip_show_interactive(
 
     show_name = interface.get_input('What is the name of this show?', show_name)
 
-    results = tmdb.search('tv', show_name)
+    results = search.search('tv', show_name)
     if (id is None and len(results) > 0):
       id = results[0].id
       interface.print(f'\nSearch results for "{show_name}":', target=Target.INPUT)

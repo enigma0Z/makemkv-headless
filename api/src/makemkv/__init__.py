@@ -7,7 +7,7 @@ from time import time
 import logging
 logger = logging.getLogger(__name__)
 
-from interface.message import RipStartMessageEvent, build_message
+from interface.message import RipStartStopMessageEvent, build_message
 from config import CONFIG
 from disc import wait_for_disc_inserted
 from interface import BaseInterface, PlaintextInterface, Target
@@ -31,7 +31,7 @@ def rip_disc(
   for rip_title in [str(v) for v in rip_titles]:
     logger.info(f'Ripping title {rip_title}')
     interface.print(f'Ripping title {rip_title}', target=Target.SORT)
-    interface.send(RipStartMessageEvent(index=rip_title))
+    interface.send(RipStartStopMessageEvent(index=rip_title))
 
     # Current and total progress title
     # PRGC:code,id,name (Current)

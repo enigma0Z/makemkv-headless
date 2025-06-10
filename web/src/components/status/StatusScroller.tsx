@@ -2,7 +2,7 @@ import endpoints from "@/api/endpoints";
 import type { StatusResponse } from "@/api/types/status";
 import { Card, IconButton, LinearProgress } from "@mui/material";
 import { useContext, useEffect, useState } from "react"
-import { StatusScrollerWrapper } from "./StatusScroller.styles";
+import { StatusScrollerWrapper, StatusScrollerWrapperMinimized } from "./StatusScroller.styles";
 
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -21,6 +21,10 @@ export const StatusScroller = () => {
     const scroller = document.getElementById('status-scroller')
     scroller?.scrollTo({top: scroller.scrollHeight})
   }, [messages])
+  
+  const WrapperComponent = isMinimized 
+    ? StatusScrollerWrapperMinimized
+    : StatusScrollerWrapper
 
   return <Card sx={{ position: "relative" }}>
     <IconButton 
@@ -40,15 +44,11 @@ export const StatusScroller = () => {
         : <ExpandLessIcon />
       }
     </IconButton>
-    <StatusScrollerWrapper 
-      id="status-scroller"
-      onScroll={handleOnScroll}
-      style={ isMinimized ? { height: "4.5em" } : {} }
-    >
+    <WrapperComponent id="status-scroller" >
       {messages?.map(message => (
         <div>{message}</div>
       ))}
-    </StatusScrollerWrapper>
+    </WrapperComponent>
     { connected
       ? <LinearProgress /> 
       : <LinearProgress variant="determinate" color="error" value={0} />

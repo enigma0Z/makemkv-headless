@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 
+import logging
 from typing import Any
 import requests
 
+from json_serializable import JSONSerializable
 from config import CONFIG
+
+logger = logging.getLogger(__name__)
 
 API_HOST_NAME = 'api.themoviedb.org'
 WEB_HOST_NAME = 'www.themoviedb.org'
 API_VERSION = '3'
 
-class Data:
+class Data(JSONSerializable):
   def __init__(self, data):
     self.data = data
 
@@ -21,6 +25,9 @@ class Data:
         return self.data['title']
       else:
         raise ex
+  
+  def json_encoder(self):
+    return self.data
 
 class SearchResult (Data):
   def __init__(self, data, content_type):
@@ -41,4 +48,9 @@ def search(content, query):
     params = { 'query': query }
   )
 
-  return [SearchResult(result, content) for result in response.json()['results']]
+  response_json = response.json()
+
+  if ('results' in response_json): 
+    return [SearchResult(result, content) for result in response.json()['results']]
+  else:
+    return Data(response_json)

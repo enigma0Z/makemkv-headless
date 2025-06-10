@@ -2,11 +2,10 @@ import { useAppDispatch, useAppSelector } from "@/api/store"
 import { ripActions } from "@/api/store/rip"
 import type { TitleInfo, Toc } from "@/api/types/Toc"
 import { hmsToSeconds } from "@/util/string"
-import { Card, Checkbox, FormControlLabel, LinearProgress, Radio, RadioGroup, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
+import { Card, Checkbox, FormControlLabel, LinearProgress, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
-import { MainExtrasRadioGroup, StatusWrapper, WidgetCell, WidgetWrapper } from "./TOCTable.styles"
-import { Context, type RipStartMessageEvent } from "../socket/Context"
-import { takeGreater } from "@/util/number"
+import { MainExtrasRadioGroup, StatusContentWrapper, StatusContentWrapperLeft, StatusWrapper, WidgetCell, WidgetWrapper } from "./TOCTable.styles"
+import { Context } from "../socket/Context"
 
 type Props = {
   data?: Toc
@@ -24,11 +23,7 @@ const EPISODE_LENGTH_TOLERANCE_SECONDS = 120
 export const TOCTable = ({ data = undefined, loading = false }: Props) => {
   const dispatch = useAppDispatch()
 
-  const { 
-    progressMessageEvents, setProgressMessageEvents,
-    progressValueMessageEvents, setProgressValueMessageEvents,
-    ripStartMessageEvents, setRipStartMessageEvents
-  } = useContext(Context)
+  const { ripState } = useContext(Context)
 
   const mainIndexes = useAppSelector((state) => state.rip.sort_info.main_indexes)
   const extraIndexes = useAppSelector((state) => state.rip.sort_info.extra_indexes)
@@ -36,74 +31,6 @@ export const TOCTable = ({ data = undefined, loading = false }: Props) => {
 
   const [oldMainIndexes, setOldMainIndexes] = useState<number[]>([])
   const [oldExtraIndexes, setOldExtraIndexes] = useState<number[]>([])
-
-  const [completedIndexes, setCompletedIndexes] = useState<number[]>([])
-  const [previousIndex, setPreviousIndex] = useState<number>()
-
-  const [completed, setCompleted] = useState<boolean>(false)
-
-  const currentProgressEvents = (progressMessageEvents && progressMessageEvents.filter((event) => event.progressType === "Current")) ?? []
-  const totalProgressEvents = (progressMessageEvents && progressMessageEvents.filter((event) => event.progressType === "Total")) ?? []
-
-  const latestProgressValueEvent = progressValueMessageEvents && progressValueMessageEvents[progressValueMessageEvents.length-1]
-
-  const latestCurrentProgressEvent = currentProgressEvents[currentProgressEvents.length-1]
-  const latestTotalProgressEvent = totalProgressEvents[totalProgressEvents.length-1]
-
-  const latestRipStartEvent: RipStartMessageEvent | undefined = ripStartMessageEvents?.[ripStartMessageEvents.length-1]
-
-  let currentIndex: number | undefined = undefined
-
-  if (
-    ( latestRipStartEvent === undefined 
-      && latestTotalProgressEvent?.name === "Saving all titles to MKV files"
-    ) || loading
-  ) {
-    console.log("Resetting rip status", latestRipStartEvent, latestTotalProgressEvent, loading)
-    if (completedIndexes.length !== 0) setCompletedIndexes([]);
-    if (previousIndex !== undefined) setPreviousIndex(undefined);
-    if (completed) setCompleted(false);
-
-    if (
-      setRipStartMessageEvents 
-      && (ripStartMessageEvents?.length ?? -1) > 0
-    ) setRipStartMessageEvents(() => [])
-
-    if (
-      setProgressMessageEvents 
-      && (progressMessageEvents?.length ?? -1) > 0
-    ) setProgressMessageEvents(() => [])
-
-    if (
-      setProgressValueMessageEvents 
-      && (progressValueMessageEvents?.length ?? -1) > 0
-    ) setProgressValueMessageEvents(() => [])
-  } else if(
-    latestCurrentProgressEvent?.name === "Analyzing seamless segments" 
-    || latestCurrentProgressEvent?.name === "Saving to MKV file" 
-  ) {
-    currentIndex = takeGreater(latestRipStartEvent?.index, latestCurrentProgressEvent?.index)
-    console.log("Current Index", currentIndex)
-    if (
-      currentIndex !== undefined
-      && completedIndexes.indexOf(currentIndex) === -1
-      && latestCurrentProgressEvent.name === "Saving to MKV file" 
-      && ((
-        latestProgressValueEvent
-        && latestProgressValueEvent.current / latestProgressValueEvent.max > 0.98
-      ) || (
-        previousIndex !== currentIndex
-      ))
-    ) {
-      setCompletedIndexes((prev) => 
-        currentIndex !== undefined ? [...prev, currentIndex] : prev
-      )
-    }
-
-    if (previousIndex !== currentIndex) {
-      setPreviousIndex(currentIndex)
-    }
-  }
 
   const getLongestTitle = () => {
     let longestTitleIndex = 0
@@ -123,13 +50,6 @@ export const TOCTable = ({ data = undefined, loading = false }: Props) => {
   }
 
   const getLongestTitleGroup = () => {
-    /**
-     * [
-     *   title: TitleInfo
-     *   index: number
-     *   matches: TitleInfo[]
-     * ]
-     */
     const titleGroups: TitleGroup[] = []
 
     const matchedIndexes = () => (titleGroups.map((titleGroup) => (
@@ -196,7 +116,7 @@ export const TOCTable = ({ data = undefined, loading = false }: Props) => {
     if (data) {
       dispatch(ripActions.setTocLength(data.source.titles.length))
 
-      let longestTitleIndex = 0
+      let longestTitleIndex =0
       let longestTitleLength = 0
       data.source.titles.forEach((title, index) => {
         const outerTitleLength = hmsToSeconds(title.runtime)
@@ -251,7 +171,26 @@ export const TOCTable = ({ data = undefined, loading = false }: Props) => {
                 onChange={handleSelectAllOnClick}
               /></TableCell>
               <WidgetCell>#</WidgetCell>
-              <TableCell width="75%">Type</TableCell>
+              <TableCell width="75%">
+                <StatusContentWrapper>
+                  <StatusContentWrapperLeft>
+                    Type
+                  </StatusContentWrapperLeft>
+                  <StatusWrapper>
+                  { ripState?.totalStatus && <>
+                        <div>
+                          {ripState?.totalStatus}
+                        </div>
+                        <LinearProgress 
+                          variant="buffer" 
+                          value={ripState?.totalProgress?.progress ?? 0} 
+                          valueBuffer={ripState?.totalProgress?.buffer ?? 0} 
+                        />
+                    </>
+                  }
+                  </StatusWrapper>
+                </StatusContentWrapper>
+              </TableCell>
               <TableCell width="10%">Runtime</TableCell>
               <TableCell width="15%">Filename</TableCell>
             </TableRow>
@@ -260,31 +199,14 @@ export const TOCTable = ({ data = undefined, loading = false }: Props) => {
             { data 
               ? (
                 data.source.titles.map((title, index) => {
-                  let progress: number = 0
-                  let buffer: number | undefined
-                  let statusText: string | undefined
-                  if (completedIndexes.indexOf(index) > -1) {
-                    progress = 100
-                  } else if (
-                    index === currentIndex
-                    && latestProgressValueEvent !== undefined
-                    && latestCurrentProgressEvent 
-                  ) {
-                    statusText = latestCurrentProgressEvent.name
-                    if (latestCurrentProgressEvent.name === "Saving to MKV file") {
-                      progress = (latestProgressValueEvent.current / latestProgressValueEvent.max) * 100
-                    } else {
-                      buffer = (latestProgressValueEvent.current / latestProgressValueEvent.max) * 100
-                    }
-                  }
                   return (
                     <TOCRow 
                       key={index} 
                       index={index} 
                       data={title} 
-                      progress={progress}
-                      buffer={buffer}
-                      statusText={statusText}
+                      progress={(ripState?.currentProgress && ripState.currentProgress[index]?.progress) ?? undefined}
+                      buffer={ripState?.currentProgress?.[index]?.buffer}
+                      statusText={index === ripState?.currentTitle ? ripState?.currentStatus : ''}
                     />
                   )
                 })
@@ -309,7 +231,7 @@ type RowProps = {
   statusText?: string;
 }
 
-export const TOCRow = ({ index, data, progress = 0, buffer, statusText }: RowProps) => {
+export const TOCRow = ({ index, data, progress, buffer, statusText }: RowProps) => {
   const dispatch = useAppDispatch()
 
   const mainIndexes = useAppSelector((state) => state.rip.sort_info.main_indexes)
@@ -360,8 +282,8 @@ export const TOCRow = ({ index, data, progress = 0, buffer, statusText }: RowPro
     /></TableCell>
     <TableCell>{index}</TableCell>
     <TableCell>
-      <WidgetWrapper>
-        <div>
+      <StatusContentWrapper>
+        <StatusContentWrapperLeft>
           <MainExtrasRadioGroup
             row
             aria-labelledby="demo-radio-buttons-group-label"
@@ -378,15 +300,17 @@ export const TOCRow = ({ index, data, progress = 0, buffer, statusText }: RowPro
             <FormControlLabel disabled={!isSelected} value="main" control={<Radio />} label="Main" />
             <FormControlLabel disabled={!isSelected} value="extra" control={<Radio />} label="Extra" />
           </MainExtrasRadioGroup>
-        </div>
+        </StatusContentWrapperLeft>
         <StatusWrapper>
-          <div>{statusText ?? ''}</div>
-          { isSelected
-            ? <LinearProgress variant={buffer !== undefined ? "buffer" : "determinate"} value={progress ?? 0} valueBuffer={buffer} />
-            : <LinearProgress variant="determinate" value={0} color="secondary" />
-          }
+          { progress !== undefined && <>
+              <div>{progress === 100 ? "Complete" : statusText ?? ''}</div>
+              { isSelected
+                ? <LinearProgress variant={buffer !== undefined ? "buffer" : "determinate"} value={progress ?? 0} valueBuffer={buffer} />
+                : <LinearProgress variant="determinate" value={0} color="secondary" />
+              }
+          </> }
         </StatusWrapper>
-      </WidgetWrapper>
+      </StatusContentWrapper>
     </TableCell>
     <TableCell>{data.runtime}</TableCell>
     <TableCell>{data.filename}</TableCell>
