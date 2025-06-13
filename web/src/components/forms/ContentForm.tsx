@@ -1,11 +1,17 @@
 import { useAppSelector } from "@/api/store"
 import { ripActions } from "@/api/store/rip"
-import { FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material"
+import { Autocomplete, Card, FormControl, InputLabel, MenuItem, Paper, Select, TextField, useTheme } from "@mui/material"
 import { useDispatch } from "react-redux"
-import { StyledFormGroup } from "./ContentForm.styles"
+import { ContentFormControl, FirstEpisodeFormControl, LibraryFormControl, MediaFormControl, NameIdFormControl, SeasonFormControl, StyledFormGroup } from "./ContentForm.styles"
+import React, { useState } from "react"
+import { throttle } from "lodash"
+import endpoints from "@/api/endpoints"
+import type { TmdbSearchResult } from "@/api/types/tmdb"
+import { AutocompleteWrapper } from "@/theme"
 
 export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
   const dispatch = useDispatch();
+  const theme = useTheme();
 
   const name = useAppSelector((state) => state.rip.sort_info.name)
   const id = useAppSelector((state) => state.rip.sort_info.id)
@@ -14,6 +20,52 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
   const content = useAppSelector((state) => state.rip.destination?.content)
   const seasonNumber = useAppSelector((state) => state.rip.sort_info.season_number)
   const firstEpisode = useAppSelector((state) => state.rip.sort_info.first_episode)
+
+  const [ nameValue, setNameValue ] = useState<TmdbSearchResult>()
+  const [ nameOptions, setNameOptions ] = useState<(TmdbSearchResult)[]>()
+
+  const getOptionLabel = (option: TmdbSearchResult) => 
+    option ? `${option.name ?? option.title} / ${option.first_air_date ?? option.release_date} (tmdbid-${option.id})` : ""
+  
+  const updateOptions = throttle((searchText: string) => {
+    console.log('updateOptions', searchText)
+    const foundOption = nameOptions?.find((option) => (
+      option.label === searchText
+    ))
+    if (!foundOption && searchText !== '') {
+      if (content?.toLowerCase() === 'show') {
+        fetch(endpoints.tmdb_show(searchText), { method: 'GET' })
+        .then(response => response.json())
+        .then(json => {
+          json.forEach((option: TmdbSearchResult) => {
+            option.label = getOptionLabel(option)
+          })
+          setNameOptions(json)
+        })
+      } else if (content?.toLowerCase() === 'movie') {
+        fetch(endpoints.tmdb_movie(searchText), { method: 'GET' })
+        .then(response => response.json())
+        .then(json => {
+          json.forEach((option: TmdbSearchResult) => {
+            option.label = getOptionLabel(option)
+          })
+          setNameOptions(json)
+        })
+      }
+    }
+  }, 2000, {leading: false, trailing: true})
+
+  const handleNameOnInputChange = (event: React.SyntheticEvent, value: string) => {
+    console.debug('handleNameOnInputChange', value)
+    updateOptions(value)
+  }
+
+  const handleNameOnChange = (event: React.SyntheticEvent, value: TmdbSearchResult | null) => {
+    console.log('handleNameChange', value)
+    if (value?.name) dispatch(ripActions.setName(value.name));
+    else if (value?.title) dispatch(ripActions.setName(value.title));
+    value?.id && dispatch(ripActions.setId(`${value.id}`))
+  }
 
   const isValid = (
     ( name !== null && name !== undefined ) &&
@@ -31,8 +83,7 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
 
   return <>
     <StyledFormGroup>
-      <div>
-        <FormControl>
+        <LibraryFormControl>
           <InputLabel id="select-library-label">Library</InputLabel>
           <Select
             labelId="select-library-label"
@@ -47,9 +98,9 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
             <MenuItem value={"main"}>Main</MenuItem>
             <MenuItem value={"kids"}>Kids</MenuItem>
           </Select>
-        </FormControl>
+        </LibraryFormControl>
 
-        <FormControl>
+        <MediaFormControl>
           <InputLabel id="select-media-label">Format</InputLabel>
           <Select
             labelId="select-media-label"
@@ -64,8 +115,9 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
             <MenuItem value={"dvd"}>DVD</MenuItem>
             <MenuItem value={"blu-ray"}>Blu-Ray</MenuItem>
           </Select>
-        </FormControl>
-        <FormControl>
+        </MediaFormControl>
+
+        <ContentFormControl>
           <InputLabel id="select-content-label">Content</InputLabel>
           <Select
             labelId="select-content-label"
@@ -80,35 +132,54 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
             <MenuItem value={"show"}>Show</MenuItem>
             <MenuItem value={"movie"}>Movie</MenuItem>
           </Select>
-        </FormControl>
-        </div><div>
-        <FormControl>
-          <TextField 
-            label="Name"
-            value={name}
-            onChange={({target: {value}}) => {
-              dispatch(ripActions.setName(value))
-            }}
-            onBlur={() => {
-              // API call to search tmdb and fill out autocomplete
-            }}
-          />
-        </FormControl>
-        <FormControl>
-          <TextField // Autocomplete based on name value
-            label="TMDB ID"
-            value={id}
-            onChange={({target: {value}}) => {
-              dispatch(ripActions.setId(value))
-            }}
-          />
-        </FormControl>
-        <FormControl
+        </ContentFormControl>
+        <NameIdFormControl
+          disabled={content === ""}
+        >
+          <AutocompleteWrapper>
+            <Autocomplete
+              disabled={content === "" || content === undefined || content === null}
+              renderInput={(params) => ( <TextField {...params} label="Name" />)} 
+              onInputChange={handleNameOnInputChange}
+              onChange={handleNameOnChange}
+              options={nameOptions ?? []}
+              getOptionLabel={(option) => option.label ?? ''}
+              filterOptions={(options, state) => {
+                const filteredOptions = options.filter((option) => {
+                  state.getOptionLabel(option).startsWith(state.inputValue)
+                })
+                return filteredOptions.length > 0 ? filteredOptions : options
+              }}
+              renderOption={({key, ...props}, option: TmdbSearchResult, state, ownerState) => {
+                return (
+                  <li 
+                    key={key} 
+                    {...props}
+                  >
+                    <Card
+                      elevation={12}
+                      sx={{
+                        padding: "10px",
+                        width: "100%",
+                      }}
+                    >
+                      <div>{ownerState.getOptionLabel(option)}</div>
+                      <div>{option.overview}</div>
+                    </Card>
+                  </li>
+                )
+              }}
+              value={nameValue}
+              fullWidth
+            />
+          </AutocompleteWrapper>
+        </NameIdFormControl>
+        <SeasonFormControl
           disabled={ content !== "show" }
         >
           <TextField 
             disabled={ content !== "show" }
-            label="Season Number"
+            label="Season #"
             type="number"
             value={seasonNumber}
             onChange={({target: {value}}) => {
@@ -117,13 +188,13 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
               }
             }}
           />
-        </FormControl>
-        <FormControl
+        </SeasonFormControl>
+        <FirstEpisodeFormControl
           disabled={ content !== "show" }
         >
           <TextField 
             disabled={ content !== "show" }
-            label="First Episode"
+            label="First Ep #"
             type="number"
             value={firstEpisode}
             onChange={({target: {value}}) => {
@@ -133,8 +204,7 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
               }
             }}
           />
-        </FormControl>
-      </div>
+        </FirstEpisodeFormControl>
     </StyledFormGroup>
   </>
 }
