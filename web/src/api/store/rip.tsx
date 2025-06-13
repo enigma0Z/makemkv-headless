@@ -3,7 +3,7 @@ import type { ShowInfo, SortInfo } from "../types/SortInfo";
 import { uniqueFilter } from "@/util/array";
 import type { StateValidation } from ".";
 
-interface RipState {
+export interface RipState {
   destination: RipStateDestination;
   rip_all: boolean;
   sort_info: SortInfo & ShowInfo;
