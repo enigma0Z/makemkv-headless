@@ -1,9 +1,7 @@
-
-
-from api.json_api import json_serializable_api
-from api.singletons import API, INTERFACE
-from config import CONFIG
-from toc import TOC
+from src.config import CONFIG
+from src.toc import TOC
+from src.api.json_api import json_serializable_api
+from src.api.singletons.singletons import API, INTERFACE
 
 @API.route('/api/v1/toc')
 @json_serializable_api

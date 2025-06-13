@@ -1,6 +1,7 @@
-from api.json_api import json_serializable_api
-from api.singletons import API
-from config import CONFIG
+from src.config import CONFIG
+
+from src.api.json_api import json_serializable_api
+from src.api.singletons.singletons import API
 
 @API.get('/api/v1/config')
 @json_serializable_api

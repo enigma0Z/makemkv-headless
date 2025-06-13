@@ -1,6 +1,6 @@
 import logging
 
-from api.singletons import SOCKET
+from src.api.singletons.singletons import SOCKET
 
 logger = logging.getLogger(__name__)
 

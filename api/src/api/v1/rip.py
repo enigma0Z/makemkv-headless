@@ -2,13 +2,13 @@ import logging
 import os
 from threading import Lock, Thread
 from flask import Response, request
-from api.singletons import API, INTERFACE, STATE
 
 # from rip_titles import rip_titles
-from api.json_api import json_serializable_api
-from config import CONFIG
-from rip_titles.rip_titles import rip_titles
-from sort import *
+from src.config import CONFIG
+from src.sort import *
+from src.rip_titles.rip_titles import rip_titles
+from src.api.json_api import json_serializable_api
+from src.api.singletons.singletons import API, INTERFACE
 
 logger = logging.getLogger(__name__)
 

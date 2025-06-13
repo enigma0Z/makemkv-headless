@@ -12,9 +12,9 @@ Endpoints
 
 import json
 
-from .json_api import json_api
-from .singletons import *
-from .v1 import *
+from src.api.json_api import json_api
+from src.api.singletons.singletons import *
+from src.api.v1 import *
 
 @API.route('/')
 @json_api
