@@ -11,7 +11,7 @@ import { Context as SocketContext } from "../socket/Context";
 export const StatusScroller = () => {
   const { connected, messageEvents } = useContext(SocketContext)
 
-  const [isMinimized, setIsMinimized] = useState<boolean>(true)
+  const [isMinimized, setIsMinimized] = useState<boolean>(false)
 
   const messages = messageEvents?.map((event) => event.text)
 
