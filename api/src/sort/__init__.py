@@ -5,16 +5,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from json_serializable import JSONSerializable
-
-import features
-
-from interface import BaseInterface, Target
-from mkvtoolnix import split_mkv
-from toc import TOC
-from util import rsync, sanitize
-
-import json
+from src import features
+from src.interface import BaseInterface, Target
+from src.json_serializable import JSONSerializable
+from src.mkvtoolnix import split_mkv
+from src.toc import TOC
+from src.util import rsync, sanitize
 
 class SortInfo(JSONSerializable):
   def __init__(

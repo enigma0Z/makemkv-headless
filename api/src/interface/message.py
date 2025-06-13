@@ -1,8 +1,10 @@
 from json import loads
 import logging
 from re import match
+from types import NoneType
+from typing import Literal, TypedDict, Union
 
-from json_serializable import JSONSerializable
+from src.json_serializable import JSONSerializable
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +34,25 @@ class MessageEvent(BaseMessageEvent):
     else:
       self.data['text'] = match(r'.+?,"(.+?)".*', data['raw']).groups()[0]
     
+class ProgressMessageData(TypedDict):
+  code: int
+  index: int
+  name: Literal[
+    "Scanning CD-ROM devices",
+    "Opening DVD disc",
+    "Processing title sets",
+    "Scanning contents",
+    "Processing titles",
+    "Decrypting data",
+    "Saving all titles to MKV files",
+    "Analyzing seamless segments",
+    "Saving to MKV file"
+  ]
+
 class ProgressMessageEvent(BaseMessageEvent):
   '''PRGC:5057,0,"Analyzing seamless segments"'''
   def __init__(self, **data):
+    self.data:ProgressMessageData = {}
     super().__init__(**data)
     logger.debug(f'ProgressMessageEvent.__init__(), data: {data}, self.data: {self.data}')
     # PRGC:code,id,name (Current)
@@ -49,8 +67,14 @@ class ProgressMessageEvent(BaseMessageEvent):
     self.data['index'] = int(self.data['raw'].split(':')[1].split(',')[1])
     self.data['name'] = str(self.data['raw'].split(':')[1].split(',')[2]).strip('"')
 
+class ProgressValueMessageData(TypedDict):
+  current: int
+  total: int
+  max: int
+
 class ProgressValueMessageEvent(BaseMessageEvent):
   def __init__(self, **data):
+    self.data: ProgressValueMessageData = {}
     super().__init__(**data)
     self.data['current'], self.data['total'], self.data['max'] = [ 
       int(value) 
@@ -58,8 +82,13 @@ class ProgressValueMessageEvent(BaseMessageEvent):
       in data['raw'].split(':')[1].split(',') 
     ]
 
+class RipStartStopMessageData(TypedDict):
+  index: Union[int, NoneType]
+  state: Literal["stop", "start"]
+
 class RipStartStopMessageEvent(BaseMessageEvent):
   def __init__(self, **data):
+    self.data: RipStartStopMessageData = {}
     assert 'index' in data
     try: 
       assert isinstance(data['index'], int)

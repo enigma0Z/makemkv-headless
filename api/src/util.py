@@ -9,7 +9,7 @@ import subprocess
 import logging
 logger = logging.getLogger(__name__)
 
-from interface import PlaintextInterface, Target
+from src.interface import PlaintextInterface, Target
 
 def grep(term, lines):
   return True in [ term.casefold() in line.casefold() for line in lines ]

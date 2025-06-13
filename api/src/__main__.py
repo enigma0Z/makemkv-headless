@@ -6,17 +6,19 @@ import sys
 
 import logging
 
-from rip_titles.interactive import rip_movie_interactive, rip_show_interactive
-logger = logging.getLogger(__name__)
+from src.rip_titles.interactive import rip_movie_interactive, rip_show_interactive
 
 from argparse import ArgumentParser
-from curses_interface import CursesInterface
-from interface import BaseInterface, PlaintextInterface, Target
 
-from api.singletons import start_api
-from config import CONFIG
 
-import features
+from src import features
+
+from src.config import CONFIG
+from src.curses_interface import CursesInterface
+from src.interface import BaseInterface, PlaintextInterface, Target
+from src.api.singletons.singletons import start_api
+
+logger = logging.getLogger(__name__)
 
 def interactive_rip(
     source, destination,

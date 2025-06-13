@@ -6,17 +6,17 @@ import threading
 
 import logging
 
-from util import sanitize
+from src.util import sanitize
 logger = logging.getLogger(__name__)
 
-from sort import SortInfo, sort_titles
+from src.sort import SortInfo, sort_titles
 
-from disc import eject_disc
-from interface import BaseInterface, PlaintextInterface, Target
-from makemkv import rip_disc
-from toc import TOC
+from src.disc import eject_disc
+from src.interface import BaseInterface, PlaintextInterface, Target
+from src.makemkv import rip_disc
+from src.toc import TOC
 
-import features
+from src import features
 
 EPISODE_LENGTH_TOLERANCE = 90
 

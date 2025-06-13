@@ -1,7 +1,7 @@
 import json
 import yaml
 
-from json_serializable import JSONSerializable
+from src.json_serializable import JSONSerializable
 
 class Config(JSONSerializable):
   keys: list[str] = []

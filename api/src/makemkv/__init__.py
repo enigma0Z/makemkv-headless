@@ -7,14 +7,11 @@ from time import time
 import logging
 logger = logging.getLogger(__name__)
 
-from interface.message import RipStartStopMessageEvent, build_message
-from config import CONFIG
-from disc import wait_for_disc_inserted
-from interface import BaseInterface, PlaintextInterface, Target
-from util import notify, seconds_to_hms
-
-import disc
-import util
+from src.interface.message import RipStartStopMessageEvent, build_message
+from src.config import CONFIG
+from src.disc import wait_for_disc_inserted
+from src.interface import BaseInterface, PlaintextInterface, Target
+from src.util import seconds_to_hms
 
 def rip_disc(
     source, 
@@ -31,7 +28,7 @@ def rip_disc(
   for rip_title in [str(v) for v in rip_titles]:
     logger.info(f'Ripping title {rip_title}')
     interface.print(f'Ripping title {rip_title}', target=Target.SORT)
-    interface.send(RipStartStopMessageEvent(index=rip_title))
+    interface.send(RipStartStopMessageEvent(index=rip_title, state="start"))
 
     # Current and total progress title
     # PRGC:code,id,name (Current)
@@ -120,14 +117,7 @@ def rip_disc(
 
           status_line = f'{total_title}, {current_title} - {total_pct*100:>6.2f}% ~{seconds_to_hms(total_remaining)}s / {current_pct*100:>6.2f}% ~{seconds_to_hms(current_remaining)}s'
 
-          # interface.send(ProgressMessageEvent(
-          #   total=total_pct,
-          #   total_elapsed=total_elapsed,
-          #   total_remaining=total_remaining,
-          #   current=current_pct,
-          #   current_elapsed=current_elapsed,
-          #   current_remaining=current_remaining
-          # ))
-
           interface.print(total_line, current_line, sep='\n', target=Target.STATUS)
           interface.title(status_line, target=Target.MKV)
+
+    interface.send(RipStartStopMessageEvent(index=rip_title, state="stop"))

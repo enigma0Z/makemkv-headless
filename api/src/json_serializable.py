@@ -8,7 +8,7 @@ class JSONSerializable:
     '''dumps(self.__dict__, cls=JSONSerializableEncoder)'''
 
     logger.debug(f'JSONSerializable.to_json({self})')
-    return dumps(self.__dict__, cls=JSONSerializableEncoder)
+    return dumps(self, cls=JSONSerializableEncoder)
 
   def json_encoder(self):
     return self.__dict__

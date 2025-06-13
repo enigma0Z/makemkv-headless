@@ -4,16 +4,16 @@ import threading
 
 import logging
 
-from rip_titles.rip_titles import rip_titles
-from sort import ShowInfo, SortInfo
+from src.rip_titles.rip_titles import rip_titles
+from src.sort import ShowInfo, SortInfo
+from src.disc import wait_for_disc_inserted
+from src.interface import BaseInterface, PlaintextInterface, Target
+from src.toc import TOC
+from src.util import hms_to_seconds, string_to_list_int
+
+from src.tmdb.search import search
+
 logger = logging.getLogger(__name__)
-
-from disc import wait_for_disc_inserted
-from interface import BaseInterface, PlaintextInterface, Target
-from toc import TOC
-from util import hms_to_seconds, string_to_list_int
-
-import tmdb.search as search
 
 EPISODE_LENGTH_TOLERANCE = 90
 

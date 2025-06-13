@@ -6,7 +6,7 @@ from typing import Any, Callable
 
 import logging
 
-from interface.message import BaseMessageEvent, MessageEvent, ProgressMessageEvent
+from src.interface.message import BaseMessageEvent, MessageEvent, ProgressMessageEvent
 logger = logging.getLogger(__name__)
 
 from json import dumps, loads

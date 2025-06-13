@@ -4,8 +4,8 @@ import logging
 from typing import Any
 import requests
 
-from json_serializable import JSONSerializable
-from config import CONFIG
+from src.json_serializable import JSONSerializable
+from src.config import CONFIG
 
 logger = logging.getLogger(__name__)
 

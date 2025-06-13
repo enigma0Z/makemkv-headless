@@ -6,12 +6,13 @@ import subprocess
 from sys import stderr
 
 import logging
+
 logger = logging.getLogger(__name__)
 
-from config import CONFIG
-from json_serializable import JSONSerializable
-
-from interface import PlaintextInterface, Target
+from src.config import CONFIG
+from src.json_serializable import JSONSerializable
+from src.interface import PlaintextInterface, Target
+from src.interface.message import build_message
 
 def format_records(lines):
   return [
@@ -46,8 +47,7 @@ class TOC(JSONSerializable):
       for b_line in process.stdout:
         line = b_line.decode('UTF-8').strip()
         self.lines += [line]
-        if not isinstance(self.interface, PlaintextInterface): 
-          self.interface.print(line, target=Target.MKV)
+        self.interface.send(build_message(raw=line))
 
     self.load()
 
@@ -107,7 +107,7 @@ class BaseInfo(JSONSerializable):
           )
         )
       except Exception as ex:
-        logger.error(f"Could not find key {name} in fields, {ex}")
+        logger.debug(f"Could not find key {name} in fields, {ex}")
         return None
 
   def json_encoder(self):
