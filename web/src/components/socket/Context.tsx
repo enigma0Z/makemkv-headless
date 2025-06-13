@@ -1,6 +1,6 @@
 import { createContext, useState } from "react";
 
-import type { RipState as ReduxRipState } from "@/api/store/rip";
+import { initialApiState, type ApiState } from "@/api/types/status";
 
 export type BaseMessageEventData = { // message.py BaseMessage
   type: string;
@@ -18,7 +18,7 @@ export type ProgressMessageEvent = BaseMessageEventData & {
       | "Saving all titles to MKV files"
       | "Analyzing seamless segments"
       | "Saving to MKV file";
-    progressType: "Current" | "Total";
+    progress_type: "current" | "total";
 }
 
 export type ProgressValueMessageEvent = BaseMessageEventData & {
@@ -47,28 +47,6 @@ export interface ClientToServerEvents { }
 
 export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>
 
-type RipState = {
-  redux?: ReduxRipState;
-
-  currentTitle?: number;
-
-  currentProgress?: {buffer?: number, progress: number}[];
-  totalProgress?: {buffer: number, progress: number};
-
-  currentStatus?: ProgressMessageEvent["name"];
-  totalStatus?: string;
-
-  ripStarted?: boolean;
-}
-
-const initialRipState: RipState = {
-  currentTitle: undefined,
-  currentProgress: undefined,
-  totalProgress: undefined,
-  currentStatus: undefined,
-  totalStatus: undefined,
-  ripStarted: false
-}
 
 type ContextProps = {
   connected: boolean
@@ -86,8 +64,8 @@ type ContextProps = {
   ripStartStopMessageEvents?: (RipStartStopMessageEvent)[];
   setRipStartStopMessageEvents?: SetStateCallback<RipStartStopMessageEvent[] | undefined>;
 
-  ripState?: RipState;
-  setRipState?: SetStateCallback<RipState | undefined>;
+  ripState?: ApiState['socket'];
+  setRipState?: SetStateCallback<ApiState['socket'] | undefined>;
   resetRipStatus?: () => void;
 }
 
@@ -106,10 +84,10 @@ const SocketContext = ({ children }: SocketContextProps) => {
   const [progressValueMessageEvents, setProgressValueMessageEvents] = useState<(ProgressValueMessageEvent)[]>()
   const [messageEvents, setMessageEvents] = useState<(MessageEvent)[]>()
   const [ripStartStopMessageEvents, setRipStartStopMessageEvents] = useState<(RipStartStopMessageEvent)[]>()
-  const [ripState, setRipState] = useState<RipState>()
+  const [ripState, setRipState] = useState<ApiState['socket']>()
 
   const resetRipStatus = () => {
-    setRipState((prev) => ({ ...prev, ...initialRipState }))
+    setRipState((prev) => ({ ...prev, ...initialApiState }))
   }
 
   return <Context value={{

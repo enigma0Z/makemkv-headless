@@ -34,35 +34,35 @@ class MessageEvent(BaseMessageEvent):
     else:
       self.data['text'] = match(r'.+?,"(.+?)".*', data['raw']).groups()[0]
     
+type StatusMessage = Literal[
+  "Scanning CD-ROM devices",
+  "Opening DVD disc",
+  "Processing title sets",
+  "Scanning contents",
+  "Processing titles",
+  "Decrypting data",
+  "Saving all titles to MKV files",
+  "Analyzing seamless segments",
+  "Saving to MKV file"
+]
+
 class ProgressMessageData(TypedDict):
   code: int
   index: int
-  name: Literal[
-    "Scanning CD-ROM devices",
-    "Opening DVD disc",
-    "Processing title sets",
-    "Scanning contents",
-    "Processing titles",
-    "Decrypting data",
-    "Saving all titles to MKV files",
-    "Analyzing seamless segments",
-    "Saving to MKV file"
-  ]
+  name: StatusMessage
+  progress_type: Literal['current', 'total']
 
 class ProgressMessageEvent(BaseMessageEvent):
   '''PRGC:5057,0,"Analyzing seamless segments"'''
   def __init__(self, **data):
     self.data:ProgressMessageData = {}
     super().__init__(**data)
-    logger.debug(f'ProgressMessageEvent.__init__(), data: {data}, self.data: {self.data}')
-    # PRGC:code,id,name (Current)
-    # PRGT:code,id,name (Current)
     assert "raw" in data
     messageType = self.data['raw'].split(':')[0]
     if (messageType == 'PRGC'):
-      self.data['progressType'] = 'Current'
+      self.data['progress_type'] = 'current'
     elif (messageType == 'PRGT'):
-      self.data['progressType'] = 'Total'
+      self.data['progress_type'] = 'total'
     self.data['code'] = int(self.data['raw'].split(':')[1].split(',')[0])
     self.data['index'] = int(self.data['raw'].split(':')[1].split(',')[1])
     self.data['name'] = str(self.data['raw'].split(':')[1].split(',')[2]).strip('"')

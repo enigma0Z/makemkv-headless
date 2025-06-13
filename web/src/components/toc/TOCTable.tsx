@@ -1,11 +1,11 @@
-import { store, useAppDispatch, useAppSelector } from "@/api/store"
+import { useAppDispatch, useAppSelector } from "@/api/store"
 import { ripActions } from "@/api/store/rip"
-import type { TitleInfo, Toc } from "@/api/types/Toc"
 import { hmsToSeconds } from "@/util/string"
 import { Card, Checkbox, FormControlLabel, LinearProgress, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
-import { MainExtrasRadioGroup, StatusContentWrapper, StatusContentWrapperLeft, StatusWrapper, WidgetCell, WidgetWrapper } from "./TOCTable.styles"
+import { MainExtrasRadioGroup, StatusContentWrapper, StatusContentWrapperLeft, StatusWrapper, WidgetCell } from "./TOCTable.styles"
 import { Context } from "../socket/Context"
+import type { TitleInfo, Toc } from "@/api/store/toc"
 
 type Props = {
   data?: Toc
@@ -20,11 +20,13 @@ type TitleGroup = {
 
 const EPISODE_LENGTH_TOLERANCE_SECONDS = 120
 
-export const TOCTable = ({ data = undefined, loading = false }: Props) => {
+// export const TOCTable = ({ data = undefined, loading = false }: Props) => {
+export const TOCTable = ({ }: Props) => {
   const dispatch = useAppDispatch()
 
   const { ripState } = useContext(Context)
 
+  const data = useAppSelector((state) => state.toc)
   const mainIndexes = useAppSelector((state) => state.rip.sort_info.main_indexes)
   const extraIndexes = useAppSelector((state) => state.rip.sort_info.extra_indexes)
   const content = useAppSelector((state) => state.rip.destination.content)
@@ -35,7 +37,7 @@ export const TOCTable = ({ data = undefined, loading = false }: Props) => {
   const getLongestTitle = () => {
     let longestTitleIndex = 0
     let longestTitleLength = 0
-    data?.source.titles.forEach((title, index) => {
+    data?.source?.titles.forEach((title, index) => {
       const outerTitleLength = hmsToSeconds(title.runtime)
       if (outerTitleLength > longestTitleLength) {
         longestTitleLength = outerTitleLength
@@ -56,10 +58,10 @@ export const TOCTable = ({ data = undefined, loading = false }: Props) => {
       titleGroup.matches
     )).flat())
 
-    data?.source.titles.forEach((outerTitle, outerIndex) => {
+    data?.source?.titles.forEach((outerTitle, outerIndex) => {
       const newTitleGroup: TitleGroup = { title: outerTitle, index: outerIndex, matches: [] }
       const outerTitleLength = hmsToSeconds(outerTitle.runtime)
-      data.source.titles.forEach((innerTitle, innerIndex) => {
+      data?.source?.titles.forEach((innerTitle, innerIndex) => {
         if (
           !(innerIndex in matchedIndexes())
           && hmsToSeconds(innerTitle.runtime) > outerTitleLength - EPISODE_LENGTH_TOLERANCE_SECONDS
@@ -72,15 +74,22 @@ export const TOCTable = ({ data = undefined, loading = false }: Props) => {
       titleGroups.push(newTitleGroup)
     })
 
+    if (titleGroups.length > 0) {
+      return {
+        titleGroups: titleGroups,
+        longestTitleGroup: titleGroups.reduce((previous, current) => {
+          if (previous.matches.length < current.matches.length) {
+            return current
+          } else {
+            return previous
+          }
+        }) 
+      }
+    }
+
     return {
-      titleGroups: titleGroups,
-      longestTitleGroup: titleGroups.reduce((previous, current) => {
-        if (previous.matches.length < current.matches.length) {
-          return current
-        } else {
-          return previous
-        }
-      })
+      titleGroups: undefined,
+      longestTItleGroup: undefined
     }
   }
 
@@ -88,7 +97,7 @@ export const TOCTable = ({ data = undefined, loading = false }: Props) => {
     const { longestTitleIndex } = getLongestTitle()
     const mainIndexes = []
     const extraIndexes = []
-    for (let i=0; i < (data?.source.titles.length ?? 0); i++) {
+    for (let i=0; i < (data?.source?.titles.length ?? 0); i++) {
       if (i == longestTitleIndex) {
         mainIndexes.push(i)
       } else {
@@ -102,8 +111,8 @@ export const TOCTable = ({ data = undefined, loading = false }: Props) => {
     const {longestTitleGroup} = getLongestTitleGroup()
     const mainIndexes = []
     const extraIndexes = []
-    for (let i=0; i < (data?.source.titles.length ?? 0); i++) {
-      if (longestTitleGroup.matches.indexOf(i) > -1) {
+    for (let i=0; i < (data?.source?.titles.length ?? 0); i++) {
+      if (longestTitleGroup?.matches.indexOf(i) ?? -1 > -1) {
         mainIndexes.push(i)
       } else {
         extraIndexes.push(i)
@@ -126,7 +135,7 @@ export const TOCTable = ({ data = undefined, loading = false }: Props) => {
 
   useEffect(() => {
     if (data) {
-      dispatch(ripActions.setTocLength(data.source.titles.length));
+      dispatch(ripActions.setTocLength(data?.source?.titles.length));
       setIndexes();
     }
   }, [data]) 
@@ -134,9 +143,9 @@ export const TOCTable = ({ data = undefined, loading = false }: Props) => {
 
   useEffect(() => { data && setIndexes() }, [content])
 
-  const handleSelectAllOnClick = (event: React.ChangeEvent, checked: boolean) => {
+  const handleSelectAllOnClick = (_event: React.ChangeEvent, checked: boolean) => {
     if (checked) {
-      data?.source.titles.forEach((value, index) => {
+      data?.source?.titles.forEach((_value, index) => {
         const isInMainIndexes = (mainIndexes.indexOf(index) > -1)
         const isInExtraIndexes = (extraIndexes.indexOf(index) > -1)
         const wasInMainIndexes = (oldMainIndexes.indexOf(index) > -1)
@@ -175,14 +184,14 @@ export const TOCTable = ({ data = undefined, loading = false }: Props) => {
                     Type
                   </StatusContentWrapperLeft>
                   <StatusWrapper>
-                  { ripState?.totalStatus && <>
+                  { ripState?.total_status && <>
                         <div>
-                          {ripState?.totalStatus}
+                          {ripState?.total_status}
                         </div>
                         <LinearProgress 
                           variant="buffer" 
-                          value={ripState?.totalProgress?.progress ?? 0} 
-                          valueBuffer={ripState?.totalProgress?.buffer ?? 0} 
+                          value={ripState?.total_progress?.progress ? ripState.total_progress.progress * 100 : 0} 
+                          valueBuffer={ripState?.total_progress?.buffer ? ripState.total_progress.buffer * 100 : 0} 
                         />
                     </>
                   }
@@ -196,15 +205,15 @@ export const TOCTable = ({ data = undefined, loading = false }: Props) => {
           <TableBody>
             { data 
               ? (
-                data.source.titles.map((title, index) => {
+                data?.source?.titles.map((title, index) => {
                   return (
                     <TOCRow 
                       key={index} 
                       index={index} 
                       data={title} 
-                      progress={(ripState?.currentProgress && ripState.currentProgress[index]?.progress) ?? undefined}
-                      buffer={ripState?.currentProgress?.[index]?.buffer}
-                      statusText={index === ripState?.currentTitle ? ripState?.currentStatus : ''}
+                      progress={(ripState?.current_progress && ripState.current_progress[index]?.progress) ?? undefined}
+                      buffer={ripState?.current_progress?.[index]?.buffer}
+                      statusText={index === ripState?.current_title ? ripState?.current_status : ''}
                     />
                   )
                 })
@@ -260,7 +269,7 @@ export const TOCRow = ({ index, data, progress, buffer, statusText }: RowProps) 
     }
   }
 
-  const handleRadioButtonChange = (event: React.ChangeEvent, value: string) => {
+  const handleRadioButtonChange = (_event: React.ChangeEvent, value: string) => {
     if (value === "main") {
       dispatch(ripActions.addMainIndex(index))
       dispatch(ripActions.removeExtraIndex(index))
@@ -301,9 +310,9 @@ export const TOCRow = ({ index, data, progress, buffer, statusText }: RowProps) 
         </StatusContentWrapperLeft>
         <StatusWrapper>
           { progress !== undefined && <>
-              <div>{progress === 100 ? "Complete" : statusText ?? ''}</div>
+              <div>{progress > .98 ? "Complete" : statusText ?? ''}</div>
               { isSelected
-                ? <LinearProgress variant={buffer !== undefined ? "buffer" : "determinate"} value={progress ?? 0} valueBuffer={buffer} />
+                ? <LinearProgress variant={buffer !== undefined ? "buffer" : "determinate"} value={progress ? progress * 100 : 0} valueBuffer={buffer ? buffer * 100 : buffer} />
                 : <LinearProgress variant="determinate" value={0} color="secondary" />
               }
           </> }

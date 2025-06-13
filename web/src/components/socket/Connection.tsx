@@ -1,6 +1,11 @@
 import { useContext, useEffect } from "react"
 import { Context, type SetStateCallback } from "./Context"
 import { socket } from "."
+import endpoints from "@/api/endpoints"
+import type { ApiState } from "@/api/types/status"
+import { useAppDispatch } from "@/api/store"
+import { tocActions } from "@/api/store/toc"
+import { ripActions } from "@/api/store/rip"
 
 const RECONNECT_DELAY_MS = 1000
 
@@ -12,6 +17,8 @@ function appendToEventQueue<T>(
 }
 
 const SocketConnection = () => {
+  const dispatch = useAppDispatch()
+
   const {
     setConnected,
     setMessageEvents,
@@ -48,8 +55,8 @@ const SocketConnection = () => {
       if (value.text.startsWith("Copy complete")) {
         setRipState && setRipState((prev) => {
           const next = {...prev}
-          next.ripStarted = false
-          next.currentStatus = undefined
+          next.rip_started = false
+          next.current_status = undefined
           return next
         })
       }
@@ -59,40 +66,40 @@ const SocketConnection = () => {
     socket.on("ProgressMessageEvent", (value) => {
       // Set index if current index is undefined
       console.log('ProgressMessageEvent', setRipState, value)
-      if (value.progressType === "Current") {
+      if (value.progress_type === "current") {
         setRipState && setRipState((prev) => {
           const next = {...prev}
           if (
-            next.ripStarted 
+            next.rip_started 
             && (
-              next.currentTitle === undefined 
-              || value.index > next.currentTitle
+              next.current_title === undefined 
+              || value.index > next.current_title
             )
           ) {
-            next.currentTitle = value.index
+            next.current_title = value.index
           }
 
-          next.currentStatus = value.name
+          next.current_status = value.name
 
           if ( // We have advanced to the next title
-            next.currentProgress
-            && prev?.currentTitle !== undefined 
-            && next?.currentTitle !== undefined
-            && prev.currentTitle < next.currentTitle
+            next.current_progress
+            && prev?.current_title !== undefined 
+            && next?.current_title !== undefined
+            && prev.current_title < next.current_title
           ) {
-            next.currentProgress[prev.currentTitle] = {buffer: 100, progress: 100}
+            next.current_progress[prev.current_title] = {buffer: 1, progress: 1}
           }
 
           console.log('Updating current status, index', next)
           return next
         });
-      } else if (value.progressType === "Total") {
+      } else if (value.progress_type === "total") {
         setRipState && setRipState((prev) => {
           const next = {...prev}
-          next.totalStatus = value.name
+          next.total_status = value.name
 
           if (value.name === "Saving all titles to MKV files") {
-            next.ripStarted = true
+            next.rip_started = true
           }
 
           return next
@@ -108,28 +115,28 @@ const SocketConnection = () => {
       console.log('ProgressValueEvent', value, setRipState)
       setRipState && setRipState((prev) => {
         const next = {...prev}
-        if (next.currentTitle !== undefined) {
-          if (next.currentProgress === undefined) next.currentProgress = []; 
-          if (next.currentProgress[next.currentTitle] === undefined) {
-            next.currentProgress[next.currentTitle] = {progress: 0, buffer: undefined}
+        if (next.current_title !== undefined) {
+          if (next.current_progress === undefined) next.current_progress = []; 
+          if (next.current_progress[next.current_title] === undefined) {
+            next.current_progress[next.current_title] = {progress: 0, buffer: undefined}
           }
           
-          if (next.currentStatus === "Analyzing seamless segments") {
-            next.currentProgress[next.currentTitle].buffer = value.current / value.max * 100
-          } else if (next.currentStatus === "Saving to MKV file") {
-            next.currentProgress[next.currentTitle].buffer = 100
-            next.currentProgress[next.currentTitle].progress = value.current / value.max * 100
+          if (next.current_status === "Analyzing seamless segments") {
+            next.current_progress[next.current_title].buffer = value.current / value.max
+          } else if (next.current_status === "Saving to MKV file") {
+            next.current_progress[next.current_title].buffer = 1
+            next.current_progress[next.current_title].progress = value.current / value.max
           }
         }
 
-        if (next.totalProgress === undefined) {
-          next.totalProgress = {progress: 0, buffer: 0}
+        if (next.total_progress === undefined) {
+          next.total_progress = {progress: 0, buffer: 0}
         }
 
-        if (next.ripStarted) {
-          next.totalProgress.progress = value.total / value.max * 100
+        if (next.rip_started) {
+          next.total_progress.progress = value.total / value.max
         } else {
-          next.totalProgress.buffer = value.total / value.max * 100
+          next.total_progress.buffer = value.total / value.max
         }
         return next
       })
@@ -142,16 +149,16 @@ const SocketConnection = () => {
       setRipState && setRipState((prev) => {
         const next = {...prev};
         if (value.index) {
-          next.currentTitle = value.index
+          next.current_title = value.index
         }
 
         if ( // We have advanced to the next title
-          next.currentProgress
-          && prev?.currentTitle !== undefined 
-          && next?.currentTitle !== undefined
-          && prev.currentTitle < next.currentTitle
+          next.current_progress
+          && prev?.current_title !== undefined 
+          && next?.current_title !== undefined
+          && prev.current_title < next.current_title
         ) {
-          next.currentProgress[prev.currentTitle] = {buffer: 100, progress: 100}
+          next.current_progress[prev.current_title] = {buffer: 1, progress: 1}
         }
 
         return next
@@ -163,6 +170,17 @@ const SocketConnection = () => {
   }
 
   useEffect(() => {
+    // Initialize state
+    fetch(endpoints.state(), { method: 'GET' })
+      .then(response => response.json() as Promise<ApiState>)
+      .then((json) => {
+        console.debug('response json', json)
+        setRipState && setRipState(json.socket) // Socket context
+        dispatch(tocActions.setTocData(json.redux.toc)) // Redux
+        dispatch(ripActions.setRipData(json.redux.rip))
+      })
+
+    // Set up socket connection
     setupHandlers()
     connect()
 

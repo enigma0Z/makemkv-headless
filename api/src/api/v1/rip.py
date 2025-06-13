@@ -4,6 +4,7 @@ from threading import Lock, Thread
 from flask import Response, request
 
 # from rip_titles import rip_titles
+from src.api.singletons.state import STATE
 from src.config import CONFIG
 from src.sort import *
 from src.rip_titles.rip_titles import rip_titles
@@ -48,6 +49,7 @@ def post_rip():
     def rip_thread_fn():
         logger.debug(f'rip_thread_fn(), {CONFIG}')
         with LOCK:
+            STATE.reset_socket()
             toc = TOC(interface=INTERFACE)
             toc.get_from_disc(CONFIG.source)
 

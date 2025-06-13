@@ -1,7 +1,12 @@
-from typing import TypedDict, Union
+import logging
+from typing import TypedDict
 from deepmerge import Merger
 
+from src.interface.message import ProgressMessageData, ProgressValueMessageData, StatusMessage
 from src.json_serializable import JSONSerializable
+from src.toc import TOC
+
+logger = logging.getLogger(__name__)
 
 class RipDestination(TypedDict, total=False):
   library: str
@@ -22,54 +27,90 @@ class ReduxRipState(TypedDict, total=False):
   destination: RipDestination
   sort_info: RipSortInfo
   rip_all: bool
-  toc_length: int
+
+class ReduxState(TypedDict, total=False):
+  rip: ReduxRipState
+  toc: TOC
 
 class ProgressState(TypedDict, total=False):
   buffer: float
   progress: float
 
-class RipState(TypedDict, total=False):
-  redux: ReduxRipState
-  currentTitle: int
-  currentProgress: list[ProgressState]
-  totalProgress: ProgressState
-  currentStatus: str
-  totalStatus: str
-  ripStarted: bool
+class SocketStatus(TypedDict, total=False):
+  current_title: int
+  current_progress: list[ProgressState]
+  total_progress: ProgressState
+  current_status: StatusMessage
+  total_status: StatusMessage
+  rip_started: bool
+
+SOCKET_STATUS_DEFAULT_VALUE = {
+  'current_title': None,
+  'current_progress': [],
+  'total_progress': {
+    'buffer': None,
+    'progress': None
+  },
+  'current_status': None,
+  'total_status': None,
+  'rip_started': False
+}
+
+class StateData(TypedDict, total=False):
+  redux: ReduxState
+  socket: SocketStatus
 
 class State(JSONSerializable):
   def __init__(self):
-    self.data: RipState = {
-      'redux': {},
-      'currentTitle': None,
-      'currentProgress': [],
-      'totalProgress': {
-        'buffer': None,
-        'progress': None
-      },
-      'currentStatus': None,
-      'totalStatus': None,
-      'ripStarted': False
-    }
+    self.reset_all()
     self.merger = Merger( [(dict, "merge")], ["override"], ["override"])
 
   def json_encoder(self):
     return self.data
 
+  def reset_all(self): 
+    self.data: StateData = {
+      'redux': {},
+      'socket': SOCKET_STATUS_DEFAULT_VALUE
+    }
+
+  def reset_socket(self):
+    self.data = {
+      **self.data,
+      'socket': SOCKET_STATUS_DEFAULT_VALUE
+    }
+
   def update_from_partial(self, data):
     self.data = self.merger(self.data, data)
 
-  def update_current_progress(self, index: int, progress: int, buffer: Union[int, None] = None):
-    if len(self.data['currentProgress']) <= index:
-      self.data['currentProgress'] = [ 
-        self.data['currentProgress'][index] 
-        if len(self.data['currentProgress']) < index
-        else {"buffer": None, "progress": None}
-        for index in range(0, self.data['currentTitle']+1)
-      ]
-    
-    self.data['currentProgress'][index]['progress'] = progress
-    if buffer != None:
-      self.data['currentProgress'][index]['buffer'] = buffer
+  def update_progress(self, data: ProgressValueMessageData):
+    self.data['socket']['total_progress']['progress'] = data['total'] / data['max']
+    if (self.data['socket']['current_title'] != None):
+      if len(self.data['socket']['current_progress']) <= self.data['socket']['current_title']:
+        # Create empty current_progress entries as needed
+        self.data['socket']['current_progress'] = [ 
+          self.data['socket']['current_progress'][index] 
+          if len(self.data['socket']['current_progress']) > index
+          else {"buffer": None, "progress": None}
+          for index in range(0, self.data['socket']['current_title']+1)
+        ]
+
+      if self.data['socket']['current_status'] == 'Saving to MKV file':
+        self.data['socket']['current_progress'][self.data['socket']['current_title']]['buffer'] = 1
+        self.data['socket']['current_progress'][self.data['socket']['current_title']]['progress'] = data['current'] / data['max']
+      elif self.data['socket']['current_status'] == 'Analyzing seamless segments':
+        self.data['socket']['current_progress'][self.data['socket']['current_title']]['buffer'] = data['current'] / data['max']
+
+  def update_status(self, data: ProgressMessageData):
+    if data['progress_type'] == 'total':
+      self.data['socket']['total_status'] = data['name']
+    elif data['progress_type'] == 'current':
+      self.data['socket']['current_status'] = data['name']
+
+      if (
+        data['name'] == 'Saving to MKV file' 
+        or data['name'] == 'Analyzing seamless segments'
+      ):
+        self.data['socket']['current_title'] = data['index']
   
 STATE = State()

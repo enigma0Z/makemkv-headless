@@ -1,5 +1,3 @@
-import endpoints from "@/api/endpoints";
-import type { StatusResponse } from "@/api/types/status";
 import { Card, IconButton, LinearProgress } from "@mui/material";
 import { useContext, useEffect, useState } from "react"
 import { StatusScrollerWrapper, StatusScrollerWrapperMinimized } from "./StatusScroller.styles";
@@ -50,7 +48,7 @@ export const StatusScroller = () => {
       ))}
     </WrapperComponent>
     { connected
-      ? <LinearProgress /> 
+      ? <LinearProgress variant="determinate" value={0} /> 
       : <LinearProgress variant="determinate" color="error" value={0} />
     }
   </Card>

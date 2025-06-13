@@ -62,7 +62,7 @@ def rip_disc(
 
       for b_line in process.stdout:
         line = b_line.decode().strip()
-        logger.debug(f'makemkvcon - {line}')
+        # logger.debug(f'makemkvcon - {line}')
 
         if not line.startswith('MSG'):
           interface.send(build_message(raw=line))

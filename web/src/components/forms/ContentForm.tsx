@@ -1,6 +1,6 @@
 import { useAppSelector } from "@/api/store"
 import { ripActions } from "@/api/store/rip"
-import { Autocomplete, Card, FormControl, InputLabel, MenuItem, Paper, Select, TextField, useTheme } from "@mui/material"
+import { Autocomplete, Card, InputLabel, MenuItem, Select, TextField } from "@mui/material"
 import { useDispatch } from "react-redux"
 import { ContentFormControl, FirstEpisodeFormControl, LibraryFormControl, MediaFormControl, NameIdFormControl, SeasonFormControl, StyledFormGroup } from "./ContentForm.styles"
 import React, { useState } from "react"
@@ -11,7 +11,6 @@ import { AutocompleteWrapper } from "@/theme"
 
 export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
   const dispatch = useDispatch();
-  const theme = useTheme();
 
   const name = useAppSelector((state) => state.rip.sort_info.name)
   const id = useAppSelector((state) => state.rip.sort_info.id)
@@ -55,12 +54,13 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
     }
   }, 2000, {leading: false, trailing: true})
 
-  const handleNameOnInputChange = (event: React.SyntheticEvent, value: string) => {
+  const handleNameOnInputChange = (_event: React.SyntheticEvent, value: string) => {
     console.debug('handleNameOnInputChange', value)
+    setNameValue({ label: value })
     updateOptions(value)
   }
 
-  const handleNameOnChange = (event: React.SyntheticEvent, value: TmdbSearchResult | null) => {
+  const handleNameOnChange = (_event: React.SyntheticEvent, value: TmdbSearchResult | null) => {
     console.log('handleNameChange', value)
     if (value?.name) dispatch(ripActions.setName(value.name));
     else if (value?.title) dispatch(ripActions.setName(value.title));
@@ -150,7 +150,7 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
                 })
                 return filteredOptions.length > 0 ? filteredOptions : options
               }}
-              renderOption={({key, ...props}, option: TmdbSearchResult, state, ownerState) => {
+              renderOption={({key, ...props}, option: TmdbSearchResult, _state, ownerState) => {
                 return (
                   <li 
                     key={key} 
@@ -169,8 +169,9 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
                   </li>
                 )
               }}
-              value={nameValue}
+              value={nameValue ?? { label: `${name} - ${id}` } }
               fullWidth
+              freeSolo
             />
           </AutocompleteWrapper>
         </NameIdFormControl>
@@ -181,7 +182,7 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
             disabled={ content !== "show" }
             label="Season #"
             type="number"
-            value={seasonNumber}
+            value={seasonNumber ?? ""}
             onChange={({target: {value}}) => {
               if (value.match(/^\d*$/)) {
                 dispatch(ripActions.setSeasonNumber(parseInt(value)))
@@ -196,7 +197,7 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
             disabled={ content !== "show" }
             label="First Ep #"
             type="number"
-            value={firstEpisode}
+            value={firstEpisode ?? ""}
             onChange={({target: {value}}) => {
               console.log(value)
               if (value.match(/^\d*$/)) {

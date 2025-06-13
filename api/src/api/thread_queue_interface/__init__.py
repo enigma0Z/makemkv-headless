@@ -39,11 +39,25 @@ class ThreadQueueInterface(BaseInterface):
 
   def send(self, message):
     self.queue.put(message)
+    if isinstance(message, MessageEvent):
+      pass
+    if isinstance(message, ProgressMessageEvent):
+      STATE.update_status(message.data)
+
+    elif isinstance(message, ProgressValueMessageEvent):
+      STATE.update_progress(message.data)
+
+    elif isinstance(message, RipStartStopMessageEvent):
+      STATE.data['socket']['current_title'] = message.data['index']
+      STATE.data['socket']['rip_started'] = message.data['state'] == 'start'
+
     return super().send(message)
 
   def print(self, *text, **kwargs):
-    message_data = {**kwargs, "raw": ' '.join(text)}
-    self.send(build_message(**message_data))
+    if 'target' in kwargs and kwargs['target'] != 'status':
+      message_data = {**kwargs, "text": ' '.join(text)}
+      self.send(MessageEvent(*text, **kwargs))
+      # self.send(build_message(**message_data))
 
   def run(self):
     '''Start the queue processing thread'''
@@ -58,3 +72,5 @@ class ThreadQueueInterface(BaseInterface):
       message = self.queue.get()
       if isinstance(message, BaseMessageEvent):
         self.socket.emit(message.type, message.data)
+      elif isinstance(message, MessageEvent):
+        self.socket.emit(message.type, message.text)

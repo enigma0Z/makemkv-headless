@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 
-import rip from './rip'
+import rip, { ripStateIsValid } from './rip'
+import toc from './toc'
+import endpoints from "../endpoints";
 
 export const store = configureStore({
   reducer: {
-    rip
+    rip, toc
   }
 })
 
@@ -19,6 +21,17 @@ export type ValidationEntry<T, S> = Record<string, (value: T, state?: S) => bool
 
 export type StateValidationEntryTypes<T> = (
   ValidationEntry<string, T> |
-  ValidationEntry<number, T>
+  ValidationEntry<number, T> |
+  ValidationEntry<boolean, T>
 )
-export type StateValidation<T> = { [key: string]: StateValidationEntryTypes<T> | StateValidation<T> }
+
+export type StateValidation<T> = { [key: string]: (StateValidationEntryTypes<T> | StateValidation<T>) }
+
+store.subscribe(() => {
+  const { rip } = store.getState()
+  if (ripStateIsValid(rip)) {
+    fetch(endpoints.state(), { method: 'PUT', body: JSON.stringify({
+      redux: { rip }
+    })})
+  }
+})

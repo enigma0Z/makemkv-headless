@@ -5,15 +5,14 @@ import { AppContainer } from './App.styles'
 import { ButtonBar } from '@/components/ButtonBar'
 import { useContext, useState } from 'react'
 import endpoints from '@/api/endpoints'
-import type { Toc } from '@/api/types/Toc'
-import { useAppSelector } from '@/api/store'
+import { useAppDispatch, useAppSelector } from '@/api/store'
 import { Context } from '@/components/socket/Context'
+import { tocActions } from '@/api/store/toc'
 
 function App() {
+  const dispatch = useAppDispatch()
   const { setRipState, resetRipStatus } = useContext(Context)
 
-  const [tocLoading, setTocLoading] = useState<boolean>()
-  const [tocData, setTocData] = useState<Toc>()
   const [error, setError] = useState<boolean>()
 
   const sortInfo = useAppSelector((state) => state.rip.sort_info)
@@ -24,14 +23,11 @@ function App() {
 
   const handleLoadTocClick = () => {
     console.info('Fetching TOC')
-    setTocLoading(true)
     setRipState && setRipState({})
     fetch(endpoints.toc(), { method: 'GET' })
       .then(response => response.json())
       .then(json => {
-        console.log('response json', json)
-        setTocData(json)
-        setTocLoading(false)
+        dispatch(tocActions.setTocData(json))
       })
   }
 
@@ -64,7 +60,7 @@ function App() {
         onError={() => setError(true)}
         onClearError={() => setError(false)}
       />
-      <TOCTable data={tocData} loading={tocLoading} />
+      <TOCTable />
       <StatusScroller /> 
     </AppContainer>
   )

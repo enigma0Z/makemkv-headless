@@ -1,7 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { ShowInfo, SortInfo } from "../types/SortInfo";
 import { uniqueFilter } from "@/util/array";
-import type { StateValidation } from ".";
 
 export interface RipState {
   destination: RipStateDestination;
@@ -36,22 +35,26 @@ const initialState: RipState = {
   toc_length: 0
 }
 
-const ripStateValidation: StateValidation<RipState> = {
-  destination: {
-    library: (value: string) => value === "kids" || value === "main",
-    media: (value: string) => value === "dvd" || value === "blu-ray",
-    content: (value: string) => value === "movie" || value === "show"
-  },
-  sort_info: {
-  }
-}
+export const ripStateIsValid = (state: RipState) => (
+  state.destination.library !== undefined
+  && state.destination.media !== undefined
+  && state.destination.content !== undefined
+  && state.sort_info.name !== undefined
+  && state.sort_info.id !== undefined
+)
 
 const ripSlice = createSlice({
   name: "rip",
   initialState,
   reducers: {
-    updateRip: (state, action: PayloadAction<RipState>) => {
-      state = {...state, ...action.payload}
+    setRipData: (state, action: PayloadAction<RipState | undefined>) => {
+      console.debug('setRipData', action)
+      if (action.payload) {
+        state.destination = action.payload.destination
+        state.rip_all = action.payload.rip_all
+        state.sort_info = action.payload.sort_info
+        state.toc_length = action.payload.toc_length
+      }
     },
     updateSortInfo: (state, action: PayloadAction<RipState['sort_info']>) => {
       state.sort_info = {...state.sort_info, ...action.payload}
