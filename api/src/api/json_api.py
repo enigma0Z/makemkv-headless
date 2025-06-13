@@ -1,9 +1,10 @@
-from functools import wraps
 import json
-from typing import Callable
 
+from functools import wraps
+from typing import Callable
 from flask import Response
-from json_serializable import JSONSerializable
+
+from src.json_serializable import JSONSerializable
 
 JSON_CONTENT_TYPE = "application/json; charset=utf-8"
 
@@ -16,7 +17,7 @@ def json_serializable_api(function: Callable[[], JSONSerializable | tuple[JSONSe
       assert json_data is not None
       assert response is not None
 
-      response.response = json_data.to_json()
+      response.response = json.dumps(json_data)
       response.content_type = JSON_CONTENT_TYPE
       return response
     else:
