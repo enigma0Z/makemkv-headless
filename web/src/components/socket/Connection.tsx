@@ -39,7 +39,7 @@ const SocketConnection = () => {
     })
 
     socket.on("disconnect", () => {
-      console.error("Socket disconnected")
+      console.info("Socket disconnected")
       setConnected(false)
       setTimeout(() => socket.connect(), RECONNECT_DELAY_MS)
     })

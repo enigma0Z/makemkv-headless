@@ -1,5 +1,7 @@
 import { createContext, useState } from "react";
 
+import type { RipState as ReduxRipState } from "@/api/store/rip";
+
 export type BaseMessageEventData = { // message.py BaseMessage
   type: string;
 }
@@ -46,12 +48,26 @@ export interface ClientToServerEvents { }
 export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>
 
 type RipState = {
+  redux?: ReduxRipState;
+
   currentTitle?: number;
+
   currentProgress?: {buffer?: number, progress: number}[];
   totalProgress?: {buffer: number, progress: number};
+
   currentStatus?: ProgressMessageEvent["name"];
   totalStatus?: string;
+
   ripStarted?: boolean;
+}
+
+const initialRipState: RipState = {
+  currentTitle: undefined,
+  currentProgress: undefined,
+  totalProgress: undefined,
+  currentStatus: undefined,
+  totalStatus: undefined,
+  ripStarted: false
 }
 
 type ContextProps = {
@@ -72,6 +88,7 @@ type ContextProps = {
 
   ripState?: RipState;
   setRipState?: SetStateCallback<RipState | undefined>;
+  resetRipStatus?: () => void;
 }
 
 export const Context = createContext<ContextProps>({
@@ -91,13 +108,17 @@ const SocketContext = ({ children }: SocketContextProps) => {
   const [ripStartStopMessageEvents, setRipStartStopMessageEvents] = useState<(RipStartStopMessageEvent)[]>()
   const [ripState, setRipState] = useState<RipState>()
 
+  const resetRipStatus = () => {
+    setRipState((prev) => ({ ...prev, ...initialRipState }))
+  }
+
   return <Context value={{
     connected, setConnected,
     progressMessageEvents, setProgressMessageEvents,
     progressValueMessageEvents, setProgressValueMessageEvents,
     messageEvents, setMessageEvents,
     ripStartStopMessageEvents, setRipStartStopMessageEvents,
-    ripState, setRipState
+    ripState, setRipState, resetRipStatus
   }}>
     {children}
   </Context>
