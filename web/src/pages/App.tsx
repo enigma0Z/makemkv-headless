@@ -10,10 +10,11 @@ import { useAppSelector } from '@/api/store'
 import { Context } from '@/components/socket/Context'
 
 function App() {
-  const { setRipState } = useContext(Context)
+  const { setRipState, resetRipStatus } = useContext(Context)
 
   const [tocLoading, setTocLoading] = useState<boolean>()
   const [tocData, setTocData] = useState<Toc>()
+  const [error, setError] = useState<boolean>()
 
   const sortInfo = useAppSelector((state) => state.rip.sort_info)
   const library = useAppSelector((state) => state.rip.destination?.library)
@@ -46,6 +47,7 @@ function App() {
         "Content-Type": "application/json"
       })
     }).then((response) => {
+      resetRipStatus && resetRipStatus();
       console.debug('handleStartRip() response', response)
     })
   }
@@ -56,11 +58,13 @@ function App() {
       <ButtonBar 
         onLoadToc={handleLoadTocClick}
         onStartRip={handleStartRip}
+        ripDisabled={error ?? true}
       />
-      <CombinedShowMovieForm />
+      <CombinedShowMovieForm 
+        onError={() => setError(true)}
+        onClearError={() => setError(false)}
+      />
       <TOCTable data={tocData} loading={tocLoading} />
-      {/* TODO: Add rip controls and rip status view */}
-      {/* TODO: Figure out how to make this a fixed height */}
       <StatusScroller /> 
     </AppContainer>
   )

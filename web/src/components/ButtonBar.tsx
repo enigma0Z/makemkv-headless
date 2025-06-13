@@ -3,9 +3,10 @@ import { Button } from "@mui/material";
 type Props = {
   onLoadToc: () => void;
   onStartRip: () => void;
+  ripDisabled: boolean;
 }
 
-export const ButtonBar = ({ onLoadToc, onStartRip }: Props) => {
+export const ButtonBar = ({ onLoadToc, onStartRip, ripDisabled }: Props) => {
   return <div>
     <Button
       onClick={onLoadToc}
@@ -14,6 +15,7 @@ export const ButtonBar = ({ onLoadToc, onStartRip }: Props) => {
     </Button>
     <Button
       onClick={onStartRip}
+      disabled={ripDisabled}
     >
       Start Rip
     </Button>
