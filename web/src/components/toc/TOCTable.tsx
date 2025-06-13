@@ -1,4 +1,4 @@
-import { useAppDispatch, useAppSelector } from "@/api/store"
+import { store, useAppDispatch, useAppSelector } from "@/api/store"
 import { ripActions } from "@/api/store/rip"
 import type { TitleInfo, Toc } from "@/api/types/Toc"
 import { hmsToSeconds } from "@/util/string"
@@ -112,29 +112,27 @@ export const TOCTable = ({ data = undefined, loading = false }: Props) => {
     return {mainIndexes, extraIndexes}
   }
 
-  useEffect(() => {
-    if (data) {
-      dispatch(ripActions.setTocLength(data.source.titles.length))
-
-      let longestTitleIndex =0
-      let longestTitleLength = 0
-      data.source.titles.forEach((title, index) => {
-        const outerTitleLength = hmsToSeconds(title.runtime)
-        if (outerTitleLength > longestTitleLength) {
-          longestTitleLength = outerTitleLength
-          longestTitleIndex = index
-        }
-      })
-
-      let getIndexes: () => { mainIndexes: number[], extraIndexes: number[] }
-      if (content === "movie") getIndexes = getMovieIndexes
-      else getIndexes = getShowIndexes
-
-      const {mainIndexes, extraIndexes} = getIndexes()
+  const setIndexes = () => {
+    if (content === "movie") {
+      const {mainIndexes, extraIndexes} = getMovieIndexes()
+      dispatch(ripActions.setMainIndexes(mainIndexes))
+      dispatch(ripActions.setExtraIndexes(extraIndexes))
+    } else if ( content === "show" ) {
+      const {mainIndexes, extraIndexes} = getShowIndexes()
       dispatch(ripActions.setMainIndexes(mainIndexes))
       dispatch(ripActions.setExtraIndexes(extraIndexes))
     }
+  }
+
+  useEffect(() => {
+    if (data) {
+      dispatch(ripActions.setTocLength(data.source.titles.length));
+      setIndexes();
+    }
   }, [data]) 
+
+
+  useEffect(() => { data && setIndexes() }, [content])
 
   const handleSelectAllOnClick = (event: React.ChangeEvent, checked: boolean) => {
     if (checked) {
