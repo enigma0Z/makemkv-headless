@@ -83,17 +83,21 @@ class State(JSONSerializable):
   def update_from_partial(self, data):
     self.data = self.merger(self.data, data)
 
+  def fill_progress_indexes(self, index):
+    if len(self.data['socket']['current_progress']) <= index:
+      # Create empty current_progress entries as needed
+      self.data['socket']['current_progress'] = [ 
+        self.data['socket']['current_progress'][index] 
+        if len(self.data['socket']['current_progress']) > index
+        else {"buffer": None, "progress": None}
+        for index in range(0, index+1)
+      ]
+    pass
+
   def update_progress(self, data: ProgressValueMessageData):
     self.data['socket']['total_progress']['progress'] = data['total'] / data['max']
     if (self.data['socket']['current_title'] != None):
-      if len(self.data['socket']['current_progress']) <= self.data['socket']['current_title']:
-        # Create empty current_progress entries as needed
-        self.data['socket']['current_progress'] = [ 
-          self.data['socket']['current_progress'][index] 
-          if len(self.data['socket']['current_progress']) > index
-          else {"buffer": None, "progress": None}
-          for index in range(0, self.data['socket']['current_title']+1)
-        ]
+      self.fill_progress_indexes(self.data['socket']['current_title'])
 
       if self.data['socket']['current_status'] == 'Saving to MKV file':
         self.data['socket']['current_progress'][self.data['socket']['current_title']]['buffer'] = 1
@@ -108,8 +112,13 @@ class State(JSONSerializable):
       self.data['socket']['current_status'] = data['name']
 
       if (
-        data['name'] == 'Saving to MKV file' 
-        or data['name'] == 'Analyzing seamless segments'
+        self.data['socket']['current_title'] != None
+        and (
+          data['name'] == 'Saving to MKV file' 
+          or data['name'] == 'Analyzing seamless segments'
+        ) and (
+          data['index'] > self.data['socket']['current_title']
+        )
       ):
         self.data['socket']['current_title'] = data['index']
   
