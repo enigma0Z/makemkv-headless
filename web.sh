@@ -1,6 +1,6 @@
 #!/bin/bash
-cd api
+cd web
 
 while true; do
-  python3 src $@
+  npm start $@
 done
