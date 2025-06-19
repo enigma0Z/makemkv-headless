@@ -182,7 +182,6 @@ export const TOCTable = ({ }: Props) => {
                 <div
                   style={{
                     display: "flex",
-                    f
                   }}
                 >
                   <div>
