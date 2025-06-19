@@ -1,6 +1,4 @@
 #!/bin/bash
 cd api
 
-while true; do
-  python3 src $@
-done
+python3 src $@
