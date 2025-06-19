@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from test.data.toc_test_data import generate_CINFO, generate_TINFO, generate_SINFO
-from toc import TOC, TrackInfo, format_records
+from src.toc import TOC, TrackInfo, format_records
 
 class TOCTest(TestCase):
   def test_format_records(self):

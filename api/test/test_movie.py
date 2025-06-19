@@ -4,10 +4,11 @@ from argparse import Namespace
 from unittest import TestCase
 from unittest.mock import DEFAULT, MagicMock, Mock, patch
 
-from rip_titles.rip_titles import rip_titles
-from sort import SortInfo
+from src.rip_titles.rip_titles import rip_titles
+from src.sort import SortInfo
+from src.toc import TOC
+
 from test.data.toc_test_data import generate_CINFO, generate_SINFO, generate_TINFO
-from toc import TOC
 
 @patch.multiple('builtins', open=DEFAULT)
 @patch.multiple('os', makedirs=DEFAULT, rename=DEFAULT)

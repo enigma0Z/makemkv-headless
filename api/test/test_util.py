@@ -2,10 +2,11 @@
 
 import os
 
-import util
 
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
+
+from src import util
 
 multi_response_index = {}
 
