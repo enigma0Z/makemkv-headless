@@ -1,5 +1,4 @@
 import styled from "@emotion/styled"
-import { Autocomplete as MUIAutocomplete } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 
 export const theme = createTheme({
