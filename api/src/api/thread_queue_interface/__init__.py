@@ -55,9 +55,7 @@ class ThreadQueueInterface(BaseInterface):
 
   def print(self, *text, **kwargs):
     if 'target' in kwargs and kwargs['target'] != 'status':
-      message_data = {**kwargs, "text": ' '.join(text)}
       self.send(MessageEvent(*text, **kwargs))
-      # self.send(build_message(**message_data))
 
   def run(self):
     '''Start the queue processing thread'''
