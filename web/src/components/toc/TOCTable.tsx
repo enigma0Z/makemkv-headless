@@ -1,9 +1,9 @@
 import { useAppDispatch, useAppSelector } from "@/api/store"
 import { ripActions } from "@/api/store/rip"
 import { hmsToSeconds } from "@/util/string"
-import { Card, Checkbox, FormControlLabel, LinearProgress, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
+import { Card, Checkbox, Divider, FormControlLabel, LinearProgress, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
-import { MainExtrasRadioGroup, StatusContentWrapper, StatusContentWrapperLeft, StatusWrapper, WidgetCell } from "./TOCTable.styles"
+import { MainExtrasRadioGroup, MobileOnlyTableRow, ProgressCell, StatusWrapper, StyledTableCellBottom, StyledTableCellTop } from "./TOCTable.styles"
 import { Context } from "../socket/Context"
 import type { TitleInfo, Toc } from "@/api/store/toc"
 
@@ -177,16 +177,33 @@ export const TOCTable = ({ }: Props) => {
               ><Checkbox 
                 onChange={handleSelectAllOnClick}
               /></TableCell>
-              <WidgetCell>#</WidgetCell>
-              <TableCell width="75%">
-                <StatusContentWrapper>
-                  <StatusContentWrapperLeft>
-                    Type
-                  </StatusContentWrapperLeft>
+              <TableCell>#</TableCell>
+              <TableCell>
+                <div
+                  style={{
+                    display: "flex",
+                    f
+                  }}
+                >
+                  <div>
+                    Main
+                  </div>
+                  <Divider orientation="vertical" flexItem />
+                  <div>
+                    Extra
+                  </div>
+                </div>
+              </TableCell>
+              {/* <TableCell>
+                Main | Extra
+              </TableCell> */}
+              <TableCell width="10%">Runtime</TableCell>
+              <TableCell width="15%">Filename</TableCell>
+              <ProgressCell width="60%">
                   <StatusWrapper>
                   { ripState?.total_status && <>
                         <div>
-                          {ripState?.total_status}
+                          {ripState?.total_status ?? "Status"}
                         </div>
                         <LinearProgress 
                           variant="buffer" 
@@ -196,11 +213,25 @@ export const TOCTable = ({ }: Props) => {
                     </>
                   }
                   </StatusWrapper>
-                </StatusContentWrapper>
-              </TableCell>
-              <TableCell width="10%">Runtime</TableCell>
-              <TableCell width="15%">Filename</TableCell>
+              </ProgressCell>
             </TableRow>
+            <MobileOnlyTableRow>
+              <TableCell colSpan={6}>
+                <StatusWrapper>
+                  { ripState?.total_status && <>
+                        <div>
+                          {ripState?.total_status ?? "Status"}
+                        </div>
+                        <LinearProgress 
+                          variant="buffer" 
+                          value={ripState?.total_progress?.progress ? ripState.total_progress.progress * 100 : 0} 
+                          valueBuffer={ripState?.total_progress?.buffer ? ripState.total_progress.buffer * 100 : 0} 
+                        />
+                    </>
+                  }
+                </StatusWrapper> 
+              </TableCell>
+            </MobileOnlyTableRow>
           </TableHead>
           <TableBody>
             { data 
@@ -279,35 +310,46 @@ export const TOCRow = ({ index, data, progress, buffer, statusText }: RowProps) 
     }
   }
 
-  return <TableRow>
-    <TableCell
+  return <><TableRow>
+    <StyledTableCellTop
       padding="checkbox"
-
     ><Checkbox 
       checked={isSelected}
       onChange={handleCheckboxOnChange}
-    /></TableCell>
-    <TableCell>{index}</TableCell>
-    <TableCell>
-      <StatusContentWrapper>
-        <StatusContentWrapperLeft>
-          <MainExtrasRadioGroup
-            row
-            aria-labelledby="demo-radio-buttons-group-label"
-            value={
-              isSelected 
-              ? (isMain ? "main" : "extra") 
-              : null
-            }
-            name="radio-buttons-group"
-            onChange={handleRadioButtonChange}
-            aria-disabled={!isSelected}
-            sx={{display: "inline-block"}}
-          >
-            <FormControlLabel disabled={!isSelected} value="main" control={<Radio />} label="Main" />
-            <FormControlLabel disabled={!isSelected} value="extra" control={<Radio />} label="Extra" />
-          </MainExtrasRadioGroup>
-        </StatusContentWrapperLeft>
+    /></StyledTableCellTop>
+    <StyledTableCellTop>{index}</StyledTableCellTop>
+    <StyledTableCellTop>
+      <MainExtrasRadioGroup
+        row
+        aria-labelledby="demo-radio-buttons-group-label"
+        value={
+          isSelected 
+          ? (isMain ? "main" : "extra") 
+          : null
+        }
+        name="radio-buttons-group"
+        onChange={handleRadioButtonChange}
+        aria-disabled={!isSelected}
+        sx={{display: "inline-block"}}
+      >
+        <Radio disabled={!isSelected} aria-label="extra" value="main" />
+        <Divider orientation="vertical" flexItem />
+        <Radio disabled={!isSelected} aria-label="extra" value="extra" />
+      </MainExtrasRadioGroup>
+    </StyledTableCellTop>
+    <StyledTableCellTop>{data.runtime}</StyledTableCellTop>
+    <StyledTableCellTop>{data.filename}</StyledTableCellTop>
+    <ProgressCell>
+      { progress !== undefined && <>
+          <div>{progress > .98 ? "Complete" : statusText ?? ''}</div>
+          { isSelected
+            ? <LinearProgress variant={buffer !== undefined ? "buffer" : "determinate"} value={progress ? progress * 100 : 0} valueBuffer={buffer ? buffer * 100 : buffer} />
+            : <LinearProgress variant="determinate" value={0} color="secondary" />
+          }
+      </> }
+    </ProgressCell>
+  </TableRow><MobileOnlyTableRow>
+    <StyledTableCellBottom colSpan={6}>
         <StatusWrapper>
           { progress !== undefined && <>
               <div>{progress > .98 ? "Complete" : statusText ?? ''}</div>
@@ -317,9 +359,6 @@ export const TOCRow = ({ index, data, progress, buffer, statusText }: RowProps) 
               }
           </> }
         </StatusWrapper>
-      </StatusContentWrapper>
-    </TableCell>
-    <TableCell>{data.runtime}</TableCell>
-    <TableCell>{data.filename}</TableCell>
-  </TableRow>
+    </StyledTableCellBottom>
+  </MobileOnlyTableRow></>
 }

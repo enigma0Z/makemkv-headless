@@ -11,29 +11,47 @@ export const StyledFormGroup = styled(FormGroup)(({ theme }) => ({
     gap: "10px",
     width: "100%",
     flexDirection: "row"
-  }
+  },
 }));
 
 export const LibraryFormControl = styled(FormControl)(({ theme }) => ({
-  gridColumn: "span 2"
+  gridColumn: "span 2",
+  [theme.breakpoints.down('md')]: {
+    gridColumn: "span 2"
+  }
 }));
 
 export const MediaFormControl = styled(FormControl)(({ theme }) => ({
-  gridColumn: "span 2"
+  gridColumn: "span 2",
+  [theme.breakpoints.down('md')]: {
+    gridColumn: "span 2"
+  }
 }));
 
 export const ContentFormControl = styled(FormControl)(({ theme }) => ({
-  gridColumn: "span 2"
+  gridColumn: "span 2",
+  [theme.breakpoints.down('md')]: {
+    gridColumn: "span 2"
+  }
 }));
 
 export const NameIdFormControl = styled(FormControl)(({ theme }) => ({
-  gridColumn: "span 4"
+  gridColumn: "span 4",
+  [theme.breakpoints.down('md')]: {
+    gridColumn: "span 6"
+  }
 }));
 
 export const SeasonFormControl = styled(FormControl)(({ theme }) => ({
-  gridColumn: "span 1"
+  gridColumn: "span 1",
+  [theme.breakpoints.down('md')]: {
+    gridColumn: "span 3"
+  }
 }));
 
 export const FirstEpisodeFormControl = styled(FormControl)(({ theme }) => ({
-  gridColumn: "span 1"
+  gridColumn: "span 1",
+  [theme.breakpoints.down('md')]: {
+    gridColumn: "span 3"
+  }
 }));
