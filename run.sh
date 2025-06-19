@@ -1,4 +1,4 @@
 #!/bin/bash
 
-./api.sh &
+./api.sh --api &
 ./web.sh &
