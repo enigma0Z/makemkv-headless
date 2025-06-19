@@ -134,7 +134,7 @@ export const TOCTable = ({ }: Props) => {
   }
 
   useEffect(() => {
-    if (data) {
+    if (data && !ripState?.rip_started) {
       dispatch(ripActions.setTocLength(data?.source?.titles.length));
       setIndexes();
     }
@@ -171,17 +171,16 @@ export const TOCTable = ({ }: Props) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell
-                padding="checkbox"
-                size="small"
-              ><Checkbox 
-                onChange={handleSelectAllOnClick}
-              /></TableCell>
-              <TableCell>#</TableCell>
+              <TableCell width="5%" >
+                <Checkbox onChange={handleSelectAllOnClick} />
+              </TableCell>
+              <TableCell width="5%">#</TableCell>
               <TableCell>
                 <div
                   style={{
                     display: "flex",
+                    justifyContent: "flex-start",
+                    gap: "10px",
                   }}
                 >
                   <div>
@@ -193,9 +192,6 @@ export const TOCTable = ({ }: Props) => {
                   </div>
                 </div>
               </TableCell>
-              {/* <TableCell>
-                Main | Extra
-              </TableCell> */}
               <TableCell width="10%">Runtime</TableCell>
               <TableCell width="15%">Filename</TableCell>
               <ProgressCell width="60%">
@@ -271,6 +267,8 @@ type RowProps = {
 export const TOCRow = ({ index, data, progress, buffer, statusText }: RowProps) => {
   const dispatch = useAppDispatch()
 
+  const { ripState } = useContext(Context)
+
   const mainIndexes = useAppSelector((state) => state.rip.sort_info.main_indexes)
   const extraIndexes = useAppSelector((state) => state.rip.sort_info.extra_indexes)
 
@@ -310,12 +308,9 @@ export const TOCRow = ({ index, data, progress, buffer, statusText }: RowProps) 
   }
 
   return <><TableRow>
-    <StyledTableCellTop
-      padding="checkbox"
-    ><Checkbox 
-      checked={isSelected}
-      onChange={handleCheckboxOnChange}
-    /></StyledTableCellTop>
+    <StyledTableCellTop>
+      <Checkbox disabled={ ripState?.rip_started } checked={isSelected} onChange={handleCheckboxOnChange} />
+    </StyledTableCellTop>
     <StyledTableCellTop>{index}</StyledTableCellTop>
     <StyledTableCellTop>
       <MainExtrasRadioGroup
@@ -331,9 +326,9 @@ export const TOCRow = ({ index, data, progress, buffer, statusText }: RowProps) 
         aria-disabled={!isSelected}
         sx={{display: "inline-block"}}
       >
-        <Radio disabled={!isSelected} aria-label="extra" value="main" />
+        <Radio disabled={!isSelected || ripState?.rip_started} aria-label="extra" value="main" />
         <Divider orientation="vertical" flexItem />
-        <Radio disabled={!isSelected} aria-label="extra" value="extra" />
+        <Radio disabled={!isSelected || ripState?.rip_started} aria-label="extra" value="extra" />
       </MainExtrasRadioGroup>
     </StyledTableCellTop>
     <StyledTableCellTop>{data.runtime}</StyledTableCellTop>
