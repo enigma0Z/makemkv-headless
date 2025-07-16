@@ -44,7 +44,7 @@ class SocketStatus(TypedDict, total=False):
   total_status: StatusMessage
   rip_started: bool
 
-SOCKET_STATUS_DEFAULT_VALUE = {
+SOCKET_STATUS_DEFAULT_VALUE: SocketStatus = {
   'current_title': None,
   'current_progress': [],
   'total_progress': {
@@ -71,14 +71,11 @@ class State(JSONSerializable):
   def reset_all(self): 
     self.data: StateData = {
       'redux': {},
-      'socket': SOCKET_STATUS_DEFAULT_VALUE
+      'socket': { **SOCKET_STATUS_DEFAULT_VALUE }
     }
 
   def reset_socket(self):
-    self.data = {
-      **self.data,
-      'socket': SOCKET_STATUS_DEFAULT_VALUE
-    }
+    self.data['socket'] = { **SOCKET_STATUS_DEFAULT_VALUE }
 
   def update_from_partial(self, data):
     self.data = self.merger(self.data, data)

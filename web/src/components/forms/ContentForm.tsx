@@ -1,15 +1,17 @@
 import { useAppSelector } from "@/api/store"
 import { ripActions } from "@/api/store/rip"
-import { Autocomplete, Card, InputLabel, MenuItem, Select, TextField } from "@mui/material"
+import { Autocomplete, Card, InputLabel, Link, MenuItem, Select, TextField } from "@mui/material"
 import { useDispatch } from "react-redux"
-import { ContentFormControl, FirstEpisodeFormControl, LibraryFormControl, MediaFormControl, NameIdFormControl, SeasonFormControl, StyledFormGroup } from "./ContentForm.styles"
-import React, { useState } from "react"
+import { ContentFormControl, FirstEpisodeFormControl, LibraryFormControl, MediaFormControl, NameIdFormControl, NameOptionWrapper, SeasonFormControl, SplitSegmentsFormControl, StyledFormGroup } from "./ContentForm.styles"
+import React, { useCallback, useState } from "react"
 import { throttle } from "lodash"
 import endpoints from "@/api/endpoints"
 import type { TmdbSearchResult } from "@/api/types/tmdb"
 import { AutocompleteWrapper } from "@/theme"
 
 export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
+  console.debug('CombinedShowMovieForm render()')
+
   const dispatch = useDispatch();
 
   const name = useAppSelector((state) => state.rip.sort_info.name)
@@ -19,21 +21,23 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
   const content = useAppSelector((state) => state.rip.destination?.content)
   const seasonNumber = useAppSelector((state) => state.rip.sort_info.season_number)
   const firstEpisode = useAppSelector((state) => state.rip.sort_info.first_episode)
+  const splitSegments = useAppSelector((state) => state.rip.sort_info.split_segments)
+  const tmdbConfiguration = useAppSelector((state) => state.tmdb.configuration)
 
   const [ nameValue, setNameValue ] = useState<TmdbSearchResult>()
   const [ nameOptions, setNameOptions ] = useState<(TmdbSearchResult)[]>()
+  const [ splitSegmentsValue, setSplitSegmentsValue ] = useState<string>()
 
   const getOptionLabel = (option: TmdbSearchResult) => 
     option ? `${option.name ?? option.title} / ${option.first_air_date ?? option.release_date} (tmdbid-${option.id})` : ""
   
-  const updateOptions = throttle((searchText: string) => {
-    console.log('updateOptions', searchText)
+  const updateOptions = useCallback(throttle((searchText: string) => {
     const foundOption = nameOptions?.find((option) => (
       option.label === searchText
     ))
     if (!foundOption && searchText !== '') {
       if (content?.toLowerCase() === 'show') {
-        fetch(endpoints.tmdb_show(searchText), { method: 'GET' })
+        fetch(endpoints.tmdb.show(searchText), { method: 'GET' })
         .then(response => response.json())
         .then(json => {
           json.forEach((option: TmdbSearchResult) => {
@@ -42,7 +46,7 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
           setNameOptions(json)
         })
       } else if (content?.toLowerCase() === 'movie') {
-        fetch(endpoints.tmdb_movie(searchText), { method: 'GET' })
+        fetch(endpoints.tmdb.movie(searchText), { method: 'GET' })
         .then(response => response.json())
         .then(json => {
           json.forEach((option: TmdbSearchResult) => {
@@ -52,16 +56,14 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
         })
       }
     }
-  }, 2000, {leading: false, trailing: true})
+  }, 2000, {trailing: true, leading: false}), [content, nameOptions]);
 
   const handleNameOnInputChange = (_event: React.SyntheticEvent, value: string) => {
-    console.debug('handleNameOnInputChange', value)
     setNameValue({ label: value })
     updateOptions(value)
   }
 
   const handleNameOnChange = (_event: React.SyntheticEvent, value: TmdbSearchResult | null) => {
-    console.log('handleNameChange', value)
     if (value?.name) dispatch(ripActions.setName(value.name));
     else if (value?.title) dispatch(ripActions.setName(value.title));
     value?.id && dispatch(ripActions.setId(`${value.id}`))
@@ -125,7 +127,13 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
             value={content ?? ''}
             label="Format"
             onChange={({ target: { value }}) => { 
+              console.debug('content onChange()')
               dispatch(ripActions.setContent(value))
+              if (value === "movie" ) {
+                dispatch(ripActions.setSeasonNumber(undefined))
+                dispatch(ripActions.setFirstEpisode(undefined))
+                dispatch(ripActions.setSplitSegments(undefined))
+              }
             }}
             fullWidth
           >
@@ -152,26 +160,31 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
               }}
               renderOption={({key, ...props}, option: TmdbSearchResult, _state, ownerState) => {
                 return (
-                  <li 
-                    key={key} 
+                  <li
+                    key={key}
                     {...props}
                   >
                     <Card
                       elevation={12}
                       sx={{
-                        padding: "10px",
                         width: "100%",
                       }}
                     >
-                      <div>{ownerState.getOptionLabel(option)}</div>
-                      <div>{option.overview}</div>
+                      <NameOptionWrapper>
+                        <div>
+                          <Link href={`https://www.themoviedb.org/${content === "show" ? "tv" : "movie"}/${option.id}`} target="_blank"><div>{ownerState.getOptionLabel(option)}</div></Link>
+                          <div>{option.overview}</div>
+                        </div>
+                        <div>
+                          {tmdbConfiguration && option.poster_path && <img src={`${tmdbConfiguration.images.base_url}${tmdbConfiguration.images.poster_sizes[0]}${option.poster_path}`} />}
+                        </div>
+                      </NameOptionWrapper>
                     </Card>
                   </li>
                 )
               }}
-              value={nameValue ?? { label: `${name} - ${id}` } }
+              value={nameValue ?? null}
               fullWidth
-              freeSolo
             />
           </AutocompleteWrapper>
         </NameIdFormControl>
@@ -199,13 +212,32 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
             type="number"
             value={firstEpisode ?? ""}
             onChange={({target: {value}}) => {
-              console.log(value)
               if (value.match(/^\d*$/)) {
                 dispatch(ripActions.setFirstEpisode(parseInt(value)))
               }
             }}
           />
         </FirstEpisodeFormControl>
+        <SplitSegmentsFormControl
+          disabled={ content !== "show" }
+        >
+          <TextField 
+            disabled={ content !== "show" }
+            label="Split Segments"
+            value={splitSegmentsValue}
+            onChange={({target: {value}}) => {
+              console.log('splitSegments value', value)
+              setSplitSegmentsValue(value)
+              dispatch(
+                ripActions.setSplitSegments(
+                  value === "" 
+                  ? []
+                  : value.split(", ").map((value) => ( parseInt(value) ))
+                )
+              )
+            }}
+          />
+        </SplitSegmentsFormControl>
     </StyledFormGroup>
   </>
 }

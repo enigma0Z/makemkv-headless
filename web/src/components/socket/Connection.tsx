@@ -3,11 +3,15 @@ import { Context, type SetStateCallback } from "./Context"
 import { socket } from "."
 import endpoints from "@/api/endpoints"
 import type { ApiState } from "@/api/types/status"
-import { useAppDispatch } from "@/api/store"
-import { tocActions } from "@/api/store/toc"
-import { ripActions } from "@/api/store/rip"
 
 const RECONNECT_DELAY_MS = 1000
+
+function isRippingStatus(status: string | undefined) {
+  return (
+    status === "Analyzing seamless segments"
+    || status === "Saving to MKV file"
+  )
+}
 
 function appendToEventQueue<T>(
   callback: SetStateCallback<T[] | undefined> | undefined,
@@ -17,24 +21,19 @@ function appendToEventQueue<T>(
 }
 
 const SocketConnection = () => {
-  const dispatch = useAppDispatch()
-
   const {
     setConnected,
     setMessageEvents,
     setProgressMessageEvents,
     setProgressValueMessageEvents,
     setRipStartStopMessageEvents,
+    ripState,
     setRipState
   } = useContext(Context)
 
-  const connect = () => {
-    socket.connect()
-  }
-
   const setupHandlers = () => {
     socket.on("connect", () => {
-      console.log("Socket connected")
+      console.info("Socket connected")
       setConnected(true)
     })
 
@@ -65,12 +64,12 @@ const SocketConnection = () => {
 
     socket.on("ProgressMessageEvent", (value) => {
       // Set index if current index is undefined
-      console.log('ProgressMessageEvent', setRipState, value)
       if (value.progress_type === "current") {
         setRipState && setRipState((prev) => {
           const next = {...prev}
           if (
             next.rip_started 
+            && isRippingStatus(next.current_status)
             && (
               next.current_title === undefined 
               || value.index > next.current_title
@@ -90,7 +89,6 @@ const SocketConnection = () => {
             next.current_progress[prev.current_title] = {buffer: 1, progress: 1}
           }
 
-          console.log('Updating current status, index', next)
           return next
         });
       } else if (value.progress_type === "total") {
@@ -112,7 +110,6 @@ const SocketConnection = () => {
 
     socket.on("ProgressValueMessageEvent", (value) => {
       // Set progress value for current index
-      console.log('ProgressValueEvent', value, setRipState)
       setRipState && setRipState((prev) => {
         const next = {...prev}
         if (next.current_title !== undefined) {
@@ -134,6 +131,7 @@ const SocketConnection = () => {
         }
 
         if (next.rip_started) {
+          next.total_progress.buffer = 1
           next.total_progress.progress = value.total / value.max
         } else {
           next.total_progress.buffer = value.total / value.max
@@ -145,9 +143,11 @@ const SocketConnection = () => {
     })
     
     socket.on("RipStartStopMessageEvent", (value) => {
-      console.log("RipStartMessageEvent", value)
       setRipState && setRipState((prev) => {
         const next = {...prev};
+
+        next.rip_started = value.state === "start"
+
         if (value.index) {
           next.current_title = value.index
         }
@@ -170,19 +170,16 @@ const SocketConnection = () => {
   }
 
   useEffect(() => {
-    // Initialize state
-    fetch(endpoints.state(), { method: 'GET' })
+    // Initialize socket state
+    fetch(endpoints.state.get("socket"), { method: 'GET' })
       .then(response => response.json() as Promise<ApiState>)
       .then((json) => {
-        console.debug('response json', json)
         setRipState && setRipState(json.socket) // Socket context
-        dispatch(tocActions.setTocData(json.redux.toc)) // Redux
-        dispatch(ripActions.setRipData(json.redux.rip))
       })
 
     // Set up socket connection
     setupHandlers()
-    connect()
+    socket.connect()
 
     return () => {
       socket.off("MessageEvent")

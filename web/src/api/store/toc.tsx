@@ -67,7 +67,6 @@ const tocSlice = createSlice({
   initialState,
   reducers: {
     setTocData: (state, action: PayloadAction<TocState | undefined>) => {
-      console.log('setTocData', action)
       if (action.payload) {
         state.lines = action.payload.lines
         state.source = action.payload.source

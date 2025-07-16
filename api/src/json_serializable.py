@@ -3,18 +3,24 @@ from json import JSONEncoder, dumps
 import logging
 logger = logging.getLogger(__name__)
 
-class JSONSerializable:
+class JSONSerializable(JSONEncoder):
+  @staticmethod
+  def dumps(object: any):
+    return dumps(object, cls=JSONSerializable)
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
   def to_json(self):
     '''dumps(self.__dict__, cls=JSONSerializableEncoder)'''
 
     logger.debug(f'JSONSerializable.to_json({self})')
-    return dumps(self, cls=JSONSerializableEncoder)
+    return dumps(self, cls=JSONSerializable)
 
   def json_encoder(self):
     return self.__dict__
 
-class JSONSerializableEncoder(JSONEncoder):
-  def default(self, object: JSONSerializable):
+  def default(self, object):
     if isinstance(object, JSONSerializable):
       logger.debug(f'isInstance() JSONSerializableEncoder(JSONEncoder).default({object})')
       return object.json_encoder()

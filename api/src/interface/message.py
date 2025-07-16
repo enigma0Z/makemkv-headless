@@ -28,11 +28,14 @@ class BaseMessageEvent(JSONSerializable):
 class MessageEvent(BaseMessageEvent):
   def __init__(self, *text, sep=' ', end="\n", **data):
     super().__init__(**data)
-    if len(text) > 0:
-      assert "text" not in data
-      self.data['text'] = sep.join(text) + end
-    else:
-      self.data['text'] = match(r'.+?,"(.+?)".*', data['raw']).groups()[0]
+    try:
+      if len(text) > 0:
+        assert "text" not in data
+        self.data['text'] = sep.join([ str(item) for item in text ]) + end
+      else:
+        self.data['text'] = match(r'.+?,"(.+?)".*', data['raw']).groups()[0]
+    except Exception as ex:
+      self.data['text'] = str(ex)
     
 type StatusMessage = Literal[
   "Scanning CD-ROM devices",

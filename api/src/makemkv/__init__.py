@@ -28,7 +28,10 @@ def rip_disc(
   for rip_title in [str(v) for v in rip_titles]:
     logger.info(f'Ripping title {rip_title}')
     interface.print(f'Ripping title {rip_title}', target=Target.SORT)
-    interface.send(RipStartStopMessageEvent(index=rip_title, state="start"))
+    if rip_title == "all":
+      interface.send(RipStartStopMessageEvent(index=0, state="start"))
+    else:
+      interface.send(RipStartStopMessageEvent(index=int(rip_title), state="start"))
 
     # Current and total progress title
     # PRGC:code,id,name (Current)

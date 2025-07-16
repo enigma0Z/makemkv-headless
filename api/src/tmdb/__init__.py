@@ -54,3 +54,12 @@ def search(content, query):
     return [SearchResult(result, content) for result in response.json()['results']]
   else:
     return Data(response_json)
+
+def configuration():
+  url = f'https://{API_HOST_NAME}/{API_VERSION}/configuration'
+  response = requests.get(
+    url = url,
+    headers = { 'Authorization': f'Bearer {CONFIG.tmdb_token}' },
+  )
+
+  return Data(response.json())

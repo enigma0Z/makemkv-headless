@@ -6,14 +6,18 @@ from flask import Response, request
 # from rip_titles import rip_titles
 from src.api.singletons.state import STATE
 from src.config import CONFIG
+from src.interface.message import RipStartStopMessageEvent
+from src.rip_titles.threaded import RipTitlesThread
 from src.sort import *
 from src.rip_titles.rip_titles import rip_titles
-from src.api.json_api import json_serializable_api
+from src.api.json_api import json_api
 from src.api.singletons.singletons import API, INTERFACE
+from src.threads import StoppableThread
 
 logger = logging.getLogger(__name__)
 
 LOCK = Lock()
+RIP_THREAD: RipTitlesThread = None
 
 class APIRequest:
     def __init__(self, destination: str, rip_all: bool, sort_info: dict[str, str]):
@@ -40,28 +44,34 @@ class APIResponse(JSONSerializable):
         self.status = status
 
 @API.post('/api/v1/rip')
-@json_serializable_api
+@json_api
 def post_rip():
+    global LOCK, RIP_THREAD
     # extract SortInfo from post data
     data = APIRequest(**request.json)
     logger.debug(data)
 
     def rip_thread_fn():
+        global RIP_THREAD
         logger.debug(f'rip_thread_fn(), {CONFIG}')
         with LOCK:
             STATE.reset_socket()
             toc = TOC(interface=INTERFACE)
             toc.get_from_disc(CONFIG.source)
 
-            rip_titles(
-                source=CONFIG.source,              # From config
-                dest_path=os.path.join(CONFIG.destination, data.destination),
-                sort_info=data.sort_info, # From post data
-                toc=toc,                 # Not sending this
-                rip_all=data.rip_all,     # From post data
-                interface=INTERFACE,      # From singletons
-                temp_prefix=CONFIG.temp_prefix # From config
+            RIP_THREAD = RipTitlesThread(
+                kwargs={
+                    "source": CONFIG.source,              # From config
+                    "dest_path": os.path.join(CONFIG.destination, data.destination),
+                    "sort_info": data.sort_info, # From post data
+                    "toc": toc,                 # Not sending this
+                    "rip_all": data.rip_all,     # From post data
+                    "interface": INTERFACE,      # From singletons
+                    "temp_prefix": CONFIG.temp_prefix # From config
+                }
             )
+
+            RIP_THREAD.start()
 
     if not LOCK.locked():
         logger.debug('not LOCK.locked()')
@@ -79,3 +89,12 @@ def post_rip():
             Response(status=208)
         )
         
+@API.get('/api/v1/rip.stop')
+@json_api
+def get_rip_stop():
+    try:
+        RIP_THREAD.stop()
+        INTERFACE.send(RipStartStopMessageEvent(state="stop"))
+        return ("success", 200)
+    except:
+        return ("failure", 500)

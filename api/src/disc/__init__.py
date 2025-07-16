@@ -4,12 +4,19 @@ import os
 import shlex
 import time
 
+from sys import platform
+
 from src.interface import PlaintextInterface, Target
 from src.util import grep, notify
 
 def disc_inserted(source):
-  if (source.startswith('dev') or source.startswith('disc')):
-    return not grep('please insert', os.popen(shlex.join(['drutil', 'discinfo'])).readlines())
+  if source.startswith('dev'):
+    match platform:
+      case 'darwin':
+        return not grep('please insert', os.popen(shlex.join(['drutil', 'discinfo'])).readlines())
+      case 'linux':
+        # TODO: Figure out what SOMETHING is here.
+        return not grep('SOMETHING', os.popen(shlex.join(['eject', '--noop', source.split(':')[1]])))  
   else:
     return True
 

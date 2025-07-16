@@ -34,6 +34,12 @@ class TOC(JSONSerializable):
     self.source = None
     self.interface=interface
 
+  def __getitem__(self, item):
+    if item == "lines":
+      return self.lines
+    elif item == "source":
+      return self.source
+
   def get_from_disc(self, source):
 
     self.interface.print('Loading disc TOC', target=Target.MKV)
@@ -109,6 +115,12 @@ class BaseInfo(JSONSerializable):
       except Exception as ex:
         logger.debug(f"Could not find key {name} in fields, {ex}")
         return None
+
+  def __getitem__(self, item: str):
+    if item in self.__dict__: 
+      return self.__dict__[item]
+    else:
+      return self.__getattr__(item)
 
   def json_encoder(self):
     '''

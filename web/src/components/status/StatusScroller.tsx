@@ -31,7 +31,7 @@ export const StatusScroller = () => {
         display: "flex",
         position: "absolute",
         top: "0",
-        right: "0"
+        left: "0"
       }} 
       onClick={() => {
         setIsMinimized((prev) => !prev)

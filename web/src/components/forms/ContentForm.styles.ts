@@ -36,7 +36,7 @@ export const ContentFormControl = styled(FormControl)(({ theme }) => ({
 }));
 
 export const NameIdFormControl = styled(FormControl)(({ theme }) => ({
-  gridColumn: "span 4",
+  gridColumn: "span 3",
   [theme.breakpoints.down('md')]: {
     gridColumn: "span 6"
   }
@@ -45,13 +45,34 @@ export const NameIdFormControl = styled(FormControl)(({ theme }) => ({
 export const SeasonFormControl = styled(FormControl)(({ theme }) => ({
   gridColumn: "span 1",
   [theme.breakpoints.down('md')]: {
-    gridColumn: "span 3"
+    gridColumn: "span 2"
   }
 }));
 
 export const FirstEpisodeFormControl = styled(FormControl)(({ theme }) => ({
   gridColumn: "span 1",
   [theme.breakpoints.down('md')]: {
-    gridColumn: "span 3"
+    gridColumn: "span 2"
   }
+}));
+
+export const SplitSegmentsFormControl = styled(FormControl)(({ theme }) => ({
+  gridColumn: "span 1",
+  [theme.breakpoints.down('md')]: {
+    gridColumn: "span 2"
+  }
+}));
+
+export const NameOptionWrapper = styled.div(({ }) => ({
+  display: "flex",
+  flexDirection: "row",
+  width: "100%",
+  div: {
+    display: "flex",
+    flexDirection: "column"
+  },
+  "> div:nth-of-type(1)": {
+    padding: "10px",
+    flexGrow: "1"
+  },
 }));

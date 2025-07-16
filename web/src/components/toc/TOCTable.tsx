@@ -1,11 +1,14 @@
 import { useAppDispatch, useAppSelector } from "@/api/store"
 import { ripActions } from "@/api/store/rip"
 import { hmsToSeconds } from "@/util/string"
-import { Card, Checkbox, Divider, FormControlLabel, LinearProgress, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
+import { Box, Card, Checkbox, Collapse, Divider, FormControlLabel, IconButton, Input, LinearProgress, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
-import { MainExtrasRadioGroup, MobileOnlyTableRow, ProgressCell, StatusWrapper, StyledTableCellBottom, StyledTableCellTop } from "./TOCTable.styles"
+import { MainExtrasRadioGroup, MobileOnlyTableRow, ProgressCell, ProgressCellHeader, StatusWrapper, StyledTableCellBottom, StyledTableCellMiddle, StyledTableCellTop } from "./TOCTable.styles"
 import { Context } from "../socket/Context"
 import type { TitleInfo, Toc } from "@/api/store/toc"
+
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 type Props = {
   data?: Toc
@@ -20,11 +23,19 @@ type TitleGroup = {
 
 const EPISODE_LENGTH_TOLERANCE_SECONDS = 120
 
+const episodeId = (seasonNumber: number, episodeNumber: number) => {
+    return "S" + `${seasonNumber}`.padStart(2, "0") + "E" + `${episodeNumber}`.padStart(2, "0")
+}
+
 // export const TOCTable = ({ data = undefined, loading = false }: Props) => {
 export const TOCTable = ({ }: Props) => {
+  console.debug('TOCTable render()')
+
   const dispatch = useAppDispatch()
 
   const { ripState } = useContext(Context)
+
+  const current_progress = ripState?.current_title !== undefined ? ripState?.current_progress?.[ripState.current_title] : undefined
 
   const data = useAppSelector((state) => state.toc)
   const mainIndexes = useAppSelector((state) => state.rip.sort_info.main_indexes)
@@ -51,7 +62,8 @@ export const TOCTable = ({ }: Props) => {
     }
   }
 
-  const getLongestTitleGroup = () => {
+  const getTitleGroups = () => {
+    console.debug('getTitleGroups()')
     const titleGroups: TitleGroup[] = []
 
     const matchedIndexes = () => (titleGroups.map((titleGroup) => (
@@ -59,7 +71,7 @@ export const TOCTable = ({ }: Props) => {
     )).flat())
 
     data?.source?.titles.forEach((outerTitle, outerIndex) => {
-      const newTitleGroup: TitleGroup = { title: outerTitle, index: outerIndex, matches: [] }
+      const newTitleGroup: TitleGroup = { title: outerTitle, index: outerIndex, matches: [outerIndex] }
       const outerTitleLength = hmsToSeconds(outerTitle.runtime)
       data?.source?.titles.forEach((innerTitle, innerIndex) => {
         if (
@@ -78,6 +90,13 @@ export const TOCTable = ({ }: Props) => {
       return {
         titleGroups: titleGroups,
         longestTitleGroup: titleGroups.reduce((previous, current) => {
+          if (hmsToSeconds(previous.title.runtime) < hmsToSeconds(current.title.runtime)) {
+            return current
+          } else {
+            return previous
+          }
+        }),
+        biggestTitleGroup: titleGroups.reduce((previous, current) => {
           if (previous.matches.length < current.matches.length) {
             return current
           } else {
@@ -89,59 +108,50 @@ export const TOCTable = ({ }: Props) => {
 
     return {
       titleGroups: undefined,
-      longestTItleGroup: undefined
+      longestTitleGroup: undefined,
+      biggestTitleGroup: undefined
     }
-  }
-
-  const getMovieIndexes = () => {
-    const { longestTitleIndex } = getLongestTitle()
-    const mainIndexes = []
-    const extraIndexes = []
-    for (let i=0; i < (data?.source?.titles.length ?? 0); i++) {
-      if (i == longestTitleIndex) {
-        mainIndexes.push(i)
-      } else {
-        extraIndexes.push(i)
-      }
-    }
-    return {mainIndexes, extraIndexes}
   }
   
-  const getShowIndexes = () => {
-    const {longestTitleGroup} = getLongestTitleGroup()
+  const getIndexes = () => {
+    const { biggestTitleGroup, longestTitleGroup } = getTitleGroups()
+    const activeTitleGroup = content === "show" ? biggestTitleGroup : longestTitleGroup
+
     const mainIndexes = []
     const extraIndexes = []
-    for (let i=0; i < (data?.source?.titles.length ?? 0); i++) {
-      if (longestTitleGroup?.matches.indexOf(i) ?? -1 > -1) {
-        mainIndexes.push(i)
-      } else {
-        extraIndexes.push(i)
+
+    if (activeTitleGroup) {
+      console.debug('getIndexes for', content, activeTitleGroup)
+      for (let i=0; i < (data?.source?.titles.length ?? 0); i++) {
+        if (activeTitleGroup.matches.indexOf(i) > -1) {
+          mainIndexes.push(i)
+        } else {
+          extraIndexes.push(i)
+        }
       }
     }
+
     return {mainIndexes, extraIndexes}
   }
 
-  const setIndexes = () => {
-    if (content === "movie") {
-      const {mainIndexes, extraIndexes} = getMovieIndexes()
-      dispatch(ripActions.setMainIndexes(mainIndexes))
-      dispatch(ripActions.setExtraIndexes(extraIndexes))
-    } else if ( content === "show" ) {
-      const {mainIndexes, extraIndexes} = getShowIndexes()
-      dispatch(ripActions.setMainIndexes(mainIndexes))
-      dispatch(ripActions.setExtraIndexes(extraIndexes))
-    }
+  const setIndexes = async () => {
+    const {mainIndexes, extraIndexes} = getIndexes()
+    dispatch(ripActions.setMainIndexes(mainIndexes))
+    dispatch(ripActions.setExtraIndexes(extraIndexes))
   }
 
   useEffect(() => {
-    if (data && !ripState?.rip_started) {
-      dispatch(ripActions.setTocLength(data?.source?.titles.length));
-      setIndexes();
+    const makeItAsync = async () => {
+      console.debug('makeItAsync()')
+      if (data && !ripState?.rip_started) {
+        dispatch(ripActions.setTocLength(data?.source?.titles.length));
+        setIndexes();
+      }
     }
-  }, [data]) 
+    
+    makeItAsync()
+  }, [data, content]) 
 
-
-  useEffect(() => { data && setIndexes() }, [content])
 
   const handleSelectAllOnClick = (_event: React.ChangeEvent, checked: boolean) => {
     if (checked) {
@@ -164,18 +174,20 @@ export const TOCTable = ({ }: Props) => {
       dispatch(ripActions.setExtraIndexes([]))
     }
   }
-
+  
   return (<>
     <Card>
       <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell width="5%" >
+              <TableCell width="1%" sx={{ paddingRight: 0 }} >
+              </TableCell>
+              <TableCell width="1%" sx={{ paddingLeft: 0, paddingRight: 0 }}>
                 <Checkbox onChange={handleSelectAllOnClick} />
               </TableCell>
-              <TableCell width="5%">#</TableCell>
-              <TableCell>
+              <TableCell width="1%">#</TableCell>
+              <TableCell width="1%">
                 <div
                   style={{
                     display: "flex",
@@ -192,23 +204,37 @@ export const TOCTable = ({ }: Props) => {
                   </div>
                 </div>
               </TableCell>
-              <TableCell width="10%">Runtime</TableCell>
-              <TableCell width="15%">Filename</TableCell>
-              <ProgressCell width="60%">
+              { content === "show" && <TableCell width="1%">Episode</TableCell> }
+              <TableCell width="1%">Runtime</TableCell>
+              <TableCell width="1%">Filename</TableCell>
+              <ProgressCellHeader width="60%">
                   <StatusWrapper>
                   { ripState?.total_status && <>
                         <div>
-                          {ripState?.total_status ?? "Status"}
+                          { ripState?.total_status 
+                            ? <>{ripState.total_status} ({ Math.round( (ripState.total_progress?.progress ?? 0) * 100) }%) </>
+                            : "Status"
+                          } { ripState?.current_status && current_progress && <>
+                              / {ripState.current_status} ({ Math.round(current_progress.progress * 100) }%)
+                            </>
+                          }
                         </div>
                         <LinearProgress 
                           variant="buffer" 
                           value={ripState?.total_progress?.progress ? ripState.total_progress.progress * 100 : 0} 
-                          valueBuffer={ripState?.total_progress?.buffer ? ripState.total_progress.buffer * 100 : 0} 
+                          valueBuffer={ripState?.total_progress?.buffer ? ripState.total_progress.buffer * 100 : 0 }
                         />
+                        { ripState?.current_status && current_progress && <>
+                          <LinearProgress
+                            variant="buffer"
+                            valueBuffer={ (current_progress.buffer ?? 1) * 100 }
+                            value={ current_progress.progress * 100 }
+                          />
+                        </>}
                     </>
                   }
                   </StatusWrapper>
-              </ProgressCell>
+              </ProgressCellHeader>
             </TableRow>
             <MobileOnlyTableRow>
               <TableCell colSpan={6}>
@@ -237,9 +263,17 @@ export const TOCTable = ({ }: Props) => {
                       key={index} 
                       index={index} 
                       data={title} 
-                      progress={(ripState?.current_progress && ripState.current_progress[index]?.progress) ?? undefined}
-                      buffer={ripState?.current_progress?.[index]?.buffer}
-                      statusText={index === ripState?.current_title ? ripState?.current_status : ''}
+                      // progress={(ripState?.current_progress?.[index]?.progress)}
+                      // buffer={ripState?.current_progress?.[index]?.buffer}
+                      // statusText={index === ripState?.current_title ? ripState?.current_status : ''}
+                      titleType={
+                        mainIndexes.indexOf(index) > -1 
+                        ? "main" 
+                        : extraIndexes.indexOf(index) > -1 
+                          ? "extra"
+                          : undefined
+                      }
+                      episodeNumber={mainIndexes.indexOf(index)}
                     />
                   )
                 })
@@ -262,24 +296,44 @@ type RowProps = {
   progress?: number;
   buffer?: number;
   statusText?: string;
+  titleType?: "main" | "extra";
+  episodeNumber?: number;
 }
 
-export const TOCRow = ({ index, data, progress, buffer, statusText }: RowProps) => {
+export const TOCRow = ({ index, data, progress, buffer, statusText, titleType, episodeNumber }: RowProps) => {
+  console.debug('TOCRow render()')
+
   const dispatch = useAppDispatch()
+
+  const [minimized, setMinimized] = useState<boolean>(false)
+  const [segments, setSegments] = useState<string | null>(null)
 
   const { ripState } = useContext(Context)
 
-  const mainIndexes = useAppSelector((state) => state.rip.sort_info.main_indexes)
-  const extraIndexes = useAppSelector((state) => state.rip.sort_info.extra_indexes)
+  // const mainIndexes = useAppSelector((state) => state.rip.sort_info.main_indexes)
+  // const extraIndexes = useAppSelector((state) => state.rip.sort_info.extra_indexes)
+  const seasonNumber = useAppSelector((state) => state.rip.sort_info.season_number)
+  const firstEpisode = useAppSelector((state) => state.rip.sort_info.first_episode)
+  const splitSegments = useAppSelector((state) => state.rip.sort_info.split_segments)
+  const content = useAppSelector((state) => state.rip.destination.content)
 
-  const isMain = mainIndexes.indexOf(index) > -1
-  const isExtra = extraIndexes.indexOf(index) > -1
-  const isSelected = isMain || isExtra
+  const isMain = titleType === "main"
+  const isExtra = titleType === "extra"
+  const isSelected = titleType !== undefined
+  const isMovie = content === "movie"
+  const isShow = content === "show"
+
+  let rowEpisodeNumber: number | undefined
+  let episodeString: string | undefined
+
+  if (isShow && isMain && seasonNumber && firstEpisode && episodeNumber && episodeNumber > -1) {
+    rowEpisodeNumber = firstEpisode + ( episodeNumber * ( splitSegments && splitSegments.length > 0 ? splitSegments.length : 1 ) )
+    episodeString = episodeId(seasonNumber, firstEpisode + episodeNumber)
+  }
 
   const [wasMain, setWasMain] = useState<boolean>(!isSelected ? true : isMain)
 
   const handleCheckboxOnChange = (event: React.ChangeEvent, checked: boolean) => {
-    console.log('handleCheckboxOnChange(), event, checked', event, checked)
     if (checked) {
       if (wasMain) {
         dispatch(ripActions.addMainIndex(index))
@@ -307,52 +361,80 @@ export const TOCRow = ({ index, data, progress, buffer, statusText }: RowProps) 
     }
   }
 
-  return <><TableRow>
-    <StyledTableCellTop>
-      <Checkbox disabled={ ripState?.rip_started } checked={isSelected} onChange={handleCheckboxOnChange} />
-    </StyledTableCellTop>
-    <StyledTableCellTop>{index}</StyledTableCellTop>
-    <StyledTableCellTop>
-      <MainExtrasRadioGroup
-        row
-        aria-labelledby="demo-radio-buttons-group-label"
-        value={
-          isSelected 
-          ? (isMain ? "main" : "extra") 
-          : null
-        }
-        name="radio-buttons-group"
-        onChange={handleRadioButtonChange}
-        aria-disabled={!isSelected}
-        sx={{display: "inline-block"}}
-      >
-        <Radio disabled={!isSelected || ripState?.rip_started} aria-label="extra" value="main" />
-        <Divider orientation="vertical" flexItem />
-        <Radio disabled={!isSelected || ripState?.rip_started} aria-label="extra" value="extra" />
-      </MainExtrasRadioGroup>
-    </StyledTableCellTop>
-    <StyledTableCellTop>{data.runtime}</StyledTableCellTop>
-    <StyledTableCellTop>{data.filename}</StyledTableCellTop>
-    <ProgressCell>
-      { progress !== undefined && <>
-          <div>{progress > .98 ? "Complete" : statusText ?? ''}</div>
-          { isSelected
-            ? <LinearProgress variant={buffer !== undefined ? "buffer" : "determinate"} value={progress ? progress * 100 : 0} valueBuffer={buffer ? buffer * 100 : buffer} />
-            : <LinearProgress variant="determinate" value={0} color="secondary" />
+  return <>
+    <TableRow>
+      <StyledTableCellTop size="small" sx={{ paddingRight: 0}}>
+        <IconButton 
+          onClick={() => {
+            setMinimized((prev) => !prev)
+          }}
+        >
+          { minimized
+            ? <ExpandMoreIcon />
+            : <ExpandLessIcon />
           }
-      </> }
-    </ProgressCell>
-  </TableRow><MobileOnlyTableRow>
-    <StyledTableCellBottom colSpan={6}>
-        <StatusWrapper>
-          { progress !== undefined && <>
-              <div>{progress > .98 ? "Complete" : statusText ?? ''}</div>
-              { isSelected
-                ? <LinearProgress variant={buffer !== undefined ? "buffer" : "determinate"} value={progress ? progress * 100 : 0} valueBuffer={buffer ? buffer * 100 : buffer} />
-                : <LinearProgress variant="determinate" value={0} color="secondary" />
-              }
-          </> }
-        </StatusWrapper>
-    </StyledTableCellBottom>
-  </MobileOnlyTableRow></>
+        </IconButton> 
+      </StyledTableCellTop>
+      <StyledTableCellTop sx={{ paddingRight: 0, paddingLeft: 0}}>
+        <Checkbox disabled={ ripState?.rip_started } checked={isSelected} onChange={handleCheckboxOnChange} />
+      </StyledTableCellTop>
+      <StyledTableCellTop>{index}</StyledTableCellTop>
+      <StyledTableCellTop>
+        <MainExtrasRadioGroup
+          row
+          aria-labelledby="demo-radio-buttons-group-label"
+          value={
+            isSelected 
+            ? (isMain ? "main" : "extra") 
+            : null
+          }
+          name="radio-buttons-group"
+          onChange={handleRadioButtonChange}
+          aria-disabled={!isSelected}
+          sx={{display: "inline-block"}}
+        >
+          <Radio disabled={!isSelected || ripState?.rip_started} aria-label="extra" value="main" />
+          <Divider orientation="vertical" flexItem />
+          <Radio disabled={!isSelected || ripState?.rip_started} aria-label="extra" value="extra" />
+        </MainExtrasRadioGroup>
+      </StyledTableCellTop>
+      { isShow && <StyledTableCellTop>{
+        splitSegments && splitSegments.length > 0 && seasonNumber && rowEpisodeNumber
+        ? splitSegments.map((_, index) => (episodeId(seasonNumber, rowEpisodeNumber + index))).join(' ')
+        : episodeString
+        
+      }</StyledTableCellTop> }
+      <StyledTableCellTop>{data.runtime}</StyledTableCellTop>
+      <StyledTableCellTop>{data.filename}</StyledTableCellTop>
+      <ProgressCell>
+        { progress !== undefined && <>
+            <div>{progress > .98 ? "Complete" : <>{statusText} ({ Math.round(progress*100) }%)</>}</div>
+            { isSelected
+              ? <LinearProgress variant={buffer !== undefined ? "buffer" : "determinate"} value={progress ? progress * 100 : 0} valueBuffer={buffer ? buffer * 100 : buffer} />
+              : <LinearProgress variant="determinate" value={0} color="secondary" />
+            }
+        </> }
+      </ProgressCell>
+    </TableRow>
+    <TableRow><StyledTableCellMiddle colSpan={8}>
+      <Collapse in={!minimized}>
+        <Box>
+          <span>Chapters: {data.chapters}</span>
+          <span>Segments: {data.segments}</span>
+          <span>Segments Map: {data.segments_map.split(",").join(", ")}</span>
+        </Box>
+      </Collapse>
+    </StyledTableCellMiddle></TableRow>
+    <MobileOnlyTableRow><StyledTableCellBottom colSpan={8}>
+          <StatusWrapper>
+            { progress !== undefined && <>
+                <div>{progress > .98 ? "Complete" : statusText ?? ''}</div>
+                { isSelected
+                  ? <LinearProgress variant={buffer !== undefined ? "buffer" : "determinate"} value={progress ? progress * 100 : 0} valueBuffer={buffer ? buffer * 100 : buffer} />
+                  : <LinearProgress variant="determinate" value={0} color="secondary" />
+                }
+            </> }
+          </StatusWrapper>
+    </StyledTableCellBottom></MobileOnlyTableRow>
+  </>
 }

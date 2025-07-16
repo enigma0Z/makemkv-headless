@@ -8,4 +8,4 @@ fi
 source .venv/bin/activate
 pip install -r requirements.txt
 
-python3 -m src $@
+exec python3 -m src --api $@

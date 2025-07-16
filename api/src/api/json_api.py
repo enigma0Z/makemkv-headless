@@ -1,43 +1,50 @@
 import json
 
 from functools import wraps
+import logging
 from typing import Callable
 from flask import Response
 
 from src.json_serializable import JSONSerializable
 
+logger = logging.getLogger(__name__)
+
 JSON_CONTENT_TYPE = "application/json; charset=utf-8"
 
-def json_serializable_api(function: Callable[[], JSONSerializable | tuple[JSONSerializable, Response]]):
-  @wraps(function)
-  def decorated_function():
-    api_response = function()
-    if isinstance(api_response, tuple):
-      json_data, response = api_response
-      assert json_data is not None
-      assert response is not None
+type serializable_api_response = JSONSerializable | str | dict | list[any]
 
-      response.response = json.dumps(json_data)
-      response.content_type = JSON_CONTENT_TYPE
-      return response
-    else:
-      json_data = None
-      if isinstance(api_response, list):
-        json_data = json.dumps([value.json_encoder() for value in api_response])
-      else:
-        json_data = api_response.to_json()
-      return Response(
-        response=json_data,
-        content_type=JSON_CONTENT_TYPE
-      )
-
-  return decorated_function
-
-def json_api(function: Callable[[any], any]):
+def json_api(
+    function: Callable[
+      [], 
+      serializable_api_response
+        | list[serializable_api_response]
+        | tuple[serializable_api_response, Response]
+        | tuple[list[serializable_api_response], Response]
+    ]
+):
   @wraps(function)
   def decorated_function(*args, **kwargs):
-    return Response(
-      function(*args, **kwargs),
-      content_type="application/json; charset=utf-8"
-    )
+    api_response = function(*args, **kwargs)
+    response_data: str = None
+    response_object: Response = None
+
+    if isinstance(api_response, tuple):
+      response_data, response_object = api_response
+      assert response_data is not None
+      assert response_object is not None
+      if isinstance(response_object, int):
+        response_object = Response(status=response_object)
+
+      assert isinstance(response_object, Response)
+    else:
+      response_data = api_response
+      response_object = Response()
+
+    json_data = JSONSerializable.dumps(response_data)
+      
+    response_object.response = json_data
+    response_object.content_type = JSON_CONTENT_TYPE
+
+    return response_object
+
   return decorated_function

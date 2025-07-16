@@ -48,7 +48,6 @@ const ripSlice = createSlice({
   initialState,
   reducers: {
     setRipData: (state, action: PayloadAction<RipState | undefined>) => {
-      console.debug('setRipData', action)
       if (action.payload) {
         state.destination = action.payload.destination
         state.rip_all = action.payload.rip_all
@@ -108,11 +107,14 @@ const ripSlice = createSlice({
     setId: (state, action: PayloadAction<string>) => {
       state.sort_info.id = action.payload
     },
-    setFirstEpisode: (state, action: PayloadAction<number>) => {
+    setFirstEpisode: (state, action: PayloadAction<number | undefined>) => {
       state.sort_info.first_episode = action.payload
     },
-    setSeasonNumber: (state, action: PayloadAction<number>) => {
+    setSeasonNumber: (state, action: PayloadAction<number | undefined>) => {
       state.sort_info.season_number = action.payload
+    },
+    setSplitSegments: (state, action: PayloadAction<number[] | undefined>) => {
+      state.sort_info.split_segments = action.payload
     }
   }
 })

@@ -19,13 +19,13 @@ INTERFACE = ThreadQueueInterface(SOCKET)
 
 def start_api():
   logger.info('Initializing socket')
-  SOCKET.init_app(API, cors_allowed_origins=CONFIG.frontend)
+  SOCKET.init_app(API, cors_allowed_origins=[CONFIG.frontend, "http://10.42.10.127:3000"])
 
   logger.info('Initializing CORS')
-  CORS(API, resources={r"/api/*": {"origins": CONFIG.frontend}})
+  CORS(API, resources={r"/api/*": {"origins": [CONFIG.frontend, "http://10.42.10.127:3000"]}})
 
   logger.info('Starting queue thread')
   INTERFACE.run()
 
   logger.info('Launching flask app')
-  SOCKET.run(API, port=4000)
+  SOCKET.run(API, port=4000, allow_unsafe_werkzeug=True, host="0.0.0.0")

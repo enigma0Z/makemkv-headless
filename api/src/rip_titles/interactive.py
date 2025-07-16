@@ -11,7 +11,7 @@ from src.interface import BaseInterface, PlaintextInterface, Target
 from src.toc import TOC
 from src.util import hms_to_seconds, string_to_list_int
 
-from src.tmdb.search import search
+from src.tmdb import search
 
 logger = logging.getLogger(__name__)
 

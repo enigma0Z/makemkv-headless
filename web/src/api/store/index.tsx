@@ -4,10 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import rip, { ripStateIsValid } from './rip'
 import toc from './toc'
 import endpoints from "../endpoints";
+import tmdb from "./tmdb";
+import { throttle } from "lodash";
 
 export const store = configureStore({
   reducer: {
-    rip, toc
+    rip, toc, tmdb
   }
 })
 
@@ -27,11 +29,15 @@ export type StateValidationEntryTypes<T> = (
 
 export type StateValidation<T> = { [key: string]: (StateValidationEntryTypes<T> | StateValidation<T>) }
 
-store.subscribe(() => {
-  const { rip } = store.getState()
-  if (ripStateIsValid(rip)) {
-    fetch(endpoints.state(), { method: 'PUT', body: JSON.stringify({
-      redux: { rip }
-    })})
-  }
-})
+// store.subscribe(throttle(() => {
+//   const { rip } = store.getState()
+//   if (ripStateIsValid(rip)) {
+//     console.info("Updating rip state on API", rip)
+//     fetch(endpoints.state.get(), { method: 'PUT', body: JSON.stringify({
+//       redux: { rip }
+//     })})
+//     console.info("Done")
+//   } else {
+//     console.info("Cannot update rip state, is not valid", rip)
+//   }
+// }, 500, {leading: false, trailing: true}))

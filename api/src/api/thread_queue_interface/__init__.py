@@ -39,6 +39,7 @@ class ThreadQueueInterface(BaseInterface):
 
   def send(self, message):
     self.queue.put(message)
+    logger.debug(message)
     if isinstance(message, MessageEvent):
       pass
     if isinstance(message, ProgressMessageEvent):

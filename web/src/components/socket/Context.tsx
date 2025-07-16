@@ -66,7 +66,7 @@ type ContextProps = {
 
   ripState?: ApiState['socket'];
   setRipState?: SetStateCallback<ApiState['socket'] | undefined>;
-  resetRipStatus?: () => void;
+  resetRipState?: () => void;
 }
 
 export const Context = createContext<ContextProps>({
@@ -86,8 +86,8 @@ const SocketContext = ({ children }: SocketContextProps) => {
   const [ripStartStopMessageEvents, setRipStartStopMessageEvents] = useState<(RipStartStopMessageEvent)[]>()
   const [ripState, setRipState] = useState<ApiState['socket']>()
 
-  const resetRipStatus = () => {
-    setRipState((prev) => ({ ...prev, ...initialApiState }))
+  const resetRipState = () => {
+    setRipState((prev) => ({ ...prev, ...initialApiState.socket }))
   }
 
   return <Context value={{
@@ -96,7 +96,7 @@ const SocketContext = ({ children }: SocketContextProps) => {
     progressValueMessageEvents, setProgressValueMessageEvents,
     messageEvents, setMessageEvents,
     ripStartStopMessageEvents, setRipStartStopMessageEvents,
-    ripState, setRipState, resetRipStatus
+    ripState, setRipState, resetRipState
   }}>
     {children}
   </Context>
