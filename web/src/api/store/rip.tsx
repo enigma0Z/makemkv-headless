@@ -1,12 +1,14 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { ShowInfo, SortInfo } from "../types/SortInfo";
 import { uniqueFilter } from "@/util/array";
+import type { TmdbSearchResult } from "../types/tmdb";
 
 export interface RipState {
   destination: RipStateDestination;
   rip_all: boolean;
   sort_info: SortInfo & ShowInfo;
-  toc_length?: number
+  toc_length: number
+  tmdb_selection: TmdbSearchResult | null
 }
 
 interface RipStateDestination {
@@ -32,7 +34,8 @@ const initialState: RipState = {
     id_db: 'tmdbid'
   },
   rip_all: false,
-  toc_length: 0
+  toc_length: 0,
+  tmdb_selection: null
 }
 
 export const ripStateIsValid = (state: RipState) => (
@@ -50,9 +53,10 @@ const ripSlice = createSlice({
     setRipData: (state, action: PayloadAction<RipState | undefined>) => {
       if (action.payload) {
         state.destination = action.payload.destination
-        state.rip_all = action.payload.rip_all
         state.sort_info = action.payload.sort_info
+        state.rip_all = action.payload.rip_all
         state.toc_length = action.payload.toc_length
+        state.tmdb_selection = action.payload.tmdb_selection
       }
     },
     updateSortInfo: (state, action: PayloadAction<RipState['sort_info']>) => {
@@ -99,7 +103,7 @@ const ripSlice = createSlice({
       state.rip_all = [...state.sort_info.main_indexes, ...state.sort_info.extra_indexes].filter(uniqueFilter).length == state.toc_length
     },
     setTocLength: (state, action: PayloadAction<number | undefined>) => {
-      state.toc_length = action.payload
+      state.toc_length = action.payload ?? 0
     },
     setName: (state, action: PayloadAction<string>) => {
       state.sort_info.name = action.payload
@@ -115,6 +119,9 @@ const ripSlice = createSlice({
     },
     setSplitSegments: (state, action: PayloadAction<number[] | undefined>) => {
       state.sort_info.split_segments = action.payload
+    },
+    setTmdbSelection: (state, action: PayloadAction<TmdbSearchResult>) => {
+      state.tmdb_selection = action.payload
     }
   }
 })

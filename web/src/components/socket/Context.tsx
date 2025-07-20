@@ -47,7 +47,6 @@ export interface ClientToServerEvents { }
 
 export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>
 
-
 type ContextProps = {
   connected: boolean
   setConnected: React.Dispatch<React.SetStateAction<boolean>>

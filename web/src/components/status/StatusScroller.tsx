@@ -1,13 +1,15 @@
 import { Card, IconButton, LinearProgress } from "@mui/material";
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { StatusScrollerWrapper, StatusScrollerWrapperMinimized } from "./StatusScroller.styles";
 
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Context as SocketContext } from "../socket/Context";
+import { useAppSelector } from "@/api/store";
 
 export const StatusScroller = () => {
-  const { connected, messageEvents } = useContext(SocketContext)
+
+  const connected = useAppSelector((state) => state.socket.ripState.connected )
+  const messageEvents = useAppSelector((state) => state.socket.messages)
 
   const [isMinimized, setIsMinimized] = useState<boolean>(false)
 
@@ -43,8 +45,8 @@ export const StatusScroller = () => {
       }
     </IconButton>
     <WrapperComponent id="status-scroller" >
-      {messages?.map(message => (
-        <div>{message}</div>
+      {messages?.map((message, index) => (
+        <div key={index}>{message}</div>
       ))}
     </WrapperComponent>
     { connected
