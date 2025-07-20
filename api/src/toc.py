@@ -76,6 +76,11 @@ class TOC(JSONSerializable):
     self.source.add_titles(records)
     self.source.add_tracks(records)
 
+  def json_encoder(self):
+    return {
+      'source': self.source
+    }
+
 class BaseInfo(JSONSerializable):
   '''
   Base metadata class.  Includes accessor for undefined attributes based on
