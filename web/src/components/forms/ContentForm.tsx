@@ -10,7 +10,6 @@ import type { TmdbSearchResult } from "@/api/types/tmdb"
 import { AutocompleteWrapper } from "@/theme"
 
 export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
-  console.debug('CombinedShowMovieForm render()')
 
   const dispatch = useDispatch();
 
@@ -23,9 +22,10 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
   const firstEpisode = useAppSelector((state) => state.rip.sort_info.first_episode)
   const splitSegments = useAppSelector((state) => state.rip.sort_info.split_segments)
   const tmdbConfiguration = useAppSelector((state) => state.tmdb.configuration)
+  const tmdbSelection = useAppSelector((state) => state.rip.tmdb_selection)
 
-  const [ nameValue, setNameValue ] = useState<TmdbSearchResult>()
-  const [ nameOptions, setNameOptions ] = useState<(TmdbSearchResult)[]>()
+  const [ nameValue, setNameValue ] = useState<TmdbSearchResult | null>(null)
+  const [ nameOptions, setNameOptions ] = useState<(TmdbSearchResult)[]>(tmdbSelection ? [ tmdbSelection ] : [])
   const [ splitSegmentsValue, setSplitSegmentsValue ] = useState<string>()
 
   const getOptionLabel = (option: TmdbSearchResult) => 
@@ -64,9 +64,11 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
   }
 
   const handleNameOnChange = (_event: React.SyntheticEvent, value: TmdbSearchResult | null) => {
-    if (value?.name) dispatch(ripActions.setName(value.name));
-    else if (value?.title) dispatch(ripActions.setName(value.title));
-    value?.id && dispatch(ripActions.setId(`${value.id}`))
+    if ((value?.name || value?.title) && value?.id) {
+      dispatch(ripActions.setName(value?.name! ?? value?.title!))
+      dispatch(ripActions.setId(`${value.id}`))
+      dispatch(ripActions.setTmdbSelection(value))
+    }
   }
 
   const isValid = (
@@ -127,7 +129,6 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
             value={content ?? ''}
             label="Format"
             onChange={({ target: { value }}) => { 
-              console.debug('content onChange()')
               dispatch(ripActions.setContent(value))
               if (value === "movie" ) {
                 dispatch(ripActions.setSeasonNumber(undefined))
@@ -183,7 +184,7 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
                   </li>
                 )
               }}
-              value={nameValue ?? null}
+              value={nameValue ?? tmdbSelection ?? null}
               fullWidth
             />
           </AutocompleteWrapper>
