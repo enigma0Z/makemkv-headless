@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Collapse, RadioGroup } from "@mui/material";
+import { Collapse, IconButton, RadioGroup } from "@mui/material";
 
 const GridWidth = 24
 
@@ -29,22 +29,32 @@ export const MainExtraCell = styled.div(({ theme }) => ({
 
 export const EpisodeCell = styled.div(({ theme }) => ({
   gridColumn: "span 3",
+  "> .MuiIconButton-root": {
+    padding: 0
+  },
+  "> .MuiIconButton-root:first-of-type": {
+    marginLeft: 10
+  },
   [theme.breakpoints.down("md")]: {
-    gridColumn: `span ${4}`,
+    gridColumn: `span ${5}`,
     alignItems: "flex-start"
   },
   [theme.breakpoints.down("sm")]: {
-    gridColumn: `span ${6}`,
+    gridColumn: `span ${9}`,
+    "> .MuiIconButton-root": {
+      padding: 4,
+    },
   },
 }))
 
 export const RuntimeCell = styled.div(({ theme }) => ({
   gridColumn: "span 3",
   [theme.breakpoints.down("md")]: {
-    gridColumn: `span ${4}`
+    gridColumn: `span ${3}`
   },
   [theme.breakpoints.down("sm")]: {
-    gridColumn: `span ${6}`
+    gridColumn: `13 / span ${6}`,
+    // paddingLeft: 16 
   },
 }))
 

@@ -98,6 +98,38 @@ const ripSlice = createSlice({
       state.sort_info.main_indexes = state.sort_info.main_indexes.filter((value) => value !== action.payload)
       state.rip_all = [...state.sort_info.main_indexes, ...state.sort_info.extra_indexes].filter(uniqueFilter).length == state.toc_length
     },
+    swapMainIndexForward: (state, action: PayloadAction<number>) => {
+      const indexOfIndex = state.sort_info.main_indexes.indexOf(action.payload)
+
+      // Make sure we are not swapping the last element off the end of the array
+      if (
+        indexOfIndex + 1 < state.sort_info.main_indexes.length
+        && indexOfIndex > -1
+      ) {
+        state.sort_info.main_indexes = [
+          ...state.sort_info.main_indexes.slice(0, indexOfIndex),
+          state.sort_info.main_indexes[indexOfIndex+1],
+          state.sort_info.main_indexes[indexOfIndex],
+          ...state.sort_info.main_indexes.slice(indexOfIndex+2)
+        ]
+      }
+    },
+    swapMainIndexBackward: (state, action: PayloadAction<number>) => {
+      const indexOfIndex = state.sort_info.main_indexes.indexOf(action.payload)
+
+      // Make sure we are not swapping the last element off the end of the array
+      if (
+        indexOfIndex > 0
+        && indexOfIndex < state.sort_info.main_indexes.length
+      ) {
+        state.sort_info.main_indexes = [
+          ...state.sort_info.main_indexes.slice(0,indexOfIndex-1), 
+          state.sort_info.main_indexes[indexOfIndex], 
+          state.sort_info.main_indexes[indexOfIndex-1], 
+          ...state.sort_info.main_indexes.slice(indexOfIndex+1)
+        ]
+      }
+    },
     removeExtraIndex: (state, action: PayloadAction<number>) => {
       state.sort_info.extra_indexes = state.sort_info.extra_indexes.filter((value) => value !== action.payload)
       state.rip_all = [...state.sort_info.main_indexes, ...state.sort_info.extra_indexes].filter(uniqueFilter).length == state.toc_length

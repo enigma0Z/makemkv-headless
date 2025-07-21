@@ -1,17 +1,21 @@
 import { useAppDispatch, useAppSelector } from "@/api/store"
 import { ripActions } from "@/api/store/rip"
 import { hmsToSeconds } from "@/util/string"
-import { Box, Card, Checkbox, CircularProgress, Collapse, Divider, IconButton, LinearProgress, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
+import { Box, Button, ButtonGroup, Card, Checkbox, CircularProgress, Collapse, Divider, IconButton, LinearProgress, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import type { TitleInfo, Toc } from "@/api/store/toc"
 
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import type { SocketProgress } from "@/api/store/socket"
 import { isCompleteEnough, isRippingStatus } from "../socket/Connection"
 import { BorderCell, CheckboxCell, CollapseRow, DetailsWrapper, DividerCell, EpisodeCell, FilenameCell, FilenameContent, FilenameHead, MainExtraCell, MainExtrasRadioGroup, RuntimeCell, StatusWrapper, StatusWrapperCell, TOCGridContainer } from "./TOCGrid.styles"
 
-import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+
 
 type Props = {
   data?: Toc
@@ -189,7 +193,7 @@ export const TOCGrid = ({ }: Props) => {
         <BorderCell />
         <CheckboxCell>
           <IconButton>
-            <KeyboardDoubleArrowDownIcon />
+            <ExpandMoreIcon />
           </IconButton>
         </CheckboxCell>
         <CheckboxCell>
@@ -251,6 +255,7 @@ export const TOCGrid = ({ }: Props) => {
                           : undefined
                     }
                     episodeNumber={mainIndexes.indexOf(index)}
+                    episodes={mainIndexes.length}
                   />
                 </>
               )
@@ -268,17 +273,18 @@ export const TOCGrid = ({ }: Props) => {
 }
 
 type RowProps = {
-  index: number;
+  index: number; // The index of the title on the disk
   data: TitleInfo;
   progress?: number;
   buffer?: number;
   statusText?: string;
   titleType?: "main" | "extra";
   episodeNumber?: number;
-  minimized?: boolean
+  episodes: number;
+  minimized?: boolean;
 }
 
-export const TOCGridRow = ({ index, data, statusText, titleType, episodeNumber, minimized: minimizedProp }: RowProps) => {
+export const TOCGridRow = ({ index, data, statusText, titleType, episodeNumber, minimized: minimizedProp, episodes }: RowProps) => {
   const dispatch = useAppDispatch()
 
   const [minimized, setMinimized] = useState<boolean>(minimizedProp ?? true)
@@ -294,7 +300,7 @@ export const TOCGridRow = ({ index, data, statusText, titleType, episodeNumber, 
   const buffer = currentProgress?.buffer
 
   const isMain = titleType === "main"
-  // const isExtra = titleType === "extra"
+  const isExtra = titleType === "extra"
   const isSelected = titleType !== undefined
   // const isMovie = content === "movie"
   const isShow = content === "show"
@@ -351,8 +357,8 @@ export const TOCGridRow = ({ index, data, statusText, titleType, episodeNumber, 
         }}
       >
         {minimized
-          ? <ExpandMoreIcon />
-          : <ExpandLessIcon />
+          ? <ArrowDropDownIcon />
+          : <ArrowDropUpIcon />
         }
       </IconButton>
     </CheckboxCell>
@@ -381,12 +387,35 @@ export const TOCGridRow = ({ index, data, statusText, titleType, episodeNumber, 
         <Radio disabled={!isSelected || ripStarted} aria-label="extra" value="extra" />
       </MainExtrasRadioGroup>
     </MainExtraCell>
-    {isShow && <EpisodeCell><Typography variant="body2">{
-      (splitSegments && splitSegments.length > 0 && seasonNumber && rowEpisodeNumber)
+    {isShow && <EpisodeCell>
+      <Typography variant="body2">{ 
+        (splitSegments && splitSegments.length > 0 && seasonNumber && rowEpisodeNumber)
         ? splitSegments.map((_, index) => (episodeId(seasonNumber, rowEpisodeNumber + index))).join(' ')
         : episodeString
-
-    }</Typography></EpisodeCell>}
+      }</Typography>
+        <IconButton
+          size="small" 
+          disabled={
+            isExtra 
+            || ripStarted
+            || (episodeNumber ?? 1) < 1
+          }
+          onClick={() => {dispatch(ripActions.swapMainIndexBackward(index))}}
+        >
+          <RemoveCircleOutlineOutlinedIcon fontSize="small" />
+        </IconButton>
+        <IconButton
+          size="small"
+          disabled={
+            isExtra 
+            || ripStarted
+            || (episodeNumber ?? 0) >= episodes - 1
+          }
+          onClick={() => {dispatch(ripActions.swapMainIndexForward(index))}}
+        >
+          <AddCircleOutlineOutlinedIcon fontSize="small" />
+        </IconButton>
+    </EpisodeCell>}
     <RuntimeCell><Typography variant="body2">
       {data.runtime}
     </Typography></RuntimeCell>
@@ -395,29 +424,29 @@ export const TOCGridRow = ({ index, data, statusText, titleType, episodeNumber, 
         <Typography variant="body2" sx={{ display: "inline-block" }}>
           {data.filename}
         </Typography>
-        <Collapse in={minimized}>
           {progress !== undefined && progress !== null && minimized && <>
+        <Collapse in={minimized}>
             <Typography variant="subtitle2" fontSize={12} color={"textDisabled"}>
                 {isCompleteEnough(progress) ? "Complete" : `${statusText} (${Math.round(progress * 10000) / 100}%)`}
             </Typography>
-          </>}
         </Collapse>
+          </>}
       </FilenameContent>
     </FilenameCell>
     <CollapseRow in={!minimized}>
       <DetailsWrapper>
         <Box>
-            <span><Typography variant="caption">
-              Chapters: {data.chapters}
-            </Typography></span>
-            <span><Typography variant="caption">
-              Segments: {data.segments}
-            </Typography></span>
-            <span><Typography variant="caption">
-              Segments Map: {data.segments_map.split(",").join(", ")}
-            </Typography></span>
+          <span><Typography variant="caption">
+            Chapters: {data.chapters}
+          </Typography></span>
+          <span><Typography variant="caption">
+            Segments: {data.segments}
+          </Typography></span>
+          <span><Typography variant="caption">
+            Segments Map: {data.segments_map.split(",").join(", ")}
+          </Typography></span>
         </Box>
-        {progress !== undefined && progress !== null && <>
+        {progress !== undefined && progress !== null && isRippingTitle && <>
           <StatusWrapperCell>
             <Typography variant="caption">{isCompleteEnough(progress) ? "Complete" : statusText ?? ''}</Typography>
             {isSelected
