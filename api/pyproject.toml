@@ -42,17 +42,6 @@ readme = "README.md"
 license = "MIT"
 license-files = ["LICEN[CS]E.*"]
 keywords = ["makemkv", "makemkv-batch", "makemkv-server", "jellyfin"]
-classifiers = [
-  "Development Status :: 4 - Beta",
-  "Programming Language :: Python"
-]
-
-# [project.optional-dependencies]
-# gui = ["PyQt5"]
-# cli = [
-#   "rich",
-#   "click",
-# ]
 
 [project.urls]
 Homepage = "https://github.com/enigma0Z/makemkv-batch"
@@ -62,10 +51,12 @@ Repository = "https://github.com/enigma0Z/makemkv-batch.git"
 Changelog = "https://github.com/enigma0Z/makemkv-batch/blob/main/CHANGELOG.md"
 
 [project.scripts]
-spam-cli = "spam:main_cli"
+# import sys; from spam import main_cli; sys.exit(main_cli())
+makemkv-batch = "src:main_cli"
+makemkv-server = "src:main_api"
 
-[project.gui-scripts]
-spam-gui = "spam:main_gui"
+# [project.entry-points."spam.magical"]
+# tomatoes = "spam:main_tomatoes"
 
-[project.entry-points."spam.magical"]
-tomatoes = "spam:main_tomatoes"
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
