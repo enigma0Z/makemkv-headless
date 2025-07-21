@@ -22,12 +22,10 @@ class JSONSerializable(JSONEncoder):
 
   def default(self, object):
     if isinstance(object, JSONSerializable):
-      logger.debug(f'isInstance() JSONSerializableEncoder(JSONEncoder).default({object})')
       return object.json_encoder()
     elif is_basic(object) or is_list(object) or is_dict(object): 
       return super().default(object)
     else:
-      logger.debug(f'default() else, {object}')
       pass
 
 def is_basic(object):

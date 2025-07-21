@@ -25,6 +25,12 @@ class BaseMessageEvent(JSONSerializable):
     else:
       return self.data.get(name)
 
+  def __repr__(self):
+    return f'{type(self)} {self.data}'
+
+  def __str__(self):
+    return f'{self.data}'
+
 class MessageEvent(BaseMessageEvent):
   def __init__(self, *text, sep=' ', end="\n", **data):
     super().__init__(**data)

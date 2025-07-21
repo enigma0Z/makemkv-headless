@@ -118,7 +118,6 @@ class BaseInfo(JSONSerializable):
           )
         )
       except Exception as ex:
-        logger.debug(f"Could not find key {name} in fields, {ex}")
         return None
 
   def __getitem__(self, item: str):
@@ -132,7 +131,6 @@ class BaseInfo(JSONSerializable):
     Translate the auto-field work that __getattr__ does to pseudo attributes 
     that are returned in the JSON stream
     '''
-    logger.debug('BaseInfo.json_encoder()')
     field_values = { 
       key: value
       for key, value in [ 
