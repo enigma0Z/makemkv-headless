@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
 
-from . import main
+from . import main_cli
 
-main()
+main_cli()
