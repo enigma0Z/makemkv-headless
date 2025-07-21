@@ -110,7 +110,6 @@ class RipTitlesThread(StoppableThread):
       for thread in rip_disc_threads:
         thread.start()
         while thread.is_alive():
-          logger.debug(f'Thread {thread} is alive')
           self._stop_event.wait(timeout=1)
           if (self.stop_requested()):
             logger.debug(f'Thread {thread} stop requested')
