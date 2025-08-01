@@ -31,4 +31,11 @@
   "vite.port": 3000,
   "vite.vitepress": false,
   "vite.buildCommand": "cd web && npm run build",
+  "python-envs.pythonProjects": [
+    {
+      "path": "api/.venv",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    }
+  ],
 }
