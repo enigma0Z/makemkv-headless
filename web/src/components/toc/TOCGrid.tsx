@@ -1,15 +1,13 @@
 import { useAppDispatch, useAppSelector } from "@/api/store"
 import { ripActions } from "@/api/store/rip"
 import { hmsToSeconds } from "@/util/string"
-import { Box, Button, ButtonGroup, Card, Checkbox, CircularProgress, Collapse, Divider, IconButton, LinearProgress, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
-import { useEffect, useState } from "react"
+import { Box, Card, Checkbox, Collapse, Divider, IconButton, LinearProgress, Radio, Typography } from "@mui/material"
+import { Fragment, useEffect, useState } from "react"
 import type { TitleInfo, Toc } from "@/api/store/toc"
 
-import type { SocketProgress } from "@/api/store/socket"
 import { isCompleteEnough, isRippingStatus } from "../socket/Connection"
-import { BorderCell, CheckboxCell, CollapseRow, DetailsWrapper, DividerCell, EpisodeCell, FilenameCell, FilenameContent, FilenameHead, MainExtraCell, MainExtrasRadioGroup, RuntimeCell, StatusWrapper, StatusWrapperCell, TOCGridContainer } from "./TOCGrid.styles"
+import { BorderCell, CheckboxCell, CollapseRow, DetailsWrapper, DividerCell, EpisodeCell, FilenameCell, FilenameContent, FilenameHead, FullWidthRow, MainExtraCell, MainExtrasRadioGroup, RuntimeCell, StatusWrapperCell, TOCGridContainer } from "./TOCGrid.styles"
 
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
@@ -44,11 +42,6 @@ export const TOCGrid = ({ }: Props) => {
   const content = useAppSelector((state) => state.rip.destination.content)
   const ripState = useAppSelector((state) => state.socket.ripState)
 
-  let current_progress: SocketProgress | undefined
-  if (ripState.current_title !== null && ripState.current_title !== undefined) {
-    current_progress = ripState.current_progress?.[ripState.current_title]
-  }
-
   // const [oldMainIndexes, setOldMainIndexes] = useState<number[]>([])
   const [oldExtraIndexes, setOldExtraIndexes] = useState<number[]>([])
 
@@ -64,10 +57,9 @@ export const TOCGrid = ({ }: Props) => {
       const outerTitleLength = hmsToSeconds(outerTitle.runtime)
       data?.source?.titles.forEach((innerTitle, innerIndex) => {
         if (
-          !(innerIndex in matchedIndexes())
+          matchedIndexes().indexOf(innerIndex) === -1 // No match already on this index
           && hmsToSeconds(innerTitle.runtime) > outerTitleLength - EPISODE_LENGTH_TOLERANCE_SECONDS
           && hmsToSeconds(innerTitle.runtime) < outerTitleLength + EPISODE_LENGTH_TOLERANCE_SECONDS
-
         ) {
           newTitleGroup.matches.push(innerIndex)
         }
@@ -75,12 +67,33 @@ export const TOCGrid = ({ }: Props) => {
       titleGroups.push(newTitleGroup)
     })
 
+    const longestTitle = titleGroups.reduce((previous, current) => {
+      if (hmsToSeconds(previous.title.runtime) < hmsToSeconds(current.title.runtime)) {
+        return current
+      } else {
+        return previous
+      }
+    }).title
+
+    const longestTitleLength = hmsToSeconds(longestTitle.runtime)
+
     if (titleGroups.length > 0) {
       return {
         titleGroups: titleGroups,
         longestTitleGroup: titleGroups.reduce((previous, current) => {
-          if (hmsToSeconds(previous.title.runtime) < hmsToSeconds(current.title.runtime)) {
-            return current
+          if ( // Title is within tolerance
+            hmsToSeconds(current.title.runtime) > longestTitleLength - EPISODE_LENGTH_TOLERANCE_SECONDS
+            && hmsToSeconds(current.title.runtime) < longestTitleLength + EPISODE_LENGTH_TOLERANCE_SECONDS
+          ) {
+            if (
+              hmsToSeconds(previous.title.runtime) > longestTitleLength - EPISODE_LENGTH_TOLERANCE_SECONDS
+              && hmsToSeconds(previous.title.runtime) < longestTitleLength + EPISODE_LENGTH_TOLERANCE_SECONDS
+              && previous.matches.length > current.matches.length
+            ) {
+              return previous
+            } else {
+              return current
+            }
           } else {
             return previous
           }
@@ -103,13 +116,16 @@ export const TOCGrid = ({ }: Props) => {
   }
 
   const getIndexes = () => {
-    const { biggestTitleGroup, longestTitleGroup } = getTitleGroups()
+    const { titleGroups, biggestTitleGroup, longestTitleGroup } = getTitleGroups()
     const activeTitleGroup = content === "show" ? biggestTitleGroup : longestTitleGroup
 
     const mainIndexes = []
     const extraIndexes = []
 
     if (activeTitleGroup) {
+      console.info("TitleGroups", titleGroups)
+      console.info("Biggest (show)", biggestTitleGroup)
+      console.info("Longest (movie)", longestTitleGroup)
       for (let i = 0; i < (data?.source?.titles.length ?? 0); i++) {
         if (activeTitleGroup.matches.indexOf(i) > -1) {
           mainIndexes.push(i)
@@ -160,116 +176,88 @@ export const TOCGrid = ({ }: Props) => {
     }
   }
 
-  return (<>
-    {ripState?.total_status && <>
-      <Card>
-        <StatusWrapper>
-          <Typography variant="caption">
-            {ripState?.total_status
-              ? <>{ripState.total_status} ({Math.round((ripState.total_progress?.progress ?? 0) * 10000) / 100}%) </>
-              : "Status"
-            } {ripState?.current_status && current_progress && <>
-              / {ripState.current_status} ({Math.round((current_progress.progress ?? 0) * 10000) / 100}%)
-            </>
-            }
-          </Typography>
-          <LinearProgress
-            variant="buffer"
-            value={ripState?.total_progress?.progress ? ripState.total_progress.progress * 100 : 0}
-            valueBuffer={ripState?.total_progress?.buffer ? ripState.total_progress.buffer * 100 : 0}
-          />
-          {ripState?.current_status && current_progress && <>
-            <LinearProgress
-              variant="buffer"
-              valueBuffer={(current_progress.buffer ?? 1) * 100}
-              value={(current_progress.progress ?? 0) * 100}
-            />
-          </>}
-        </StatusWrapper>
-      </Card>
-    </>}
-    <Card>
-      <TOCGridContainer>
-        <BorderCell />
-        <CheckboxCell>
-          <IconButton>
-            <ExpandMoreIcon />
-          </IconButton>
-        </CheckboxCell>
-        <CheckboxCell>
-          <Checkbox onChange={handleSelectAllOnClick} />
-        </CheckboxCell>
-        <CheckboxCell>
+  return (<Card>
+    <TOCGridContainer>
+      <BorderCell />
+      <CheckboxCell>
+        <IconButton>
+          <ExpandMoreIcon />
+        </IconButton>
+      </CheckboxCell>
+      <CheckboxCell>
+        <Checkbox onChange={handleSelectAllOnClick} />
+      </CheckboxCell>
+      <CheckboxCell>
+        <Typography variant="body2">
+          #
+        </Typography>
+      </CheckboxCell>
+      <MainExtraCell>
+        <Typography variant="body2"
+          component={'div'}
+          style={{
+            display: "flex",
+            justifyContent: "flex-start",
+            gap: "10px",
+          }}
+        >
+          <div>
+            Main
+          </div>
+          <Divider orientation="vertical" flexItem />
+          <div>
+            Extra
+          </div>
+        </Typography>
+      </MainExtraCell>
+      {content === "show" &&
+        <EpisodeCell>
+          <Typography variant="body2">Episode(s)</Typography>
+        </EpisodeCell>
+      }
+      <RuntimeCell><Typography variant="body2">Runtime</Typography></RuntimeCell>
+      <FilenameCell>
+        <FilenameHead>
           <Typography variant="body2">
-            #
+            Filename
           </Typography>
-        </CheckboxCell>
-        <MainExtraCell>
-          <Typography variant="body2"
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              gap: "10px",
-            }}
-          >
-            <div>
-              Main
-            </div>
-            <Divider orientation="vertical" flexItem />
-            <div>
-              Extra
-            </div>
-          </Typography>
-        </MainExtraCell>
-        {content === "show" &&
-          <EpisodeCell>
-            <Typography variant="body2">Episode(s)</Typography>
-          </EpisodeCell>
-        }
-        <RuntimeCell><Typography variant="body2">Runtime</Typography></RuntimeCell>
-        <FilenameCell>
-          <FilenameHead>
-            <Typography variant="body2">
-              Filename
-            </Typography>
-          </FilenameHead>
-        </FilenameCell>
-        {data
-          ? (
-            data?.source?.titles.map((title, index) => {
-              return (
-                <>
-                  <DividerCell/>
-                  <TOCGridRow
-                    key={index}
-                    index={index}
-                    data={title}
-                    progress={ripState?.current_progress?.[index]?.progress ?? undefined}
-                    buffer={ripState?.current_progress?.[index]?.buffer ?? undefined}
-                    statusText={index === ripState?.current_title ? ripState?.current_status : ''}
-                    titleType={
-                      mainIndexes.indexOf(index) > -1
-                        ? "main"
-                        : extraIndexes.indexOf(index) > -1
-                          ? "extra"
-                          : undefined
-                    }
-                    episodeNumber={mainIndexes.indexOf(index)}
-                    episodes={mainIndexes.length}
-                  />
-                </>
-              )
-            })
-          ) : (
-            <TableRow>
-              <TableCell colSpan={5}>No data</TableCell>
-            </TableRow>
-          )
-        }
-        <BorderCell />
-      </TOCGridContainer>
-    </Card>
-  </>)
+        </FilenameHead>
+      </FilenameCell>
+      {data
+        ? (
+          data?.source?.titles.map((title, index) => {
+            return (
+              <Fragment key={index}>
+                <DividerCell />
+                <TOCGridRow
+                  key={index}
+                  index={index}
+                  data={title}
+                  progress={ripState?.current_progress?.[index]?.progress ?? undefined}
+                  buffer={ripState?.current_progress?.[index]?.buffer ?? undefined}
+                  statusText={index === ripState?.current_title ? ripState?.current_status : ''}
+                  titleType={
+                    mainIndexes.indexOf(index) > -1
+                      ? "main"
+                      : extraIndexes.indexOf(index) > -1
+                        ? "extra"
+                        : undefined
+                  }
+                  episodeNumber={mainIndexes.indexOf(index)}
+                  episodes={mainIndexes.length}
+                />
+              </Fragment>
+            )
+          })
+        ) : (
+          <FullWidthRow>
+            <Typography variant="body2">No data</Typography>
+          </FullWidthRow>
+        )
+      }
+      <BorderCell />
+    </TOCGridContainer>
+  </Card> )
 }
 
 type RowProps = {
@@ -388,33 +376,35 @@ export const TOCGridRow = ({ index, data, statusText, titleType, episodeNumber, 
       </MainExtrasRadioGroup>
     </MainExtraCell>
     {isShow && <EpisodeCell>
-      <Typography variant="body2">{ 
+      <Typography variant="body2">{
         (splitSegments && splitSegments.length > 0 && seasonNumber && rowEpisodeNumber)
-        ? splitSegments.map((_, index) => (episodeId(seasonNumber, rowEpisodeNumber + index))).join(' ')
-        : episodeString
+          ? splitSegments.map((_, index) => (episodeId(seasonNumber, rowEpisodeNumber + index))).join(' ')
+          : episodeString
       }</Typography>
+      {isMain && <>
         <IconButton
-          size="small" 
+          size="small"
           disabled={
-            isExtra 
+            isExtra
             || ripStarted
             || (episodeNumber ?? 1) < 1
           }
-          onClick={() => {dispatch(ripActions.swapMainIndexBackward(index))}}
+          onClick={() => { dispatch(ripActions.swapMainIndexBackward(index)) }}
         >
           <RemoveCircleOutlineOutlinedIcon fontSize="small" />
         </IconButton>
         <IconButton
           size="small"
           disabled={
-            isExtra 
+            isExtra
             || ripStarted
             || (episodeNumber ?? 0) >= episodes - 1
           }
-          onClick={() => {dispatch(ripActions.swapMainIndexForward(index))}}
+          onClick={() => { dispatch(ripActions.swapMainIndexForward(index)) }}
         >
           <AddCircleOutlineOutlinedIcon fontSize="small" />
         </IconButton>
+      </>}
     </EpisodeCell>}
     <RuntimeCell><Typography variant="body2">
       {data.runtime}
@@ -424,13 +414,13 @@ export const TOCGridRow = ({ index, data, statusText, titleType, episodeNumber, 
         <Typography variant="body2" sx={{ display: "inline-block" }}>
           {data.filename}
         </Typography>
-          {progress !== undefined && progress !== null && minimized && <>
-        <Collapse in={minimized}>
+        {progress !== undefined && progress !== null && minimized && <>
+          <Collapse in={minimized}>
             <Typography variant="subtitle2" fontSize={12} color={"textDisabled"}>
-                {isCompleteEnough(progress) ? "Complete" : `${statusText} (${Math.round(progress * 10000) / 100}%)`}
+              {isCompleteEnough(progress) ? "Complete" : `${statusText} (${Math.round(progress * 10000) / 100}%)`}
             </Typography>
-        </Collapse>
-          </>}
+          </Collapse>
+        </>}
       </FilenameContent>
     </FilenameCell>
     <CollapseRow in={!minimized}>

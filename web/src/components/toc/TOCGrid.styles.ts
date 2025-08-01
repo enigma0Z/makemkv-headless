@@ -103,6 +103,10 @@ export const CollapseRow = styled(Collapse)(({ theme }) => ({
   }
 }));
 
+export const FullWidthRow = styled.div(({ theme }) => ({
+  gridColumn: `span ${GridWidth}`,
+}));
+
 export const DetailsWrapper = styled.div(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
