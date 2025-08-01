@@ -4,9 +4,10 @@ from threading import Lock, Thread
 from flask import Response, request
 
 # from rip_titles import rip_titles
+from src.api.api_response import APIResponse
 from src.api.singletons.state import STATE
 from src.config import CONFIG
-from src.interface.message import RipStartStopMessageEvent
+from src.message.rip_start_stop_message_event import RipStartStopMessageEvent
 from src.rip_titles.threaded import RipTitlesThread
 from src.sort import *
 from src.rip_titles.rip_titles import rip_titles
@@ -38,10 +39,6 @@ class APIRequest:
                 exceptions.append(ex)
         
         raise(Exception(exceptions))
-
-class APIResponse(JSONSerializable):
-    def __init__(self, status):
-        self.status = status
 
 @API.post('/api/v1/rip')
 @json_api
@@ -84,10 +81,7 @@ def post_rip():
 
     else:
         logger.debug('LOCK.locked()')
-        return (
-            APIResponse("in progress"),
-            Response(status=208)
-        )
+        return (APIResponse("in progress"), 200)
         
 @API.get('/api/v1/rip.stop')
 @json_api

@@ -4,10 +4,11 @@ import threading
 
 import logging
 
+from src.interface.base_interface import BaseInterface
+from src.interface.plaintext_interface import PlaintextInterface
 from src.rip_titles.rip_titles import rip_titles
 from src.sort import ShowInfo, SortInfo
 from src.disc import wait_for_disc_inserted
-from src.interface import BaseInterface, PlaintextInterface, Target
 from src.toc import TOC
 from src.util import hms_to_seconds, string_to_list_int
 

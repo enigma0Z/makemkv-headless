@@ -15,7 +15,6 @@ from src import features
 
 from src.config import CONFIG
 from src.curses_interface import CursesInterface
-from src.interface import BaseInterface, PlaintextInterface, Target
 from src.api.singletons.singletons import start_api
 
 logger = logging.getLogger(__name__)

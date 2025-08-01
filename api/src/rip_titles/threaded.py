@@ -7,6 +7,9 @@ import threading
 import logging
 from typing import TypedDict
 
+from src.interface.base_interface import BaseInterface
+from src.interface.plaintext_interface import PlaintextInterface
+from src.interface.target import Target
 from src.makemkv.threaded import RipDiscThread
 from src.threads import StoppableThread
 from src.util import sanitize
@@ -15,7 +18,6 @@ logger = logging.getLogger(__name__)
 from src.sort import SortInfo, sort_titles
 
 from src.disc import eject_disc
-from src.interface import BaseInterface, PlaintextInterface, Target
 from src.makemkv import rip_disc
 from src.toc import TOC
 

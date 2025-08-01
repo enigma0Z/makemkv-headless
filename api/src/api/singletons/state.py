@@ -2,8 +2,9 @@ import logging
 from typing import TypedDict
 from deepmerge import Merger
 
-from src.interface.message import ProgressMessageData, ProgressValueMessageData, StatusMessage
 from src.json_serializable import JSONSerializable
+from src.message.progress_message_event import ProgressMessageData, StatusMessage
+from src.message.progress_value_message_event import ProgressValueMessageData
 from src.toc import TOC
 
 logger = logging.getLogger(__name__)
@@ -101,6 +102,18 @@ class State(JSONSerializable):
         self.data['socket']['current_progress'][self.data['socket']['current_title']]['progress'] = data['current'] / data['max']
       elif self.data['socket']['current_status'] == 'Analyzing seamless segments':
         self.data['socket']['current_progress'][self.data['socket']['current_title']]['buffer'] = data['current'] / data['max']
+
+  def get_progress(self):
+    try:
+      return {
+        "total": {**self.data['socket']['total_progress']},
+        "current": {**self.data['socket']['current_progress'][self.data['socket']['current_title']]}
+      }
+    except Exception:
+      return {
+        "total": {},
+        "current": {}
+      }
 
   def update_status(self, data: ProgressMessageData):
     if data['progress_type'] == 'total':

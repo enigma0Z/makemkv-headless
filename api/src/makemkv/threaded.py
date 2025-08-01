@@ -6,13 +6,16 @@ from time import time
 
 import logging
 
+from src.interface.base_interface import BaseInterface
+from src.interface.plaintext_interface import PlaintextInterface
+from src.interface.target import Target
+from src.message.rip_start_stop_message_event import RipStartStopMessageEvent
 from src.threads import StoppableThread
 logger = logging.getLogger(__name__)
 
-from src.interface.message import RipStartStopMessageEvent, build_message
+from src.message.build_message import build_message
 from src.config import CONFIG
 from src.disc import wait_for_disc_inserted
-from src.interface import BaseInterface, PlaintextInterface, Target
 from src.util import seconds_to_hms
 
 class RipDiscThread(StoppableThread):

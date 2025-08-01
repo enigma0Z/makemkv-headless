@@ -3,10 +3,12 @@ from shutil import rmtree
 
 import logging
 
+from src.interface.base_interface import BaseInterface
+from src.interface.target import Target
+
 logger = logging.getLogger(__name__)
 
 from src import features
-from src.interface import BaseInterface, Target
 from src.json_serializable import JSONSerializable
 from src.mkvtoolnix import split_mkv
 from src.toc import TOC

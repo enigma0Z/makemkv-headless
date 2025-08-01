@@ -5,14 +5,15 @@ import re
 import subprocess
 from sys import stderr
 
-import logging
+from src.config import CONFIG
+from src.interface.target import Target
+from src.json_serializable import JSONSerializable
+from src.message.build_message import build_message
+from src.interface.plaintext_interface import PlaintextInterface
 
+import logging
 logger = logging.getLogger(__name__)
 
-from src.config import CONFIG
-from src.json_serializable import JSONSerializable
-from src.interface import PlaintextInterface, Target
-from src.interface.message import build_message
 
 def format_records(lines):
   return [

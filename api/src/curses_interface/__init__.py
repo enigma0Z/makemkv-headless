@@ -6,13 +6,13 @@ import queue
 import threading
 
 import logging
+
+from src.interface.base_interface import BaseInterface
+from src.interface.target import Target
 logger = logging.getLogger(__name__)
 
 from curses import ascii
 from math import floor
-from sys import stderr
-
-from src.interface import BaseInterface, Target
 
 KEY_ENTER = 10
 KEY_BACKSPACE = 127

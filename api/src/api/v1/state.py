@@ -1,12 +1,61 @@
 import json
 import logging
+from math import ceil
 
 from flask import Response, request
+from src.api.api_response import APIResponse, PaginatedAPIResponse
 from src.api.json_api import json_api, json_api
 from src.api.singletons.singletons import API
 from src.api.singletons.state import STATE
 
 logger = logging.getLogger(__name__)
+
+DEFAULT_PAGE_SIZE = 10
+
+def get_state_by_path(path: str, page=None, page_size=None, filter_keys: list[str]=[]):
+  path_parts = [ path_part for path_part in path.split("/") if path_part != '' ]
+  num_pages = None
+  selected_data = STATE.data
+  try:
+    output_object = {}
+    next_object = output_object
+    logger.debug(f'path_parts: {path_parts}')
+    for index, path_part in enumerate(path_parts):
+      logger.debug(f'path_part: {path_part}')
+      if type(selected_data) in [tuple, list]:
+        logger.debug(f'path_part has integer indexes')
+        path_part = int(path_part)
+
+      selected_data = selected_data[path_part] # Descend into state tree
+
+      if index == len(path_parts) - 1: # Last object
+        if (
+          type(page) == int and type(page_size) == int
+        ):
+          logger.debug(f'path_part is the last in the list')
+          if type(selected_data) == list and page != None and page_size != None:
+            logger.debug(f'paginating; page: {page}, size: {page_size}')
+            num_pages = ceil(len(selected_data)/page_size)
+            selected_data = selected_data[page*page_size:page*page_size+page_size]
+            for filter_key in filter_keys:
+              for selected_item in selected_data:
+                if filter_key in selected_item:
+                  selected_item[filter_key] = "<FILTERED>"
+          else:
+            raise ValueError(f'Data at path {path} cannot be paginated')
+
+        next_object[path_part] = selected_data
+      else:
+        next_object[path_part] = {}
+        next_object = next_object[path_part]
+
+    if (num_pages != None):
+      return PaginatedAPIResponse(page=page, page_size=page_size, num_pages=num_pages, status="success", data=output_object)
+    else:
+      return output_object
+  except KeyError as ex:
+    logger.error(f'Unable to find key {ex}')
+    raise ValueError(f'Cannot find data at path {path}')
 
 @API.get('/api/v1/state')
 @API.get('/api/v1/state/')
@@ -17,24 +66,24 @@ def get_state():
 @API.get('/api/v1/state/<path:path>')
 @json_api
 def get_state_select(path: str):
-  path_parts = [ path_part for path_part in path.split("/") if path_part != '' ]
-  selected_data = STATE.data
   try:
-    output_object = {}
-    next_object = output_object
-    for index, path_part in enumerate(path_parts):
-      selected_data = selected_data[path_part] # Descend into state tree
+    return get_state_by_path(path)
+  except Exception as ex:
+    return (APIResponse("error", ex), 400)
 
-      if index == len(path_parts) - 1: # Last object
-        next_object[path_part] = selected_data
-      else:
-        next_object[path_part] = {}
-        next_object = next_object[path_part]
+@API.get('/api/v1/state.paginated/<path:path>')
+@json_api
+def get_state_paginated(path: str):
+  try:
+    page = int(request.args['page']) if 'page' in request.args else 0
+    page_size = int(request.args['page_size']) if 'page_size' in request.args else DEFAULT_PAGE_SIZE
+    filter_keys = request.args['filter_keys'].split(',') if 'filter_keys' in request.args else []
+    return get_state_by_path(path, page, page_size, filter_keys)
 
-    return output_object
-  except KeyError as ex:
-    logger.error(f'Unable to find key {ex}')
-    return ({}, 400)
+  except Exception as ex:
+    logger.error(ex)
+    return (APIResponse("error", f'{ex}'), 400)
+
   
 @API.put('/api/v1/state')
 @json_api

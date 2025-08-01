@@ -6,7 +6,8 @@ import time
 
 from sys import platform
 
-from src.interface import PlaintextInterface, Target
+from src.interface.plaintext_interface import PlaintextInterface
+from src.interface.target import Target
 from src.util import grep, notify
 
 def disc_inserted(source):

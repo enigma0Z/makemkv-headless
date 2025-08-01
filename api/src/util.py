@@ -7,9 +7,10 @@ import shutil
 import subprocess
 
 import logging
-logger = logging.getLogger(__name__)
 
-from src.interface import PlaintextInterface, Target
+from src.interface.plaintext_interface import PlaintextInterface
+from src.interface.target import Target
+logger = logging.getLogger(__name__)
 
 def grep(term, lines):
   return True in [ term.casefold() in line.casefold() for line in lines ]
@@ -124,7 +125,6 @@ def string_to_list_int(_input):
       output_list.append(int(value))
 
   return output_list
-
 
 def input_with_default(
     prompt, 

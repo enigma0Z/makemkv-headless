@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from src.interface import BaseInterface, PlaintextInterface
+from src.interface.base_interface import BaseInterface
+from src.interface.plaintext_interface import PlaintextInterface
 from src.rip_titles.interactive import rip_movie_interactive, rip_show_interactive
 
 def interactive_rip(

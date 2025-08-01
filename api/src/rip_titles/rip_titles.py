@@ -6,12 +6,13 @@ import threading
 
 import logging
 
+from src.interface.base_interface import BaseInterface
+from src.interface.plaintext_interface import PlaintextInterface
 from src.rip_titles.threaded import RipTitlesThread
 logger = logging.getLogger(__name__)
 
 from src.sort import SortInfo
 
-from src.interface import BaseInterface, PlaintextInterface, Target
 from src.toc import TOC
 
 

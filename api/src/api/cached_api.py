@@ -19,6 +19,12 @@ def cached_api(function):
       return response
   return cached_api_wrapper
 
-def clear_cache():
+def clear_cache(key: str = None):
   global CACHE
-  CACHE = {}
+  if key == None:
+    CACHE = {}
+  else:
+    try:
+      CACHE[key]
+    except KeyError:
+      logger.info(f"Attempted to clear cache for key which doesn't exist: {key}")

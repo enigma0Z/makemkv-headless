@@ -4,9 +4,11 @@ import os
 import subprocess
 
 import logging
-logger = logging.getLogger(__name__)
 
-from src.interface import BaseInterface, PlaintextInterface, Target
+from src.interface.base_interface import BaseInterface
+from src.interface.plaintext_interface import PlaintextInterface
+from src.interface.target import Target
+logger = logging.getLogger(__name__)
 
 MKVMERGE='/opt/homebrew/bin/mkvmerge'
 
