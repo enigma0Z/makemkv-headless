@@ -1,6 +1,6 @@
-import { AppBar, Button, IconButton, Toolbar, Tooltip } from "@mui/material";
+import { AppBar, Button, IconButton, LinearProgress, Toolbar, Tooltip, Typography } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "@/api/store";
-import { socketActions } from "@/api/store/socket";
+import { socketActions, type SocketProgress } from "@/api/store/socket";
 import endpoints from "@/api/endpoints";
 import { tocActions } from "@/api/store/toc";
 import { ConfirmationDialog } from "./ConfirmationModal";
@@ -11,6 +11,7 @@ import EjectIcon from '@mui/icons-material/Eject';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import { StatusWrapper } from "./ButtonBar.styles";
 
 type Props = {}
 
@@ -26,6 +27,12 @@ export const ButtonBar = ({ }: Props) => {
   const ripState = useAppSelector((state) => state.socket.ripState)
 
   const [cancelModalOpen, setCancelModalOpen] = useState<boolean>(false)
+  const [tocLoading, setTocLoading] = useState<boolean>(false)
+
+  let current_progress: SocketProgress | undefined
+  if (ripState.current_title !== null && ripState.current_title !== undefined) {
+    current_progress = ripState.current_progress?.[ripState.current_title]
+  }
 
   const handleEject = () => {
     console.info('Ejecting disc')
@@ -35,12 +42,15 @@ export const ButtonBar = ({ }: Props) => {
 
   const handleLoadToc = () => {
     console.info('Fetching TOC')
+    setTocLoading(true);
     dispatch(tocActions.setTocData(undefined))
     // fetch(endpoints.state.resetSocket(), { method: 'GET' })
     fetch(endpoints.toc(), { method: 'GET' })
       .then(response => response.json())
       .then(json => {
         dispatch(tocActions.setTocData(json))
+      }).then(() => {
+        setTocLoading(false);
       })
   }
 
@@ -91,12 +101,13 @@ export const ButtonBar = ({ }: Props) => {
           <IconButton
             onClick={handleLoadToc}
             disabled={ripState?.rip_started}
+            loading={tocLoading}
           >
             <SaveAltIcon />
           </IconButton>
         </Tooltip>
         <Button
-          sx={{ marginLeft: "auto" }}
+          sx={{ marginLeft: "auto", textWrap: "nowrap", minWidth: 'max-content' }}
           onClick={handleStartRip}
           variant="outlined"
           startIcon={ ripState?.rip_started ? <CancelIcon /> : <CheckCircleIcon /> }
@@ -114,7 +125,30 @@ export const ButtonBar = ({ }: Props) => {
           message={'This disc will not get uploaded if it is cancelled now'}
         />
       </Toolbar>
+      { ripState?.total_status && <StatusWrapper>
+        <Typography variant="caption">
+          {ripState?.total_status
+            ? <>{ripState.total_status} ({Math.round((ripState.total_progress?.progress ?? 0) * 10000) / 100}%) </>
+            : "Status"
+          } {ripState?.current_status && current_progress && <>
+            / {ripState.current_status} ({Math.round((current_progress.progress ?? 0) * 10000) / 100}%)
+          </>
+          }
+        </Typography>
+        <LinearProgress
+          variant="buffer"
+          value={ripState?.total_progress?.progress ? ripState.total_progress.progress * 100 : 0}
+          valueBuffer={ripState?.total_progress?.buffer ? ripState.total_progress.buffer * 100 : 0}
+        />
+        {ripState?.current_status && current_progress && <>
+          <LinearProgress
+            variant="buffer"
+            valueBuffer={(current_progress.buffer ?? 1) * 100}
+            value={(current_progress.progress ?? 0) * 100}
+          />
+        </>}
+      </StatusWrapper> }
     </AppBar>
-    <div style={{ height: "4rem" }} />
+    <div style={{ height: ripState?.total_status ? "8rem" : "4rem" }} />
   </>
 }
