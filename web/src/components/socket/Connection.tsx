@@ -2,8 +2,9 @@ import { useEffect } from "react"
 import { socket } from "."
 import endpoints from "@/api/endpoints"
 import type { ApiState } from "@/api/types/status"
-import { store, useAppDispatch } from "@/api/store"
+import { store } from "@/api/store"
 import { socketActions, type SocketState } from "@/api/store/socket"
+import { throttle } from "lodash"
 
 const RECONNECT_DELAY_MS = 1000
 
@@ -18,37 +19,57 @@ export function isCompleteEnough(progress: number | null | undefined) {
   return (progress ?? 0) > .999
 }
 
-const SocketConnection = () => {
-  const dispatch = useAppDispatch();
+const throttledUpdateSocketState = throttle(
+  (newState: SocketState['ripState']) => {
+    console.info('Throttled update socket state')
+    store.dispatch(socketActions.updateSocketState(newState))
+  }, 
+  500
+  // { trailing: true, leading: true }
+)
 
+const shouldUpdateProgress = (current: number | undefined | null, next: number, logName: string = "") => {
+  if (current === undefined || current === null) {
+    console.debug('Do update (undefined)', logName)
+    return true
+  } else if (next - current > 0.001) {
+    console.debug('Do update', next - current, logName)
+    return true
+  }
+
+  console.debug('Skip update', logName)
+  return false
+}
+
+const SocketConnection = () => {
   const setupHandlers = () => {
     socket.on("connect", () => {
       console.info("Socket connected")
-      dispatch(socketActions.updateSocketState({ connected: true }))
+      store.dispatch(socketActions.updateSocketState({ connected: true }))
     })
 
     // Reconnect on disconnect
     socket.on("connect_error", () => {
       console.error("Could not connect to socket")
-      dispatch(socketActions.updateSocketState({ connected: false }))
+      store.dispatch(socketActions.updateSocketState({ connected: false }))
       setTimeout(() => socket.connect(), RECONNECT_DELAY_MS)
     })
 
     socket.on("disconnect", () => {
       console.info("Socket disconnected")
-      dispatch(socketActions.updateSocketState({ connected: false }))
+      store.dispatch(socketActions.updateSocketState({ connected: false }))
       setTimeout(() => socket.connect(), RECONNECT_DELAY_MS)
     })
 
     socket.on("MessageEvent", (value) => {
       if (value.text.startsWith("Copy complete")) {
-        dispatch(socketActions.updateSocketState({
+        store.dispatch(socketActions.updateSocketState({
           rip_started: false,
           current_status: undefined
         }))
       }
 
-      dispatch(socketActions.appendToMessages(value))
+      store.dispatch(socketActions.appendToMessages(value))
     })
 
     socket.on("ProgressMessageEvent", (value) => {
@@ -92,7 +113,7 @@ const SocketConnection = () => {
         }
       }
 
-      dispatch(socketActions.updateSocketState(nextSocketState))
+      store.dispatch(socketActions.updateSocketState(nextSocketState))
     })
 
     socket.on("ProgressValueMessageEvent", (value) => {
@@ -104,7 +125,10 @@ const SocketConnection = () => {
 
       // Set progress value for current index
       if (socketState.current_title !== undefined && socketState.current_title !== null) {
-        if (nextSocketState.current_progress === undefined) nextSocketState.current_progress = []; 
+        if (nextSocketState.current_progress === undefined) {
+          nextSocketState.current_progress = []; 
+        }
+
         if (nextSocketState.current_progress[socketState.current_title] === undefined) {
           nextSocketState.current_progress[socketState.current_title] = {progress: 0, buffer: undefined}
         }
@@ -118,7 +142,6 @@ const SocketConnection = () => {
             buffer: 1,
             progress: value.current / value.max
           }
-        } else {
         }
       } 
 
@@ -137,7 +160,7 @@ const SocketConnection = () => {
         }
       }
 
-      dispatch(socketActions.updateSocketState(nextSocketState))
+      throttledUpdateSocketState(nextSocketState)
     })
     
     socket.on("RipStartStopMessageEvent", (value) => {
@@ -161,7 +184,7 @@ const SocketConnection = () => {
         nextSocketState.current_progress[socketState.current_title] = {buffer: 1, progress: 1}
       }
 
-      dispatch(socketActions.updateSocketState(nextSocketState))
+      store.dispatch(socketActions.updateSocketState(nextSocketState))
     })
   }
 
@@ -170,7 +193,7 @@ const SocketConnection = () => {
     fetch(endpoints.state.get("socket"), { method: 'GET' })
       .then(response => response.json() as Promise<ApiState>)
       .then((json) => {
-        dispatch(socketActions.updateSocketState(json.socket)) // Socket context
+        store.dispatch(socketActions.updateSocketState(json.socket)) // Socket context
       })
 
     // Set up socket connection
@@ -182,7 +205,7 @@ const SocketConnection = () => {
       socket.off("ProgressMessageEvent")
       socket.off("ProgressValueMessageEvent")
       socket.disconnect()
-      dispatch(socketActions.updateSocketState({ connected: false }))
+      store.dispatch(socketActions.updateSocketState({ connected: false }))
     }
   }, [])
 
