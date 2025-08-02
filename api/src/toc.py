@@ -12,6 +12,8 @@ from src.message.build_message import build_message
 from src.interface.plaintext_interface import PlaintextInterface
 
 import logging
+
+from src.models.toc import BaseInfoModel, SourceInfoModel, TOCModel, TitleInfoModel
 logger = logging.getLogger(__name__)
 
 
@@ -29,11 +31,10 @@ def format_records(lines):
     ]
   ]
 
-class TOC(JSONSerializable):
-  def __init__(self, interface=PlaintextInterface()):
-    self.lines = []
-    self.source = None
+class TOC(TOCModel):
+  def __init__(self, interface=PlaintextInterface(), **data):
     self.interface=interface
+    super().__init__(**data)
 
   def __getitem__(self, item):
     if item == "lines":
@@ -82,7 +83,7 @@ class TOC(JSONSerializable):
       'source': self.source
     }
 
-class BaseInfo(JSONSerializable):
+class BaseInfo(BaseInfoModel):
   '''
   Base metadata class.  Includes accessor for undefined attributes based on
   static _field_lookup member provided by subclasses.  This enables the numeric
@@ -102,13 +103,16 @@ class BaseInfo(JSONSerializable):
   _field_lookup = {}
 
   def __init__(self, records, key_start, key_length = 2):
-    self.fields = {}
+    data = {}
+    fields: dict[str, str] = {}
     for record in records:
       index = ','.join(record[key_start:key_start+key_length])
       value = ','.join(record[key_start+key_length:])
-      self.fields[index] = value
+      fields[index] = value
+
+    super().__init__(fields=fields)
   
-  def __getattr__(self, name: str):
+  def lookup_field(self, name: str):
     if name == 'index': 
       return self.fields['index']
     else:
@@ -120,12 +124,6 @@ class BaseInfo(JSONSerializable):
         )
       except Exception as ex:
         return None
-
-  def __getitem__(self, item: str):
-    if item in self.__dict__: 
-      return self.__dict__[item]
-    else:
-      return self.__getattr__(item)
 
   def json_encoder(self):
     '''
@@ -143,7 +141,7 @@ class BaseInfo(JSONSerializable):
     return {**self.__dict__, **field_values}
 
 
-class SourceInfo(BaseInfo):
+class SourceInfo(SourceInfoModel, BaseInfo):
   '''
   Source Information
 
@@ -205,7 +203,7 @@ class SourceInfo(BaseInfo):
 
     return '\n'.join(lines)
 
-class TitleInfo (BaseInfo):
+class TitleInfo(TitleInfoModel, BaseInfo):
   '''
   Title Information
   Example - TINFO:7,30,0,"2 chapter(s) , 44.9 MB (A1)"
@@ -229,7 +227,7 @@ class TitleInfo (BaseInfo):
   def __str__(self):
     return f'{self.runtime} - {self.filename} - {self.summary}'
 
-class TrackInfo (BaseInfo):
+class TrackInfo(TrackInfoModel, BaseInfo):
   '''
   Track Information
   Example - SINFO:7,2,3,0,"eng"

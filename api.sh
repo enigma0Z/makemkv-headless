@@ -1,9 +1,8 @@
 #!/bin/bash
 cd api
 
-if [ ! -d .venv ]; then
-  python3 -m venv .venv
-fi
+# rm -rvf .venv
+python3 -m venv .venv
 
 source .venv/bin/activate
 pip install -r requirements.txt

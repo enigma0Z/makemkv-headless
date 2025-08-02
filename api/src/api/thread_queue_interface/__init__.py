@@ -8,7 +8,7 @@ from threading import Thread
 # from gevent.threading import Thread
 
 from flask_socketio import SocketIO
-from src.api.flask.singletons.state import STATE
+from src.api.state import STATE
 from src.interface.base_interface import BaseInterface
 from src.message.base_message_event import BaseMessageEvent
 from src.message.message_event import MessageEvent

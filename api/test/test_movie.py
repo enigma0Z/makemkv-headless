@@ -8,7 +8,7 @@ from src.rip_titles.rip_titles import rip_titles
 from src.sort import SortInfo
 from src.toc import TOC
 
-from test.data.toc_test_data import generate_CINFO, generate_SINFO, generate_TINFO
+from .data.toc_test_data import generate_CINFO, generate_SINFO, generate_TINFO
 
 @patch.multiple('builtins', open=DEFAULT)
 @patch.multiple('os', makedirs=DEFAULT, rename=DEFAULT)

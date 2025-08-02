@@ -1,15 +1,23 @@
 #!/usr/bin/env python3
 
-from typing import TypedDict
+from pydantic import BaseModel
 
 
-class Params(TypedDict):
-  foo: str
-  bar: int
-  baz: bool
+class Model(BaseModel):
+  model_field: list[str]
 
-def fn(params: Params):
-  print(params)
+class Impl(Model):
+  impl_field: str
+  def __init__(self, model_field_str: str):
+    super().__init__(
+      impl_field=model_field_str,
+      model_field=model_field_str.split(',')
+    )
 
-fn(params={
-})
+    self.impl_field += "foo"
+
+print('hello world')
+
+v = Impl('a,b,c,d')
+
+print(v)

@@ -5,6 +5,7 @@ import logging
 
 from src.interface.base_interface import BaseInterface
 from src.interface.target import Target
+from src.models.sort import ShowInfoModel, SortInfoModel
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +15,7 @@ from src.mkvtoolnix import split_mkv
 from src.toc import TOC
 from src.util import rsync, sanitize
 
-class SortInfo(JSONSerializable):
+class SortInfo(SortInfoModel):
   def __init__(
       self,
       name: str,
@@ -49,7 +50,7 @@ class SortInfo(JSONSerializable):
   def __str__(self):
     return self.path()
 
-class ShowInfo(SortInfo):
+class ShowInfo(ShowInfoModel, SortInfo):
   def __init__(
       self,
       season_number: int,
