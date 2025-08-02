@@ -22,7 +22,7 @@
   "python.testing.unittestArgs": [
     "-v",
     "-s",
-    "./api",
+    "./api/test"
   ],
   "python.testing.pytestEnabled": false,
   "python.testing.unittestEnabled": true,
