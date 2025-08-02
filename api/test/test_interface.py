@@ -3,7 +3,8 @@
 
 from unittest import TestCase
 from unittest.mock import patch
-from src.interface import PlaintextInterface, Target
+from src.interface.plaintext_interface import PlaintextInterface
+from src.interface.target import Target
 from src.message.base_message_event import BaseMessageEvent
 from src.message.message_event import MessageEvent
 from src.message.progress_message_event import ProgressMessageEvent
