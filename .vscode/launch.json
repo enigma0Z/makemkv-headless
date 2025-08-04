@@ -5,10 +5,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python Debugger: Main File with Arguments",
+      "name": "Python Debugger: API",
       "type": "debugpy",
       "request": "launch",
-      "program": "main.py",
+      "program": "api/src/main_api.py",
       "console": "integratedTerminal",
       "args": [
         "dev:/dev/disk6",

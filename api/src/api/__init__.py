@@ -1,22 +1,36 @@
-#!/usr/bin/env python3
-'''
-Rest / JSON interface + API
 
-Endpoints
+from asyncio import create_task
+from contextlib import asynccontextmanager
+import logging
+from fastapi import APIRouter, FastAPI
 
-1  Get TOC
-2  Rip Disc
-3  Sort Content
-4  Store Content
-'''
+from src.config import CONFIG
 
-import json
+from src.interface import get_interface, init_interface
 
-from src.api.json_api import json_api
-from src.api.singletons.singletons import *
-from src.api.v1 import *
+from src.interface.async_queue_interface import AsyncQueueInterface
 
-@API.route('/')
-@json_api
-def index():
-    return json.dumps({'foo': 'bar', 'bin': 'baz'})
+from . import v1
+
+logger = logging.getLogger(__name__)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+  # Start thread queue interface
+  CONFIG.update_from_file('./config.yaml')
+  init_interface(AsyncQueueInterface())
+  create_task(get_interface().run())
+  yield
+  # Shut down thread queue interface
+  logger.info('Shutdown')
+
+app = FastAPI(lifespan=lifespan)
+api_router = APIRouter(prefix="/api")
+
+api_router.include_router(v1.router)
+
+@app.get('/')
+async def root():
+  return "OK"
+
+app.include_router(api_router)

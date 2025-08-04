@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
+from asyncio import create_subprocess_shell, sleep
 import os
 import shlex
 import time
 
 from sys import platform
 
+from src.interface import get_interface
 from src.interface.plaintext_interface import PlaintextInterface
 from src.interface.target import Target
 from src.util import grep, notify
@@ -23,7 +25,7 @@ def disc_inserted(source):
 
 def wait_for_disc_inserted(
     source, 
-    interface=PlaintextInterface()
+    interface=get_interface()
   ):
   if not disc_inserted(source):
     interface.print(f'Please insert a disc into {source}', target=Target.INPUT)
@@ -31,13 +33,11 @@ def wait_for_disc_inserted(
   while not disc_inserted(source):
     time.sleep(1)
 
-def eject_disc(
+async def eject_disc(
     source, 
-    interface=PlaintextInterface()
+    interface=get_interface()
   ):
   if (source.startswith('disc') or source.startswith('dev')):
-    interface.print("Ejecting Disc", target=Target.INPUT)
-    while(disc_inserted(source)):
-      time.sleep(1)
-      os.popen(shlex.join([ 'drutil', 'eject' ]))
-      os.popen(shlex.join([ 'diskutil', 'eject', source ]))
+    await interface.print("Ejecting Disc", target=Target.INPUT)
+    await create_subprocess_shell(shlex.join([ 'drutil', 'eject' ]))
+    await create_subprocess_shell(shlex.join([ 'diskutil', 'eject' ]))

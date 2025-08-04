@@ -1,85 +1,34 @@
 import logging
-from typing import TypedDict
-from deepmerge import Merger
 
-from src.json_serializable import JSONSerializable
-from src.message.progress_message_event import ProgressMessageData, StatusMessage
+from src.message.progress_message_event import ProgressMessageData
 from src.message.progress_value_message_event import ProgressValueMessageData
-from src.toc import TOC
+from src.models.state import StateModel
 
 logger = logging.getLogger(__name__)
 
-class RipDestination(TypedDict, total=False):
-  library: str
-  media: str
-  content: str
-
-class RipSortInfo(TypedDict, total=False):
-  name: str
-  id: str
-  first_episode: int
-  season_number: int
-  main_indexes: list[int]
-  extra_indexes: list[int]
-  split_segments: list[int]
-  id_db: str
-
-class ReduxRipState(TypedDict, total=False):
-  destination: RipDestination
-  sort_info: RipSortInfo
-  rip_all: bool
-
-class ReduxState(TypedDict, total=False):
-  rip: ReduxRipState
-  toc: TOC
-
-class ProgressState(TypedDict, total=False):
-  buffer: float
-  progress: float
-
-class SocketStatus(TypedDict, total=False):
-  current_title: int
-  current_progress: list[ProgressState]
-  total_progress: ProgressState
-  current_status: StatusMessage
-  total_status: StatusMessage
-  rip_started: bool
-
-SOCKET_STATUS_DEFAULT_VALUE: SocketStatus = {
-  'current_title': None,
-  'current_progress': [],
-  'total_progress': {
-    'buffer': None,
-    'progress': None
-  },
-  'current_status': None,
-  'total_status': None,
-  'rip_started': False
-}
-
-class StateData(TypedDict, total=False):
-  redux: ReduxState
-  socket: SocketStatus
-
-class State(JSONSerializable):
-  def __init__(self):
-    self.reset_all()
-    self.merger = Merger( [(dict, "merge")], ["override"], ["override"])
-
+class State(StateModel):
   def json_encoder(self):
     return self.data
 
   def reset_all(self): 
-    self.data: StateData = {
-      'redux': {},
-      'socket': { **SOCKET_STATUS_DEFAULT_VALUE }
-    }
+    for field, field_info in State.model_fields.items():
+      if field_info.default_factory:
+        default_value = field_info.default_factory()
+      else:
+        default_value = field_info.default
+      
+      setattr(self, field, default_value)
+
+    self.model_fields_set.clear()
 
   def reset_socket(self):
-    self.data['socket'] = { **SOCKET_STATUS_DEFAULT_VALUE }
+    for field, field_info in type(self.socket).model_fields.items():
+      if field_info.default_factory:
+        default_value = field_info.default_factory()
+      else:
+        default_value = field_info.default
 
-  def update_from_partial(self, data):
-    self.data = self.merger(self.data, data)
+      setattr(self.socket, field, default_value)
 
   def fill_progress_indexes(self, index):
     if len(self.data['socket']['current_progress']) <= index:

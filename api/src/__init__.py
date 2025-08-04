@@ -14,8 +14,8 @@ from argparse import ArgumentParser
 from src import features
 
 from src.config import CONFIG
-from src.curses_interface import CursesInterface
-from src.api.singletons.singletons import start_api
+from src.interface.curses_interface import CursesInterface
+# from src.api.singletons.singletons import start_api
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +89,7 @@ def main_cli():
 
   try:
     if (opts.api): 
-      start_api()
+      # start_api()
       sys.exit(0)
 
     elif not opts.curses:
@@ -127,9 +127,3 @@ def main_cli():
   except Exception as ex:
     logger.error(ex)
     raise ex
-
-def main_api():
-  parse_args()
-
-  start_api()
-  sys.exit(0)

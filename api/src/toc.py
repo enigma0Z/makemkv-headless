@@ -1,19 +1,22 @@
 #!usr/bin/env python3
 
+from functools import lru_cache
 from json import dumps
 import re
 import subprocess
-from sys import stderr
+
+from pydantic import PrivateAttr
 
 from src.config import CONFIG
+from src.interface import get_interface
+from src.interface.base_interface import BaseInterface
 from src.interface.target import Target
-from src.json_serializable import JSONSerializable
 from src.message.build_message import build_message
 from src.interface.plaintext_interface import PlaintextInterface
 
 import logging
 
-from src.models.toc import BaseInfoModel, SourceInfoModel, TOCModel, TitleInfoModel
+from src.models.toc import BaseInfoModel, SourceInfoModel, TOCModel, TitleInfoModel, TrackInfoModel
 logger = logging.getLogger(__name__)
 
 
@@ -32,9 +35,7 @@ def format_records(lines):
   ]
 
 class TOC(TOCModel):
-  def __init__(self, interface=PlaintextInterface(), **data):
-    self.interface=interface
-    super().__init__(**data)
+  _interface: BaseInterface = PrivateAttr(default_factory=get_interface)
 
   def __getitem__(self, item):
     if item == "lines":
@@ -43,8 +44,7 @@ class TOC(TOCModel):
       return self.source
 
   def get_from_disc(self, source):
-
-    self.interface.print('Loading disc TOC', target=Target.MKV)
+    self._interface.print('Loading disc TOC', target=Target.MKV)
 
     # Load the disc TOC from makemkvcon output
     with subprocess.Popen(
@@ -55,7 +55,7 @@ class TOC(TOCModel):
       for b_line in process.stdout:
         line = b_line.decode('UTF-8').strip()
         self.lines += [line]
-        self.interface.send(build_message(raw=line))
+        self._interface.send(build_message(raw=line))
 
     self.load()
 
@@ -111,6 +111,15 @@ class BaseInfo(BaseInfoModel):
       fields[index] = value
 
     super().__init__(fields=fields)
+
+    for name, key in self._field_lookup.items():
+      if key in self.fields:
+        self.__dict__[name] = re.sub( # Strip leading and trailing quotes off if they exist
+          r'^"', '', re.sub(
+            r'"\n?$', '', self.fields[key]
+          )
+        )
+
   
   def lookup_field(self, name: str):
     if name == 'index': 
@@ -147,7 +156,7 @@ class SourceInfo(SourceInfoModel, BaseInfo):
 
   Example: `CINFO:2,0,"STARGATE_SG1_SEASON_10_D5_US"`
   '''
-  key = "CINFO"
+  _key = "CINFO"
 
   _field_lookup = {
     "name": "2,0",
@@ -159,7 +168,6 @@ class SourceInfo(SourceInfoModel, BaseInfo):
 
   def __init__(self, records):
     super().__init__(records, 1)
-    self.titles = []
 
   def __str__(self):
     return f'SourceInfo({self.media}: {self.name})'
@@ -208,7 +216,7 @@ class TitleInfo(TitleInfoModel, BaseInfo):
   Title Information
   Example - TINFO:7,30,0,"2 chapter(s) , 44.9 MB (A1)"
   '''
-  key = 'TINFO'
+  _key = 'TINFO'
 
   _field_lookup = {
     'chapters': '8,0',

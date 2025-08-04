@@ -6,6 +6,7 @@ import requests
 
 from src.json_serializable import JSONSerializable
 from src.config import CONFIG
+from src.models.tmdb import TMDBConfigurationModel, TMDBMovieSearchResultModel, TMDBShowSearchResultModel
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,7 @@ class Data(JSONSerializable):
   def json_encoder(self):
     return self.data
 
-class SearchResult (Data):
+class SearchResult(Data):
   def __init__(self, data, content_type):
     super().__init__(data)
     self.content_type = content_type
@@ -37,7 +38,6 @@ class SearchResult (Data):
 
   def __str__(self):
     return f'{self.id}: {self.name}, {self.url}'
-
 
 def search(content, query):
   content = content.lower()
@@ -51,7 +51,10 @@ def search(content, query):
   response_json = response.json()
 
   if ('results' in response_json): 
-    return [SearchResult(result, content) for result in response.json()['results']]
+    if content == 'movie':
+      return [TMDBMovieSearchResultModel(**result) for result in response.json()['results']]
+    elif content == 'tv':
+      return [TMDBShowSearchResultModel(**result) for result in response.json()['results']]
   else:
     return Data(response_json)
 
@@ -62,4 +65,4 @@ def configuration():
     headers = { 'Authorization': f'Bearer {CONFIG.tmdb_token}' },
   )
 
-  return Data(response.json())
+  return TMDBConfigurationModel(**response.json())

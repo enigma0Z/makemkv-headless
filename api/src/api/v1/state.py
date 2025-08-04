@@ -1,21 +1,23 @@
 import json
-import logging
 from math import ceil
 
-from flask import Response, request
-from src.api.api_response import APIResponse, PaginatedAPIResponse
-from src.api.json_api import json_api, json_api
-from src.api.singletons.singletons import API
-from src.api.singletons.state import STATE
+from fastapi import APIRouter, HTTPException
 
+from src.api.api_response import APIResponse, PaginatedAPIResponse
+
+import logging
+
+from src.api.state import STATE
 logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/state")
 
 DEFAULT_PAGE_SIZE = 10
 
 def get_state_by_path(path: str, page=None, page_size=None, filter_keys: list[str]=[]):
   path_parts = [ path_part for path_part in path.split("/") if path_part != '' ]
   num_pages = None
-  selected_data = STATE.data
+  selected_data = STATE.model_dump()
   try:
     output_object = {}
     next_object = output_object
@@ -57,22 +59,19 @@ def get_state_by_path(path: str, page=None, page_size=None, filter_keys: list[st
     logger.error(f'Unable to find key {ex}')
     raise ValueError(f'Cannot find data at path {path}')
 
-@API.get('/api/v1/state')
-@API.get('/api/v1/state/')
-@json_api
+@router.get('')
+@router.get('/')
 def get_state():
   return STATE
 
-@API.get('/api/v1/state/<path:path>')
-@json_api
-def get_state_select(path: str):
+@router.get('/{state_path:path}')
+def get_state_select(state_path: str):
   try:
-    return get_state_by_path(path)
+    return get_state_by_path(state_path)
   except Exception as ex:
-    return (APIResponse("error", ex), 400)
+    raise HTTPException(500, APIResponse(status="error"))
 
-@API.get('/api/v1/state.paginated/<path:path>')
-@json_api
+@router.get('/api/v1/state.paginated/<path:path>')
 def get_state_paginated(path: str):
   try:
     page = int(request.args['page']) if 'page' in request.args else 0
@@ -85,31 +84,28 @@ def get_state_paginated(path: str):
     return (APIResponse("error", f'{ex}'), 400)
 
   
-@API.put('/api/v1/state')
-@json_api
-def put_state():
-  try:
-    data = json.loads(request.data.decode('utf-8'))
-    STATE.data['redux']['rip'] = data['redux']['rip']
-    return data
-  except:
-    return ("failure", 400)
+# @router.put('/api/v1/state')
+# def put_state():
+#   try:
+#     data = json.loads(request.data.decode('utf-8'))
+#     STATE.data['redux']['rip'] = data['redux']['rip']
+#     return data
+#   except:
+#     return ("failure", 400)
 
-@API.get('/api/v1/state.reset')
-@json_api
+@router.get('.reset')
 def reset_state():
   try:
     STATE.reset_all()
-    return ("success", 202)
+    return APIResponse(status="success")
   except:
     return ("failure", 500)
 
-@API.get('/api/v1/state.reset/socket')
-@json_api
+@router.get('.reset/socket')
 def reset_state_socket():
   try:
     STATE.reset_socket()
-    return ("success", 202)
-  except:
-    return ("failure", 500)
+    return APIResponse(status="success")
+  except Exception as ex:
+    raise HTTPException(500, APIResponse(status="error"))
     

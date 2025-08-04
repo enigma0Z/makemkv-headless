@@ -6,8 +6,8 @@ import threading
 
 import logging
 
+from src.interface import get_interface
 from src.interface.base_interface import BaseInterface
-from src.interface.plaintext_interface import PlaintextInterface
 from src.rip_titles.threaded import RipTitlesThread
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ def rip_titles(
     sort_info: SortInfo,
     toc: TOC = None,
     rip_all=False,
-    interface: BaseInterface = PlaintextInterface(),
+    interface: BaseInterface = get_interface(),
     temp_prefix: str = None,
   ):
   '''

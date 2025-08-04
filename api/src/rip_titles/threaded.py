@@ -7,8 +7,8 @@ import threading
 import logging
 from typing import TypedDict
 
+from src.interface import get_interface
 from src.interface.base_interface import BaseInterface
-from src.interface.plaintext_interface import PlaintextInterface
 from src.interface.target import Target
 from src.makemkv.threaded import RipDiscThread
 from src.threads import StoppableThread
@@ -45,7 +45,7 @@ class RipTitlesThread(StoppableThread):
       sort_info: SortInfo,
       toc: TOC = None,
       rip_all=False,
-      interface: BaseInterface = PlaintextInterface(),
+      interface: BaseInterface = get_interface(),
       temp_prefix: str = None,
     ):
     '''

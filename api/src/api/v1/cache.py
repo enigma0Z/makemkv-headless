@@ -1,8 +1,7 @@
-from flask import Response, request
-
+from fastapi import Response
 from src.api import cached_api
-from src.api.json_api import json_api
-from src.api.singletons.singletons import API
+from src.api.fastapi import json_api
+from src.api.fastapi import API
 
 @API.get('/api/v1/cache/clear')
 @json_api
@@ -11,4 +10,4 @@ def get_clear_cache():
     cached_api.clear_cache()
     return "success"
   except:
-    return Response("failure", status=500)
+    return Response("failure", status_code=500)
