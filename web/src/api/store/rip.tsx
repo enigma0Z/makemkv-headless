@@ -39,7 +39,7 @@ const initialState: RipState = {
 }
 
 export const ripStateIsValid = (state: RipState) => (
-  state.destination.library !== undefined
+  state.destination?.library !== undefined
   && state.destination.media !== undefined
   && state.destination.content !== undefined
   && state.sort_info.name !== undefined

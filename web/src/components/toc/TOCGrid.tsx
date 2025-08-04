@@ -37,9 +37,9 @@ export const TOCGrid = ({ }: Props) => {
   const dispatch = useAppDispatch()
 
   const data = useAppSelector((state) => state.toc)
-  const mainIndexes = useAppSelector((state) => state.rip.sort_info.main_indexes)
-  const extraIndexes = useAppSelector((state) => state.rip.sort_info.extra_indexes)
-  const content = useAppSelector((state) => state.rip.destination.content)
+  const mainIndexes = useAppSelector((state) => state.rip.sort_info?.main_indexes)
+  const extraIndexes = useAppSelector((state) => state.rip.sort_info?.extra_indexes)
+  const content = useAppSelector((state) => state.rip.destination?.content)
   const ripState = useAppSelector((state) => state.socket.ripState)
 
   // const [oldMainIndexes, setOldMainIndexes] = useState<number[]>([])

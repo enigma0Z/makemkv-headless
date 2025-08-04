@@ -3,6 +3,7 @@ from asyncio import create_task
 from contextlib import asynccontextmanager
 import logging
 from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.config import CONFIG
 
@@ -25,12 +26,18 @@ async def lifespan(app: FastAPI):
   logger.info('Shutdown')
 
 app = FastAPI(lifespan=lifespan)
-api_router = APIRouter(prefix="/api")
 
-api_router.include_router(v1.router)
+app.add_middleware(
+  CORSMiddleware,
+  # TODO: Add routable IPs
+  allow_origins=["http://localhost:3000"],
+  allow_credentials=True,
+  allow_methods=['*'],
+  allow_headers=['*']
+)
+
+app.include_router(prefix="/api", router=v1.router)
 
 @app.get('/')
 async def root():
   return "OK"
-
-app.include_router(api_router)

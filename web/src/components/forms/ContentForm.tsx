@@ -13,14 +13,14 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
 
   const dispatch = useDispatch();
 
-  const name = useAppSelector((state) => state.rip.sort_info.name)
-  const id = useAppSelector((state) => state.rip.sort_info.id)
+  const name = useAppSelector((state) => state.rip.sort_info?.name)
+  const id = useAppSelector((state) => state.rip.sort_info?.id)
   const library = useAppSelector((state) => state.rip.destination?.library)
   const media = useAppSelector((state) => state.rip.destination?.media)
   const content = useAppSelector((state) => state.rip.destination?.content)
-  const seasonNumber = useAppSelector((state) => state.rip.sort_info.season_number)
-  const firstEpisode = useAppSelector((state) => state.rip.sort_info.first_episode)
-  const splitSegments = useAppSelector((state) => state.rip.sort_info.split_segments)
+  const seasonNumber = useAppSelector((state) => state.rip.sort_info?.season_number)
+  const firstEpisode = useAppSelector((state) => state.rip.sort_info?.first_episode)
+  const splitSegments = useAppSelector((state) => state.rip.sort_info?.split_segments)
   const tmdbConfiguration = useAppSelector((state) => state.tmdb.configuration)
   const tmdbSelection = useAppSelector((state) => state.rip.tmdb_selection)
 

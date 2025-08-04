@@ -8,15 +8,16 @@ import { store } from './api/store'
 import { ThemeProvider } from '@emotion/react'
 import { theme } from './theme'
 import { CssBaseline } from '@mui/material'
-import SocketConnection from './components/socket/Connection'
+// import SocketConnection from './components/socket/Connection'
 import { StatusScroller } from './components/status/StatusScroller'
+import { socket } from './components/socket'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Provider store={store} >
-        <SocketConnection />
+        {/* <SocketConnection /> */}
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<App />} />

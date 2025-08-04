@@ -14,4 +14,4 @@ logger = logging.getLogger(__name__)
 logger.info(f'Starting app {app}')
 
 if __name__ == '__main__':
-  uvicorn.run(app, host="0.0.0.0", port=8000) 
+  uvicorn.run(app, host="0.0.0.0", port=4000) 
