@@ -1,8 +1,8 @@
 import logging
+from typing import TypedDict
 
-from src.message.progress_message_event import ProgressMessageData
-from src.message.progress_value_message_event import ProgressValueMessageData
-from src.models.state import StateModel
+from src.models.socket import CurrentProgressMessage, ProgressValueMessage, TotalProgressMessage
+from src.models.state import ProgressStateModel, StateModel
 
 logger = logging.getLogger(__name__)
 
@@ -31,54 +31,58 @@ class State(StateModel):
       setattr(self.socket, field, default_value)
 
   def fill_progress_indexes(self, index):
-    if len(self.data['socket']['current_progress']) <= index:
+    if len(self.socket.current_progress) <= index:
       # Create empty current_progress entries as needed
-      self.data['socket']['current_progress'] = [ 
-        self.data['socket']['current_progress'][index] 
-        if len(self.data['socket']['current_progress']) > index
-        else {"buffer": None, "progress": None}
+      self.socket.current_progress = [ 
+        self.socket.current_progress[index] 
+        if len(self.socket.current_progress) > index
+        else ProgressStateModel()
         for index in range(0, index+1)
       ]
     pass
 
-  def update_progress(self, data: ProgressValueMessageData):
-    self.data['socket']['total_progress']['progress'] = data['total'] / data['max']
-    if (self.data['socket']['current_title'] != None):
-      self.fill_progress_indexes(self.data['socket']['current_title'])
+  def update_progress(self, data: ProgressValueMessage):
+    self.socket.total_progress.progress = data.total / data.max
+    if (self.socket.current_title != None):
+      self.fill_progress_indexes(self.socket.current_title)
 
-      if self.data['socket']['current_status'] == 'Saving to MKV file':
-        self.data['socket']['current_progress'][self.data['socket']['current_title']]['buffer'] = 1
-        self.data['socket']['current_progress'][self.data['socket']['current_title']]['progress'] = data['current'] / data['max']
-      elif self.data['socket']['current_status'] == 'Analyzing seamless segments':
-        self.data['socket']['current_progress'][self.data['socket']['current_title']]['buffer'] = data['current'] / data['max']
+      if self.socket.current_status == 'Saving to MKV file':
+        self.socket.current_progress[self.socket.current_title].buffer = 1
+        self.socket.current_progress[self.socket.current_title].progress = data.current / data.max
+      elif self.socket.current_status == 'Analyzing seamless segments':
+        self.socket.current_progress[self.socket.current_title].buffer = data.current / data.max
 
-  def get_progress(self):
+  class ProgressResponse(TypedDict):
+    total: ProgressStateModel | None
+    current: ProgressStateModel
+
+  def get_progress(self) -> ProgressResponse:
     try:
       return {
-        "total": {**self.data['socket']['total_progress']},
-        "current": {**self.data['socket']['current_progress'][self.data['socket']['current_title']]}
+        "total": self.socket.total_progress,
+        "current": self.socket.current_progress[self.socket.current_title]
       }
     except Exception:
       return {
-        "total": {},
-        "current": {}
+        "total": None,
+        "current": None,
       }
 
-  def update_status(self, data: ProgressMessageData):
-    if data['progress_type'] == 'total':
-      self.data['socket']['total_status'] = data['name']
-    elif data['progress_type'] == 'current':
-      self.data['socket']['current_status'] = data['name']
+  def update_status(self, data: CurrentProgressMessage | TotalProgressMessage):
+    if isinstance(data, TotalProgressMessage):
+      self.socket.total_status = data.name
+    if isinstance(data, CurrentProgressMessage):
+      self.data.socket.current_status = data.name
 
       if (
-        self.data['socket']['current_title'] != None
+        self.socket.current_title != None
         and (
-          data['name'] == 'Saving to MKV file' 
-          or data['name'] == 'Analyzing seamless segments'
+          data.name == 'Saving to MKV file' 
+          or data.name == 'Analyzing seamless segments'
         ) and (
-          data['index'] > self.data['socket']['current_title']
+          data.index > self.socket.current_title
         )
       ):
-        self.data['socket']['current_title'] = data['index']
+        self.socket.current_title = data.index
   
 STATE = State()

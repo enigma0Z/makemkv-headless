@@ -3,13 +3,11 @@
 from asyncio import QueueShutDown
 from asyncio.queues import Queue
 
+from src.api.socket import SocketConnectionManager
 from src.api.state import STATE
 from src.interface.base_interface import BaseInterface
-from src.message.base_message_event import BaseMessageEvent
-from src.message.message_event import MessageEvent
-from src.message.progress_message_event import ProgressMessageEvent
-from src.message.progress_value_message_event import ProgressValueMessageEvent
-from src.message.rip_start_stop_message_event import RipStartStopMessageEvent
+
+from src.models.socket import CurrentProgressMessage, LogMessage, ProgressMessage, ProgressValueMessage, RipStartStopMessage, SocketMessage, TotalProgressMessage
 
 import logging
 logger = logging.getLogger(__name__)
@@ -17,7 +15,7 @@ logger = logging.getLogger(__name__)
 PROGRESS_SEND_THRESHOLD = 0.001
 
 class AsyncQueueInterface(BaseInterface):
-  def __init__(self, socket: None = None):
+  def __init__(self, socket: SocketConnectionManager = None):
     self.queue = Queue()
     self.socket = socket
 
@@ -37,12 +35,12 @@ class AsyncQueueInterface(BaseInterface):
     '''Not implemented'''
     pass
 
-  async def send(self, message: BaseMessageEvent):
-    if isinstance(message, ProgressMessageEvent):
+  async def send(self, message: SocketMessage):
+    if isinstance(message, CurrentProgressMessage) or isinstance(message, TotalProgressMessage):
       await self.queue.put(message)
-      STATE.update_status(message.data)
+      STATE.update_status(message)
 
-    elif isinstance(message, ProgressValueMessageEvent):
+    elif isinstance(message, ProgressValueMessage):
       progress_before = STATE.get_progress()
       STATE.update_progress(message.data)
       progress_after = STATE.get_progress()
@@ -82,10 +80,10 @@ class AsyncQueueInterface(BaseInterface):
       if (send_update): 
         await self.queue.put(message)
 
-    elif isinstance(message, RipStartStopMessageEvent):
+    elif isinstance(message, RipStartStopMessage):
       await self.queue.put(message)
-      STATE.data['socket']['current_title'] = message.data['index']
-      STATE.data['socket']['rip_started'] = message.data['state'] == 'start'
+      STATE.socket.current_title = message.index
+      STATE.socket.rip_started = message.state == 'start'
     
     else:
       await self.queue.put(message)
@@ -93,19 +91,17 @@ class AsyncQueueInterface(BaseInterface):
     return super().send(message)
 
   async def print(self, *text, **kwargs):
+    sep = kwargs['sep'] if 'sep' in kwargs else ' '
     if 'target' in kwargs and kwargs['target'] != 'status':
-      await self.send(MessageEvent(*text, **kwargs))
+      await self.send(LogMessage(message=sep.join(text)))
 
   async def run(self):
     '''Start the queue processing thread'''
     try:
       while True:
         message = await self.queue.get()
-        if type(message) != BaseMessageEvent:
-          logger.debug(f'sending message: {message}')
-          # self.socket.emit(message.type, message.data)
-        else:
-          logger.debug(f'skipping message: {message}')
+        if (isinstance(message, SocketMessage)):
+          self.socket.broadcast(message)
     except QueueShutDown:
       return
 

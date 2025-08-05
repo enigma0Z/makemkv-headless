@@ -1,11 +1,11 @@
-from typing import Generic, Literal, TypeVar, TypedDict
+from typing import Generic, Literal, TypeVar
 from pydantic import BaseModel
 
-from time import time
+from src.models.makemkv import CurrentProgressModel, ProgressModel, ProgressValueModel, TotalProgressModel
 
 T = TypeVar('T')
 
-class SocketMessage(BaseModel, Generic[T]):
+class SocketMessage(BaseModel):
   type: str
 
   def __init__(self, **kwargs):
@@ -15,12 +15,24 @@ class SocketMessage(BaseModel, Generic[T]):
   def __getitem__(self, key):
     return self.__dict__[key]
 
-class PingMessage(SocketMessage):
-  type Message = Literal['ping', 'pong']
+class ClientPingMessage(SocketMessage):
+  message: str = "ping"
 
-  message: Message
-  time: int
+class ServerPongMessage(SocketMessage):
+  message: str = "pong"
 
+class LogMessage(SocketMessage):
+  message: str
 
-class LogDataModel(SocketMessage):
-  text: str
+class RipStartStopMessage(SocketMessage):
+  index: int
+  state: Literal['stop', 'start']
+
+class ProgressMessage(SocketMessage): ...
+
+class CurrentProgressMessage(ProgressMessage, CurrentProgressModel): ...
+
+class TotalProgressMessage(ProgressMessage, TotalProgressModel): ...
+
+class ProgressValueMessage(SocketMessage, ProgressValueModel): ...
+

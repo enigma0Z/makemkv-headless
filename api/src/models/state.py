@@ -33,7 +33,7 @@ class ReduxStateModel(BaseModel):
 
 class ProgressStateModel(BaseModel):
   buffer: float | None = None
-  progress: float = None
+  progress: float = 0
 
 class SocketStatusModel(BaseModel):
   current_title: int | None = None
