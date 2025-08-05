@@ -54,7 +54,7 @@ def get_state_by_path(path: str, page=None, page_size=None, filter_keys: list[st
     if (num_pages != None):
       return PaginatedAPIResponse(page=page, page_size=page_size, num_pages=num_pages, status="success", data=output_object)
     else:
-      return output_object
+      return APIResponse(status="success", data=output_object)
   except KeyError as ex:
     logger.error(f'Unable to find key {ex}')
     raise ValueError(f'Cannot find data at path {path}')

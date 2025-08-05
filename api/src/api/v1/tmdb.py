@@ -1,6 +1,5 @@
 from functools import lru_cache
 from fastapi import APIRouter
-from flask import request
 
 from src.api.api_response import APIResponse
 from src.tmdb import configuration, search
