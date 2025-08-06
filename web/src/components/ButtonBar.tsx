@@ -1,7 +1,6 @@
 import { AppBar, Button, IconButton, LinearProgress, Toolbar, Tooltip, Typography } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "@/api/store";
 import { socketActions, type SocketProgress } from "@/api/store/socket";
-import endpoints from "@/api/endpoints";
 import { tocActions } from "@/api/store/toc";
 import { ConfirmationDialog } from "./ConfirmationModal";
 import { useState } from "react";
@@ -12,6 +11,7 @@ import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { StatusWrapper } from "./ButtonBar.styles";
+import { endpoints, type ApiModel } from "@/api/endpoints";
 
 type Props = {}
 
@@ -37,7 +37,7 @@ export const ButtonBar = ({ }: Props) => {
   const handleEject = () => {
     console.info('Ejecting disc')
     dispatch(socketActions.resetSocketState({}))
-    fetch(endpoints.eject(), { method: 'GET' })
+    fetch(endpoints.disc.eject(), { method: 'GET' })
   }
 
   const handleLoadToc = () => {
@@ -46,19 +46,19 @@ export const ButtonBar = ({ }: Props) => {
     dispatch(tocActions.setTocData(undefined))
     // fetch(endpoints.state.resetSocket(), { method: 'GET' })
     fetch(endpoints.toc(), { method: 'GET' })
-      .then(response => response.json())
-      .then(json => {
-        dispatch(tocActions.setTocData(json))
+      .then(response => response.json() as Promise<ApiModel['v1']['toc']>)
+      .then(({ data }) => {
+        dispatch(tocActions.setTocData(data))
       }).then(() => {
         setTocLoading(false);
       })
   }
 
   const handleCancelRip = () => {
-    fetch(endpoints.rip.stop(), {
-      method: 'GET'
-    }).then((response) => {
-      console.log('Rip stop response', response)
+    fetch(endpoints.rip.stop(), { method: 'GET' })
+    .then((response) => response.json() as Promise<ApiModel['v1']['rip.stop']>)
+    .then(({ status, data }) => {
+      console.log('Rip stop response', status, data)
     })
   };
 

@@ -7,6 +7,4 @@ export type PingMessage = BaseSocketMessage & {
   message: "ping" | "pong";
 }
 
-const v: PingMessage = {message: "ping"}
-
-print(v)
+const v: PingMessage = {type: "PingMessage", message: "ping"}

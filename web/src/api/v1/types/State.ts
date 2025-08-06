@@ -4,7 +4,7 @@ import type { SocketProgress, SocketState } from "@/api/store/socket";
 
 import type { ProgressMessageEvent } from "@/components/socket/Context";
 
-export type ApiState = {
+export type State = {
   redux: {
     rip?: RipState;
     toc?: TocState;
@@ -23,7 +23,7 @@ export type ApiState = {
   }
 }
 
-export const initialApiState: ApiState = {
+export const initialApiState: State = {
   redux: {
     rip: {
       destination: {
@@ -42,7 +42,8 @@ export const initialApiState: ApiState = {
         id_db: 'tmdbid'
       },
       rip_all: false,
-      toc_length: 0
+      toc_length: 0,
+      tmdb_selection: null
     },
     toc: {
       lines: [],
@@ -59,7 +60,8 @@ export const initialApiState: ApiState = {
         current_status: undefined,
         total_status: undefined,
         rip_started: false
-      }
+      },
+      messages: []
     }
   },
   socket: {

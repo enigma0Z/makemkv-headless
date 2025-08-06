@@ -11,11 +11,11 @@ from src.config import CONFIG
 from src.interface import get_interface
 from src.interface.base_interface import BaseInterface
 from src.interface.target import Target
-from src.message.build_message import build_message
 from src.interface.plaintext_interface import PlaintextInterface
 
 import logging
 
+from src.models.socket import mkv_message_from_raw
 from src.models.toc import BaseInfoModel, SourceInfoModel, TOCModel, TitleInfoModel, TrackInfoModel
 logger = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ class TOC(TOCModel):
       for b_line in process.stdout:
         line = b_line.decode('UTF-8').strip()
         self.lines += [line]
-        self._interface.send(build_message(raw=line))
+        self._interface.send(mkv_message_from_raw(line))
 
     self.load()
 

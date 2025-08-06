@@ -5,6 +5,7 @@ import logging
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.api.socket import socket
 from src.config import CONFIG
 
 from src.interface import get_interface, init_interface
@@ -19,7 +20,8 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
   # Start thread queue interface
   CONFIG.update_from_file('./config.yaml')
-  init_interface(AsyncQueueInterface())
+  logger.debug(f'Starting async queue interface with socket {socket}')
+  init_interface(AsyncQueueInterface(socket))
   create_task(get_interface().run())
   yield
   # Shut down thread queue interface

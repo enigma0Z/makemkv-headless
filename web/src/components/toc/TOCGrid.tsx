@@ -5,7 +5,6 @@ import { Box, Card, Checkbox, Collapse, Divider, IconButton, LinearProgress, Rad
 import { Fragment, useEffect, useState } from "react"
 import type { TitleInfo, Toc } from "@/api/store/toc"
 
-import { isCompleteEnough, isRippingStatus } from "../socket/Connection"
 import { BorderCell, CheckboxCell, CollapseRow, DetailsWrapper, DividerCell, EpisodeCell, FilenameCell, FilenameContent, FilenameHead, FullWidthRow, MainExtraCell, MainExtrasRadioGroup, RuntimeCell, StatusWrapperCell, TOCGridContainer } from "./TOCGrid.styles"
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -13,6 +12,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import { isRippingStatus } from "@/models/socket"
 
 
 type Props = {
@@ -335,6 +335,10 @@ export const TOCGridRow = ({ index, data, statusText, titleType, episodeNumber, 
       dispatch(ripActions.addExtraIndex(index))
       dispatch(ripActions.removeMainIndex(index))
     }
+  }
+
+  function isCompleteEnough(progress: number) {
+    throw new Error("Function not implemented.")
   }
 
   return <>

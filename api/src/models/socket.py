@@ -1,7 +1,7 @@
 from typing import Generic, Literal, TypeVar
 from pydantic import BaseModel
 
-from src.models.makemkv import CurrentProgressModel, ProgressModel, ProgressValueModel, TotalProgressModel
+from src.models.makemkv import CurrentProgressModel, ProgressModel, ProgressValueModel, SourceInfoModel, TitleInfoModel, TotalProgressModel, TrackInfoModel, mkv_model_from_raw
 
 T = TypeVar('T')
 
@@ -28,11 +28,23 @@ class RipStartStopMessage(SocketMessage):
   index: int
   state: Literal['stop', 'start']
 
+# MKV Messages
 class ProgressMessage(SocketMessage): ...
+class CurrentProgressMessage(CurrentProgressModel, ProgressMessage): ...
+class TotalProgressMessage(TotalProgressModel, ProgressMessage): ...
+class ProgressValueMessage(ProgressValueModel, SocketMessage): ...
+class SourceInfoMessage(SourceInfoModel, SocketMessage): ...
+class TitleInfoMessage(TitleInfoModel, SocketMessage): ...
+class TrackInfoMessage(TrackInfoModel, SocketMessage): ...
 
-class CurrentProgressMessage(ProgressMessage, CurrentProgressModel): ...
+def mkv_message_class_from_raw(raw: str):
+  model_cls = mkv_model_from_raw(raw)
+  message_cls = globals()[model_cls.__name__.replace('Model', 'Message')]
+  return message_cls
 
-class TotalProgressMessage(ProgressMessage, TotalProgressModel): ...
-
-class ProgressValueMessage(SocketMessage, ProgressValueModel): ...
-
+def mkv_message_from_raw(raw: str):
+  try: 
+    message_cls = mkv_message_class_from_raw(raw)
+    return message_cls(raw)
+  except KeyError:
+    return LogMessage(message=raw)

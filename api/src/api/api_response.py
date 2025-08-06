@@ -21,8 +21,8 @@ T = TypeVar('T')
 class APIResponse(BaseModel, Generic[T]):
   status: Status
   data: T | None = None
-  def __init__(self, status: Status, **data):
-    super().__init__(status=status, **data)
+  def __init__(self, status: Status, data):
+    super().__init__(status=status, data=data)
 
 class PaginatedAPIResponse(APIResponse[T]):
   page: int

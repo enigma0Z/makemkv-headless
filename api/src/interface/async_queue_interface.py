@@ -1,23 +1,28 @@
 #!/usr/bin/env python3
 
-from asyncio import QueueShutDown
+from asyncio import QueueShutDown, create_task
 from asyncio.queues import Queue
 
 from src.api.socket import SocketConnectionManager
 from src.api.state import STATE
 from src.interface.base_interface import BaseInterface
 
-from src.models.socket import CurrentProgressMessage, LogMessage, ProgressMessage, ProgressValueMessage, RipStartStopMessage, SocketMessage, TotalProgressMessage
+from src.interface.target import Target
+from src.models.makemkv import from_raw
+from src.models.socket import CurrentProgressMessage, LogMessage, ProgressMessage, ProgressValueMessage, RipStartStopMessage, SocketMessage, TotalProgressMessage, mkv_message_from_raw
 
 import logging
 logger = logging.getLogger(__name__)
 
 PROGRESS_SEND_THRESHOLD = 0.001
 
+Target.MKV
+
 class AsyncQueueInterface(BaseInterface):
   def __init__(self, socket: SocketConnectionManager = None):
     self.queue = Queue()
     self.socket = socket
+    logger.debug(f'Initializing {self.__class__.__name__} with socket {socket}')
 
   def __enter__(self, *args, **kwargs):
     '''Not implemented'''
@@ -35,7 +40,10 @@ class AsyncQueueInterface(BaseInterface):
     '''Not implemented'''
     pass
 
-  async def send(self, message: SocketMessage):
+  def send(self, message: SocketMessage):
+    return create_task(self._send(message))
+
+  async def _send(self, message: SocketMessage):
     if isinstance(message, CurrentProgressMessage) or isinstance(message, TotalProgressMessage):
       await self.queue.put(message)
       STATE.update_status(message)
@@ -90,18 +98,25 @@ class AsyncQueueInterface(BaseInterface):
 
     return super().send(message)
 
-  async def print(self, *text, **kwargs):
-    sep = kwargs['sep'] if 'sep' in kwargs else ' '
-    if 'target' in kwargs and kwargs['target'] != 'status':
-      await self.send(LogMessage(message=sep.join(text)))
+  def print(self, *text, sep=' ', target: Target=Target.INPUT, **kwargs):
+    match target:
+      case Target.MKV:
+        self.send(mkv_message_from_raw(sep.join(text)))
+      case Target.INPUT | Target.SORT:
+        self.send(LogMessage(message=sep.join(text)))
+      case Target.STATUS:
+        pass
+
 
   async def run(self):
     '''Start the queue processing thread'''
     try:
       while True:
         message = await self.queue.get()
+        logger.debug(f'Received {message.__class__.__name__} {message}')
         if (isinstance(message, SocketMessage)):
-          self.socket.broadcast(message)
+          logger.debug(f'Broadcasting message {message.type} on {self.socket}')
+          await self.socket.broadcast(message)
     except QueueShutDown:
       return
 

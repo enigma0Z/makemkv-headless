@@ -1,10 +1,11 @@
 from functools import lru_cache
 import logging
 from threading import Lock
+from traceback import format_exc
 
 from fastapi import APIRouter
 
-from src.api.api_response import APIError, APIException
+from src.api.api_response import APIError, APIException, APIResponse
 from src.api.state import STATE
 from src.config import CONFIG
 # from src.message.toc_complete_message_event import TOCCompleteMessageEvent
@@ -16,7 +17,7 @@ lock = Lock()
 
 router = APIRouter(prefix="/toc")
 
-@lru_cache
+# @lru_cache
 def get_toc_from_disc(source):
   toc = TOC()
   toc.get_from_disc(source)
@@ -29,8 +30,9 @@ async def get_toc():
     with lock:
       toc = get_toc_from_disc(CONFIG.source)
       STATE.redux.toc = toc
-      return toc
+      return APIResponse("success", toc)
   except Exception as ex:
+    logger.error(format_exc())
     raise APIException(500, APIError("error", ex))
 
 @router.get('.cache.clear')

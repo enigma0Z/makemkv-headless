@@ -4,9 +4,9 @@ import { throttle } from "lodash";
 
 import rip, { ripStateIsValid, type RipState } from './rip'
 import toc, { type TocState } from './toc'
-import endpoints from "../endpoints";
 import tmdb, { type TmdbState } from "./tmdb";
 import socket, { type SocketState } from "./socket";
+import { endpoints } from "../endpoints";
 
 export type RootState = {
   rip: RipState,

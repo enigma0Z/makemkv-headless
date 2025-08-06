@@ -5,9 +5,9 @@ import { useDispatch } from "react-redux"
 import { ContentFormControl, FirstEpisodeFormControl, LibraryFormControl, MediaFormControl, NameIdFormControl, NameOptionWrapper, SeasonFormControl, SplitSegmentsFormControl, StyledFormGroup } from "./ContentForm.styles"
 import React, { useCallback, useState } from "react"
 import { throttle } from "lodash"
-import endpoints from "@/api/endpoints"
-import type { TmdbSearchResult } from "@/api/types/tmdb"
+import type { TmdbSearchResult } from "@/api/v1/types/Tmdb"
 import { AutocompleteWrapper } from "@/theme"
+import { endpoints, type ApiModel } from "@/api/endpoints"
 
 export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
 
@@ -38,21 +38,21 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
     if (!foundOption && searchText !== '') {
       if (content?.toLowerCase() === 'show') {
         fetch(endpoints.tmdb.show(searchText), { method: 'GET' })
-        .then(response => response.json())
-        .then(json => {
-          json.forEach((option: TmdbSearchResult) => {
+        .then(response => response.json() as Promise<ApiModel['v1']['tmdb/show']>)
+        .then(({ data }) => {
+          data.forEach((option: TmdbSearchResult) => {
             option.label = getOptionLabel(option)
           })
-          setNameOptions(json)
+          setNameOptions(data)
         })
       } else if (content?.toLowerCase() === 'movie') {
         fetch(endpoints.tmdb.movie(searchText), { method: 'GET' })
-        .then(response => response.json())
-        .then(json => {
-          json.forEach((option: TmdbSearchResult) => {
+        .then(response => response.json() as Promise<ApiModel['v1']['tmdb/movie']>)
+        .then(({ data }) => {
+          data.forEach((option: TmdbSearchResult) => {
             option.label = getOptionLabel(option)
           })
-          setNameOptions(json)
+          setNameOptions(data)
         })
       }
     }

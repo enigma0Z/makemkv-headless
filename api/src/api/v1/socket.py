@@ -1,6 +1,6 @@
 import logging
 
-from api.socket import socket
+from src.api.socket import socket
 from src.models import socket as model
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
