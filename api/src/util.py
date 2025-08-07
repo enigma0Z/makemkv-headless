@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
+from asyncio import create_subprocess_shell
+from asyncio.subprocess import PIPE
 from math import trunc
 import os
 import re
+import shlex
 import shutil
 import subprocess
 
@@ -42,7 +45,7 @@ def clearing_line(line=' '):
   if len(line) == 0: line = ' '
   return line + ' ' * (-len(line) % shutil.get_terminal_size().columns)
 
-def rsync(source, dest, interface=PlaintextInterface()):
+async def rsync(source, dest, interface=PlaintextInterface()):
   logger.debug(' '.join([
     'rsync() called with args:',
     ', '.join([
@@ -54,36 +57,23 @@ def rsync(source, dest, interface=PlaintextInterface()):
   # Put output files into their final destinations if the rip was done locally
   interface.print(f'Copying local rip from {source} to {dest}', target=Target.SORT)
   notify(f'Copying local rip to {dest}')
-  process = subprocess.Popen(
-    [ 'rsync', '-av', source, dest ], 
-    stdout=subprocess.PIPE,
-    stderr=subprocess.PIPE,
-    preexec_fn=os.setpgrp,
+  process = await create_subprocess_shell(
+    shlex.join([ 'rsync', '-av', source, dest ]),
+    stdout=PIPE,
+    stderr=PIPE
   )
 
-  for b_line in process.stdout:
-    line = b_line.decode('utf-8').strip()
-    
+  while not process.stdout.at_eof():
+    line = (await process.stdout.readline()).decode('utf-8').strip()
     interface.print(line, target=Target.SORT)
     logger.info(line)
-  
-  stderr_lines = []
 
-  for b_line in process.stderr:
-    line = b_line.decode('utf-8').strip()
-    logger.error(line)
-    stderr_lines.append(line)
-
-  if process.returncode == 0:
+  if process.returncode == 0 or process.returncode == None:
     line = f'rsync completed successfully for {os.path.split(source)[-1]}'
     interface.print(line, target=Target.SORT)
   else:
     line = f'RSYNC FAILED FOR {dest} with return code {process.returncode}'
     interface.print(line, target=Target.SORT)
-
-    for line in stderr_lines:
-      line.strip()
-      interface.print(line, target=Target.SORT)
 
 def sanitize(value: str): # Strips out non alphanumeric characters and replaces with "_"
   return re.sub(r'[^\w]', '_', value.lower())

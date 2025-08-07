@@ -72,7 +72,7 @@ class State(StateModel):
     if isinstance(data, TotalProgressMessage):
       self.socket.total_status = data.name
     if isinstance(data, CurrentProgressMessage):
-      self.data.socket.current_status = data.name
+      self.socket.current_status = data.name
 
       if (
         self.socket.current_title != None

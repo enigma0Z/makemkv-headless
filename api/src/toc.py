@@ -15,6 +15,7 @@ from src.config import CONFIG
 from src.interface import get_interface
 from src.interface.base_interface import BaseInterface
 from src.interface.target import Target
+from src.interface.plaintext_interface import PlaintextInterface
 
 import logging
 

@@ -338,7 +338,7 @@ export const TOCGridRow = ({ index, data, statusText, titleType, episodeNumber, 
   }
 
   function isCompleteEnough(progress: number) {
-    throw new Error("Function not implemented.")
+    return (1 - progress < 0.01)
   }
 
   return <>

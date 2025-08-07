@@ -10,6 +10,7 @@ from src.models.sort import ShowInfoModel, SortInfoModel
 logger = logging.getLogger(__name__)
 
 from src import features
+from src.interface import get_interface
 from src.json_serializable import JSONSerializable
 from src.mkvtoolnix import split_mkv
 from src.toc import TOC
@@ -42,12 +43,12 @@ class ShowInfo(ShowInfoModel, SortInfo):
   def __str__(self):
     return f'{self.path()} - First Episode: {self.first_episode}'
 
-def sort_titles(
+async def sort_titles(
     toc: TOC,
     rip_path_base: str,  # /tmp/XXXXXX
     dest_path_base: str, # user@host:/path/to/media/library
     sort_info: SortInfo,
-    interface: BaseInterface,
+    interface: BaseInterface = get_interface(),
 ):
   logger.debug(
     'sort_titles() called with args; ' 

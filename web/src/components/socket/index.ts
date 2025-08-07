@@ -28,8 +28,9 @@ socket.on("LogMessage", (value: LogMessage) => {
   store.dispatch(socketActions.appendToMessages(value.message))
 })
 
-socket.on("ProgressMessage", (value: ProgressMessage) => {
+const progressMessageHandler = (value: ProgressMessage) => {
   // Set index if current index is undefined
+  console.debug('ProgressMessage', value)
   const socketState = store.getState().socket.ripState
   const nextSocketState: SocketState['ripState'] = { 
     ...socketState, 
@@ -70,9 +71,13 @@ socket.on("ProgressMessage", (value: ProgressMessage) => {
   }
 
   store.dispatch(socketActions.updateSocketState(nextSocketState))
-})
+}
+
+socket.on("CurrentProgressMessage", progressMessageHandler)
+socket.on("TotalProgressMessage", progressMessageHandler)
 
 socket.on("ProgressValueMessage", (value: ProgressValueMessage) => {
+  // console.debug('ProgressValueMessage', value)
   const socketState = store.getState().socket.ripState
   const nextSocketState: SocketState['ripState'] = {
     current_progress: socketState.current_progress?.slice(),

@@ -44,13 +44,14 @@ class AsyncQueueInterface(BaseInterface):
     return create_task(self._send(message))
 
   async def _send(self, message: SocketMessage):
+    # logger.debug(f'{message}')
     if isinstance(message, CurrentProgressMessage) or isinstance(message, TotalProgressMessage):
       await self.queue.put(message)
       STATE.update_status(message)
 
     elif isinstance(message, ProgressValueMessage):
       progress_before = STATE.get_progress()
-      STATE.update_progress(message.data)
+      STATE.update_progress(message)
       progress_after = STATE.get_progress()
 
       send_update = True
@@ -114,7 +115,11 @@ class AsyncQueueInterface(BaseInterface):
     try:
       while True:
         message = await self.queue.get()
+        if isinstance(message, ProgressMessage):
+          logger.info(f'progress message in queue {message}')
         if (isinstance(message, SocketMessage)):
+          if isinstance(message, ProgressMessage):
+            logger.info(f'sending progress message {message} to clients {self.socket.active_connections}')
           await self.socket.broadcast(message)
     except QueueShutDown:
       return

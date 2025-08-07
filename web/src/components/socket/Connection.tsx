@@ -66,11 +66,14 @@ export class SocketConnection {
   }
 
   handleMessage(data: BaseMessageType) {
-    console.debug('Socket message', data)
     if (data.type === 'ServerPongMessage') {
       this.pongTimestamp = Date.now()
     } else if (data.type in this.messageHandlers) {
+      if (data.type !== 'ProgressValueMessage')
+        console.debug(data.type, data)
       this.messageHandlers[data.type](data)
+    } else {
+      console.info('Received unhandled message', data.type, data)
     }
   }
 

@@ -27,8 +27,8 @@ async def rip_disc(
     source, 
     dest,
     rip_titles=['all'],
-    interface: BaseInterface = get_interface(),
 ):
+  interface = get_interface()
   logger.info(f'Backing up {source} to {dest}')
   interface.print(f'Backing up {source} to {dest}', target=Target.SORT)
 
@@ -52,7 +52,6 @@ async def rip_disc(
 
       while not process.stdout.at_eof():
         line = (await process.stdout.readline()).decode().strip()
-
         interface.send(mkv_message_from_raw(line))
 
     interface.send(RipStartStopMessageEvent(index=rip_title, state="stop"))
