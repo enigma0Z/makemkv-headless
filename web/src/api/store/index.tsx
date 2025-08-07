@@ -18,7 +18,7 @@ export type RootState = {
 const updateRipStateOnApi = throttle(async (ripState: RipState) => {
   if (ripStateIsValid(ripState)) {
     console.info("Updating rip state on API")
-    fetch(endpoints.state.get(), { method: 'PUT', body: JSON.stringify({
+    fetch(endpoints.state.get(), { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({
       redux: { rip: ripState }
     })})
   } else {

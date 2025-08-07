@@ -2,13 +2,18 @@ import json
 from math import ceil
 
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
-from src.api.api_response import APIResponse, PaginatedAPIResponse
+from src.api.api_response import APIError, APIResponse, PaginatedAPIResponse
 
 import logging
 
 from src.api.state import STATE
+from src.models.state import StateModel
 logger = logging.getLogger(__name__)
+
+class RequestModel(BaseModel):
+  pass
 
 router = APIRouter(prefix="/state")
 
@@ -71,27 +76,27 @@ def get_state_select(state_path: str):
   except Exception as ex:
     raise HTTPException(500, APIResponse(status="error"))
 
-@router.get('/api/v1/state.paginated/<path:path>')
-def get_state_paginated(path: str):
-  try:
-    page = int(request.args['page']) if 'page' in request.args else 0
-    page_size = int(request.args['page_size']) if 'page_size' in request.args else DEFAULT_PAGE_SIZE
-    filter_keys = request.args['filter_keys'].split(',') if 'filter_keys' in request.args else []
-    return get_state_by_path(path, page, page_size, filter_keys)
+# @router.get('/api/v1/state.paginated/<path:path>')
+# def get_state_paginated(path: str):
+#   try:
+#     page = int(request.args['page']) if 'page' in request.args else 0
+#     page_size = int(request.args['page_size']) if 'page_size' in request.args else DEFAULT_PAGE_SIZE
+#     filter_keys = request.args['filter_keys'].split(',') if 'filter_keys' in request.args else []
+#     return get_state_by_path(path, page, page_size, filter_keys)
 
-  except Exception as ex:
-    logger.error(ex)
-    return (APIResponse("error", f'{ex}'), 400)
+#   except Exception as ex:
+#     logger.error(ex)
+#     return (APIResponse("error", f'{ex}'), 400)
 
   
-# @router.put('/api/v1/state')
-# def put_state():
-#   try:
-#     data = json.loads(request.data.decode('utf-8'))
-#     STATE.data['redux']['rip'] = data['redux']['rip']
-#     return data
-#   except:
-#     return ("failure", 400)
+@router.put('')
+@router.put('/')
+def put_state(data: StateModel):
+  try:
+    STATE.redux.rip = data.redux.rip
+    return data
+  except Exception as ex:
+    return APIError(400)
 
 @router.get('.reset')
 def reset_state():

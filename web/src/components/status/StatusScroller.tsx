@@ -9,11 +9,9 @@ import { useAppSelector } from "@/api/store";
 export const StatusScroller = () => {
 
   const connected = useAppSelector((state) => state.socket.ripState.connected )
-  const messageEvents = useAppSelector((state) => state.socket.messages)
+  const messages = useAppSelector((state) => state.socket.messages)
 
   const [isMinimized, setIsMinimized] = useState<boolean>(false)
-
-  const messages = messageEvents?.map((event) => event.text)
 
   const handleOnScroll = () => { };
 

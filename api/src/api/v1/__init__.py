@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from . import config
 from . import disc
+from . import rip
 from . import socket
 from . import state
 from . import tmdb
@@ -11,6 +12,7 @@ from . import queue
 router = APIRouter(prefix="/v1")
 router.include_router(config.router)
 router.include_router(disc.router)
+router.include_router(rip.router)
 router.include_router(socket.router)
 router.include_router(state.router)
 router.include_router(tmdb.router)

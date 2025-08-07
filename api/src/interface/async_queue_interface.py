@@ -95,6 +95,7 @@ class AsyncQueueInterface(BaseInterface):
     
     else:
       await self.queue.put(message)
+      logger.info(message)
 
     return super().send(message)
 
@@ -113,9 +114,7 @@ class AsyncQueueInterface(BaseInterface):
     try:
       while True:
         message = await self.queue.get()
-        logger.debug(f'Received {message.__class__.__name__} {message}')
         if (isinstance(message, SocketMessage)):
-          logger.debug(f'Broadcasting message {message.type} on {self.socket}')
           await self.socket.broadcast(message)
     except QueueShutDown:
       return

@@ -1,4 +1,12 @@
 export type Response<T> = {
-  status: string
+  status: (
+    'success' |
+    'failure' |
+    'started' |
+    'in progress' |
+    'done' |
+    'stopped' |
+    'error'
+  ),
   data: T
 }

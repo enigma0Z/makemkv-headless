@@ -16,24 +16,6 @@ from src.toc import TOC
 from src.util import rsync, sanitize
 
 class SortInfo(SortInfoModel):
-  def __init__(
-      self,
-      name: str,
-      id: str,
-      main_indexes: list[int],
-      extra_indexes: list[int],
-      split_segments: list[int] = [],
-      id_db: str = 'tmdbid',
-      **kwargs
-  ):
-    self.name = name
-    self.id = id
-    self.main_indexes = main_indexes
-    self.extra_indexes = extra_indexes
-    self.split_segments = split_segments
-    self.id_db = id_db
-    self.index = -1 # The first call of next_file will increment to 0
-
   def path(self):
     return self.base_path()
 
@@ -51,16 +33,6 @@ class SortInfo(SortInfoModel):
     return self.path()
 
 class ShowInfo(ShowInfoModel, SortInfo):
-  def __init__(
-      self,
-      season_number: int,
-      first_episode: int,
-      **kwargs
-  ):
-    self.season_number = season_number
-    self.first_episode = first_episode
-    super().__init__(**kwargs)
-
   def path(self):
     return path.join(super().path(), f'Season {self.season_number:02d}')
 

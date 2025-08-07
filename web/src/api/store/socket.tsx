@@ -23,7 +23,7 @@ export interface SocketState {
 
     connected?: boolean;
   }
-  messages: MessageEvent[]
+  messages: string[]
 }
 
 const initialState: SocketState = {
@@ -42,7 +42,7 @@ const socketSlice = createSlice({
     resetSocketState: (state, action: PayloadAction<SocketState['ripState']> ) => {
       state.ripState = { ...initialState.ripState, ...action.payload }
     },
-    appendToMessages: (state, action: PayloadAction<MessageEvent>) => {
+    appendToMessages: (state, action: PayloadAction<string>) => {
       if (!state.messages) state.messages = []
       state.messages = state.messages.concat(action.payload).slice(-100)
     }

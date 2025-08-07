@@ -12,6 +12,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { StatusWrapper } from "./ButtonBar.styles";
 import { endpoints, type ApiModel } from "@/api/endpoints";
+import { ripActions } from "@/api/store/rip";
 
 type Props = {}
 
@@ -57,8 +58,10 @@ export const ButtonBar = ({ }: Props) => {
   const handleCancelRip = () => {
     fetch(endpoints.rip.stop(), { method: 'GET' })
     .then((response) => response.json() as Promise<ApiModel['v1']['rip.stop']>)
-    .then(({ status, data }) => {
-      console.log('Rip stop response', status, data)
+    .then(({ status }) => {
+      if (status === 'stopped') {
+        dispatch(socketActions.updateSocketState({ rip_started: false }))
+      }
     })
   };
 

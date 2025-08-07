@@ -1,9 +1,13 @@
 #!usr/bin/env python3
 
+from asyncio import create_subprocess_shell
+from asyncio.subprocess import PIPE
 from functools import lru_cache
 from json import dumps
 import re
-import subprocess
+import shlex
+from traceback import format_exc
+# import subprocess
 
 from pydantic import PrivateAttr
 
@@ -11,7 +15,6 @@ from src.config import CONFIG
 from src.interface import get_interface
 from src.interface.base_interface import BaseInterface
 from src.interface.target import Target
-from src.interface.plaintext_interface import PlaintextInterface
 
 import logging
 
@@ -37,25 +40,30 @@ def format_records(lines):
 class TOC(TOCModel):
   _interface: BaseInterface = PrivateAttr(default_factory=get_interface)
 
-  def __getitem__(self, item):
-    if item == "lines":
-      return self.lines
-    elif item == "source":
-      return self.source
+  # def __getitem__(self, item):
+  #   if item == "lines":
+  #     return self.lines
+  #   elif item == "source":
+  #     return self.source
 
-  def get_from_disc(self, source):
+  async def get_from_disc(self, source):
     self._interface.print('Loading disc TOC', target=Target.MKV)
 
     # Load the disc TOC from makemkvcon output
-    with subprocess.Popen(
-      [CONFIG.makemkvcon_path, '--noscan', '--robot', 'info', source],
-      stdout=subprocess.PIPE,
-      stderr=subprocess.PIPE,
-    ) as process:
-      for b_line in process.stdout:
-        line = b_line.decode('UTF-8').strip()
-        self.lines += [line]
-        self._interface.send(mkv_message_from_raw(line))
+    process = await create_subprocess_shell(
+      shlex.join([CONFIG.makemkvcon_path, '--noscan', '--robot', 'info', source]),
+      stdout=PIPE,
+      stderr=PIPE
+    )
+
+    while not process.stdout.at_eof():
+      stdout = await process.stdout.readline()
+      self.lines.append(stdout.decode().strip())
+      try:
+        self._interface.send(mkv_message_from_raw(self.lines[-1]))
+      except Exception as ex:
+        logger.error(f'Failed to send {self.lines[-1]} to FE with error {ex}, {format_exc()}')
+        raise ex
 
     self.load()
 

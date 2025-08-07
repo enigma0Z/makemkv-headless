@@ -19,9 +19,9 @@ function App() {
 
   if (!tmdbConfiguration) {
     fetch(endpoints.tmdb.configuration())
-      .then(response => response.json())
-      .then(json => {
-        dispatch(tmdbActions.setTmdbConfiguration(json))
+      .then(response => response.json() as Promise<ApiModel['v1']['tmdb/configuration']>)
+      .then(({ data }) => {
+        dispatch(tmdbActions.setTmdbConfiguration(data))
       })
   }
 

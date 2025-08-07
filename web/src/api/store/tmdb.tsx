@@ -1,8 +1,8 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 export type TmdbConfiguration = {
-  change_keys: string[];
-  images: {
+  change_keys?: string[];
+  images?: {
     base_url: string;
     secure_base_url: string;
     backdrop_sizes: string[];

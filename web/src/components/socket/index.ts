@@ -18,14 +18,14 @@ const throttledUpdateSocketState = throttle(
 socket.connect()
 
 socket.on("LogMessage", (value: LogMessage) => {
-  if (value.text.startsWith("Copy complete")) {
+  if (value.message.startsWith("Copy complete")) {
     store.dispatch(socketActions.updateSocketState({
       rip_started: false,
       current_status: undefined
     }))
   }
 
-  store.dispatch(socketActions.appendToMessages(value))
+  store.dispatch(socketActions.appendToMessages(value.message))
 })
 
 socket.on("ProgressMessage", (value: ProgressMessage) => {

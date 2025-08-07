@@ -18,9 +18,9 @@ lock = Lock()
 router = APIRouter(prefix="/toc")
 
 # @lru_cache
-def get_toc_from_disc(source):
+async def get_toc_from_disc(source):
   toc = TOC()
-  toc.get_from_disc(source)
+  await toc.get_from_disc(source)
   return toc
 
 @router.get('')
@@ -28,7 +28,7 @@ def get_toc_from_disc(source):
 async def get_toc():
   try:
     with lock:
-      toc = get_toc_from_disc(CONFIG.source)
+      toc = await get_toc_from_disc(CONFIG.source)
       STATE.redux.toc = toc
       return APIResponse("success", toc)
   except Exception as ex:

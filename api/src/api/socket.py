@@ -22,9 +22,9 @@ class SocketConnectionManager:
     await websocket.send_json(data.model_dump())
 
   async def broadcast(self, data: model.SocketMessage):
-    logger.debug(f'{self} Broadcasting message {data.type} to {self.active_connections}')
+    # logger.debug(f'{self} Broadcasting message {data.type} to {self.active_connections}')
     for connection in self.active_connections:
-      logger.debug(f'Sending broadcast to {connection}')
+      # logger.debug(f'Sending broadcast to {connection}')
       await self.send(data, connection)
 
 socket = SocketConnectionManager()

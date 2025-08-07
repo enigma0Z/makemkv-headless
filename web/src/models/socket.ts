@@ -38,7 +38,7 @@ export type ProgressValueMessage = BaseMessageType & {
 }
 
 export type LogMessage = BaseMessageType & {
-  text: string
+  message: string
 }
 
 export type RipStartStopMessage = BaseMessageType & {

@@ -177,7 +177,7 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
                           <div>{option.overview}</div>
                         </div>
                         <div>
-                          {tmdbConfiguration && option.poster_path && <img src={`${tmdbConfiguration.images.base_url}${tmdbConfiguration.images.poster_sizes[0]}${option.poster_path}`} />}
+                          {tmdbConfiguration?.images && option.poster_path && <img src={`${tmdbConfiguration.images.base_url}${tmdbConfiguration.images.poster_sizes[0]}${option.poster_path}`} />}
                         </div>
                       </NameOptionWrapper>
                     </Card>

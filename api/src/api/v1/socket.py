@@ -18,7 +18,7 @@ async def websocket_root(websocket: WebSocket):
       data = await websocket.receive_json()
       try:
         message = getattr(model, data['type'])(**data)
-        logger.debug(f'{websocket} received {message}')
+        # logger.debug(f'{websocket} received {message}')
 
         if isinstance(message, model.ClientPingMessage):
           await socket.send(model.ServerPongMessage(), websocket)

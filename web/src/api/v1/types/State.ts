@@ -20,6 +20,7 @@ export type State = {
     total_status?: string;
 
     rip_started?: boolean;
+    
   }
 }
 
