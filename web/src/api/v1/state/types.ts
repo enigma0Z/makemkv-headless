@@ -1,6 +1,6 @@
-import type { RipState } from "@/api/store/rip";
-import type { TocState } from "@/api/store/toc";
-import type { SocketProgress, SocketState } from "@/api/store/socket";
+import type { RipState } from "@/api/v1/rip/store";
+import type { TocState } from "@/api/v1/toc/store";
+import type { SocketProgress, SocketState } from "@/api/v1/socket/store";
 
 import type { ProgressMessageEvent } from "@/components/socket/Context";
 

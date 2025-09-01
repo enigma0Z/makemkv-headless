@@ -4,7 +4,7 @@ import { StatusScrollerWrapper, StatusScrollerWrapperMinimized } from "./StatusS
 
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useAppSelector } from "@/api/store";
+import { useAppSelector } from "@/api";
 
 export const StatusScroller = () => {
 

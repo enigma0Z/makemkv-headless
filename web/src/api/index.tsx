@@ -2,11 +2,12 @@ import { configureStore, type Middleware, type UnknownAction } from "@reduxjs/to
 import { useDispatch, useSelector } from "react-redux";
 import { throttle } from "lodash";
 
-import rip, { ripStateIsValid, type RipState } from './rip'
-import toc, { type TocState } from './toc'
-import tmdb, { type TmdbState } from "./tmdb";
-import socket, { type SocketState } from "./socket";
-import { endpoints } from "../endpoints";
+import rip, { ripStateIsValid, type RipState } from './v1/rip/store'
+import toc, { type TocState } from './v1/toc/store'
+import tmdb, { type TmdbState } from "./v1/tmdb/store";
+import socket, { type SocketState } from "./v1/socket/store";
+import { BACKEND, endpoints } from "./endpoints";
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export type RootState = {
   rip: RipState,
@@ -26,6 +27,11 @@ const updateRipStateOnApi = throttle(async (ripState: RipState) => {
   }
 }, 500, {leading: false, trailing: true})
 
+export const api = createApi({
+  baseQuery: fetchBaseQuery({ baseUrl: BACKEND }),
+  endpoints: () => ({}),
+})
+
 const updateApiMiddleware: Middleware<{}, RootState> = store => next => action => {
   if ((action as UnknownAction).type.startsWith('rip/')) {
     const result = next(action)
@@ -40,9 +46,10 @@ const updateApiMiddleware: Middleware<{}, RootState> = store => next => action =
 
 export const store = configureStore({
   middleware: (getDefaultMiddleware) => getDefaultMiddleware()
-    .concat(updateApiMiddleware),
+    .concat(updateApiMiddleware)
+    .concat(api.middleware),
   reducer: {
-    rip, toc, tmdb, socket
+    rip, toc, tmdb, socket, api: api.reducer
   }
 })
 

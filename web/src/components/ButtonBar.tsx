@@ -1,7 +1,7 @@
 import { AppBar, Button, IconButton, LinearProgress, Toolbar, Tooltip, Typography } from "@mui/material";
-import { useAppDispatch, useAppSelector } from "@/api/store";
-import { socketActions, type SocketProgress } from "@/api/store/socket";
-import { tocActions } from "@/api/store/toc";
+import { useAppDispatch, useAppSelector } from "@/api";
+import { socketActions, type SocketProgress } from "@/api/v1/socket/store";
+import { tocActions } from "@/api/v1/toc/store";
 import { ConfirmationDialog } from "./ConfirmationModal";
 import { useState } from "react";
 
@@ -12,7 +12,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { StatusWrapper } from "./ButtonBar.styles";
 import { endpoints, type ApiModel } from "@/api/endpoints";
-import { ripActions } from "@/api/store/rip";
+import { ripActions } from "@/api/v1/rip/store";
 
 type Props = {}
 

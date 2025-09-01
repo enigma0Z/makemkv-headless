@@ -1,5 +1,5 @@
-import { store } from "@/api/store";
-import { socketActions, type SocketState } from "@/api/store/socket";
+import { store } from "@/api";
+import { socketActions, type SocketState } from "@/api/v1/socket/store";
 import { isRippingStatus, type LogMessage, type ProgressMessage, type ProgressValueMessage, type RipStartStopMessage } from "@/models/socket";
 import { throttle } from "lodash";
 import { SocketConnection } from "./Connection";

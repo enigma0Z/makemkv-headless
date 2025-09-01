@@ -1,6 +1,6 @@
 import { createContext, useState } from "react";
 
-import { initialApiState, type ApiState } from "@/api/v1/types/State";
+import { initialApiState, type ApiState } from "@/api/v1/state/types";
 
 export type BaseMessageEventData = { // message.py BaseMessage
   type: string;

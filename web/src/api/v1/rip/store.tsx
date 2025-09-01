@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { ShowInfo, SortInfo } from "../v1/types/SortInfo";
+import type { ShowInfo, SortInfo } from "../sort/types";
 import { uniqueFilter } from "@/util/array";
-import type { TmdbSearchResult } from "../v1/types/Tmdb";
+import type { TmdbSearchResult } from "../tmdb/types";
 
 export interface RipState {
   destination: RipStateDestination;
@@ -51,7 +51,9 @@ const ripSlice = createSlice({
   initialState,
   reducers: {
     setRipData: (state, action: PayloadAction<RipState | undefined>) => {
+      console.debug('setRipData', action.payload)
       if (action.payload) {
+        console.debug('applying')
         state.destination = action.payload.destination ?? initialState.destination
         state.sort_info = action.payload.sort_info ?? initialState.sort_info
         state.rip_all = action.payload.rip_all ?? initialState.rip_all

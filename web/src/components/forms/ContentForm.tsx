@@ -1,11 +1,11 @@
-import { useAppSelector } from "@/api/store"
-import { ripActions } from "@/api/store/rip"
+import { useAppSelector } from "@/api"
+import { ripActions } from "@/api/v1/rip/store"
 import { Autocomplete, Card, InputLabel, Link, MenuItem, Select, TextField } from "@mui/material"
 import { useDispatch } from "react-redux"
 import { ContentFormControl, FirstEpisodeFormControl, LibraryFormControl, MediaFormControl, NameIdFormControl, NameOptionWrapper, SeasonFormControl, SplitSegmentsFormControl, StyledFormGroup } from "./ContentForm.styles"
 import React, { useCallback, useState } from "react"
 import { throttle } from "lodash"
-import type { TmdbSearchResult } from "@/api/v1/types/Tmdb"
+import type { TmdbSearchResult } from "@/api/v1/tmdb/types"
 import { AutocompleteWrapper } from "@/theme"
 import { endpoints, type ApiModel } from "@/api/endpoints"
 
@@ -24,34 +24,36 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
   const tmdbConfiguration = useAppSelector((state) => state.tmdb.configuration)
   const tmdbSelection = useAppSelector((state) => state.rip.tmdb_selection)
 
-  const [ nameValue, setNameValue ] = useState<TmdbSearchResult | null>(null)
-  const [ nameOptions, setNameOptions ] = useState<(TmdbSearchResult)[]>(tmdbSelection ? [ tmdbSelection ] : [])
+  const [ nameValue, setNameValue ] = useState<string | null>(null)
+  const [ nameOptions, setNameOptions ] = useState<(TmdbSearchResult)[]>([])
+
   const [ splitSegmentsValue, setSplitSegmentsValue ] = useState<string>()
 
-  const getOptionLabel = (option: TmdbSearchResult) => 
-    option ? `${option.name ?? option.title} / ${option.first_air_date ?? option.release_date} (tmdbid-${option.id})` : ""
-  
+  const getOptionLabel = (option: TmdbSearchResult | string | undefined | null) => {
+    if (option && typeof option === "string") {
+      return option
+    } else if (option && typeof option === "object") {
+      return `${option.name ?? option.title} / ${option.first_air_date ?? option.release_date} (tmdbid-${option.id})`
+    } else {
+      return ''
+    }
+  }
+
   const updateOptions = useCallback(throttle((searchText: string) => {
     const foundOption = nameOptions?.find((option) => (
-      option.label === searchText
+      getOptionLabel(option) === searchText
     ))
     if (!foundOption && searchText !== '') {
       if (content?.toLowerCase() === 'show') {
         fetch(endpoints.tmdb.show(searchText), { method: 'GET' })
         .then(response => response.json() as Promise<ApiModel['v1']['tmdb/show']>)
         .then(({ data }) => {
-          data.forEach((option: TmdbSearchResult) => {
-            option.label = getOptionLabel(option)
-          })
           setNameOptions(data)
         })
       } else if (content?.toLowerCase() === 'movie') {
         fetch(endpoints.tmdb.movie(searchText), { method: 'GET' })
         .then(response => response.json() as Promise<ApiModel['v1']['tmdb/movie']>)
         .then(({ data }) => {
-          data.forEach((option: TmdbSearchResult) => {
-            option.label = getOptionLabel(option)
-          })
           setNameOptions(data)
         })
       }
@@ -59,12 +61,14 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
   }, 2000, {trailing: true, leading: false}), [content, nameOptions]);
 
   const handleNameOnInputChange = (_event: React.SyntheticEvent, value: string) => {
-    setNameValue({ label: value })
+    setNameValue(value)
     updateOptions(value)
   }
 
-  const handleNameOnChange = (_event: React.SyntheticEvent, value: TmdbSearchResult | null) => {
-    if ((value?.name || value?.title) && value?.id) {
+  const handleNameOnChange = (_event: React.SyntheticEvent, value: TmdbSearchResult | string | undefined | null) => {
+    if (value && typeof value === "string") {
+
+    } else if (value && typeof value === "object" && (value?.name || value?.title) && value?.id) {
       dispatch(ripActions.setName(value?.name! ?? value?.title!))
       dispatch(ripActions.setId(`${value.id}`))
       dispatch(ripActions.setTmdbSelection(value))
@@ -147,21 +151,22 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
         >
           <AutocompleteWrapper>
             <Autocomplete
+              freeSolo forcePopupIcon
               disabled={content === "" || content === undefined || content === null}
               renderInput={(params) => ( <TextField {...params} label="Name" />)} 
               onInputChange={handleNameOnInputChange}
               onChange={handleNameOnChange}
-              options={nameOptions ?? []}
-              getOptionLabel={(option) => option.label ?? ''}
+              options={[...nameOptions, tmdbSelection]}
+              getOptionLabel={(option) => getOptionLabel(option)}
               filterOptions={(options, state) => {
                 const filteredOptions = options.filter((option) => {
                   state.getOptionLabel(option).startsWith(state.inputValue)
                 })
                 return filteredOptions.length > 0 ? filteredOptions : options
               }}
-              renderOption={({key, ...props}, option: TmdbSearchResult, _state, ownerState) => {
+              renderOption={({key, ...props}, option: TmdbSearchResult | undefined, _state, ownerState) => {
                 return (
-                  <li
+                  option && <li
                     key={key}
                     {...props}
                   >
@@ -185,6 +190,7 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
                 )
               }}
               value={nameValue ?? tmdbSelection ?? null}
+              // defaultValue={tmdbSelection ?? null}
               fullWidth
             />
           </AutocompleteWrapper>
@@ -227,7 +233,6 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
             label="Split Segments"
             value={splitSegmentsValue}
             onChange={({target: {value}}) => {
-              console.log('splitSegments value', value)
               setSplitSegmentsValue(value)
               dispatch(
                 ripActions.setSplitSegments(

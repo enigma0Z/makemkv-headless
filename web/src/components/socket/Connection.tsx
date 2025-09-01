@@ -1,5 +1,6 @@
-import { store } from "@/api/store";
-import { socketActions } from "@/api/store/socket";
+import { endpoints, type ApiModel } from "@/api/endpoints";
+import { store } from "@/api";
+import { socketActions } from "@/api/v1/socket/store";
 import { ClientPingMessage, type BaseMessageType } from "@/models/socket";
 
 export class SocketConnection { 
@@ -36,6 +37,13 @@ export class SocketConnection {
         clearTimeout(this.connectTimeout)
         this.connectTimeout = null
       }
+
+
+      fetch(endpoints.state.get("socket"), { method: 'GET' })
+      .then(response => response.json() as Promise<ApiModel['v1']['state']>) 
+      .then(({ data: { socket } } ) => {
+        store.dispatch(socketActions.updateSocketState(socket))
+      })
 
       store.dispatch(socketActions.updateSocketState({ connected: true }))
       this.connected = true
