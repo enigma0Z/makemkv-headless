@@ -8,11 +8,14 @@ from pydantic import BaseModel
 from src.api.api_response import APIError, APIException, APIResponse
 from src.api.state import STATE
 from src.config import CONFIG
+from src.interface import get_interface
 from src.message.rip_start_stop_message_event import RipStartStopMessageEvent
+from src.models.socket import RipStartStopMessage
 from src.rip_titles.asyncio import rip_titles
 from src.sort import ShowInfo, SortInfo
 from src.toc import TOC
 
+interface = get_interface()
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix='/rip')
 
@@ -40,6 +43,8 @@ async def rip_task_fn(data: RequestModel):
       temp_prefix=CONFIG.temp_prefix
     )
 
+    interface.send(RipStartStopMessage(state="stop"))
+
 @router.post('')
 @router.post('/')
 async def post_rip(data: RequestModel, background_tasks: BackgroundTasks):
@@ -59,7 +64,7 @@ async def get_rip_stop():
     if rip_task != None:
       if not rip_task.done():
         rip_task.cancel()
-        INTERFACE.send(RipStartStopMessageEvent(state="stop"))
+        interface.send(RipStartStopMessageEvent(state="stop"))
         return APIResponse(status="in progress")
 
     return APIResponse(status="stopped")

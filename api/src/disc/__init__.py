@@ -38,6 +38,6 @@ async def eject_disc(
     interface=get_interface()
   ):
   if (source.startswith('disc') or source.startswith('dev')):
-    await interface.print("Ejecting Disc", target=Target.INPUT)
+    interface.print("Ejecting Disc", target=Target.INPUT)
     await create_subprocess_shell(shlex.join([ 'drutil', 'eject' ]))
     await create_subprocess_shell(shlex.join([ 'diskutil', 'eject' ]))

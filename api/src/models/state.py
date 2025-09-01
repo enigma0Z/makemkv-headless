@@ -2,6 +2,7 @@
 from pydantic import BaseModel
 
 from src.message.progress_message_event import StatusMessage
+from src.models.tmdb import TMDBMovieSearchResultModel, TMDBShowSearchResultModel
 from src.models.toc import TOCModel
 
 
@@ -26,6 +27,7 @@ class ReduxRipStateModel(BaseModel):
   destination: RipDestinationModel = None
   sort_info: RipSortInfoModel | RipShowInfoModel = None
   rip_all: bool = None
+  tmdb_selection: TMDBShowSearchResultModel | TMDBMovieSearchResultModel | None = None
 
 class ReduxStateModel(BaseModel):
   rip: ReduxRipStateModel = ReduxRipStateModel()

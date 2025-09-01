@@ -3,6 +3,8 @@ from shutil import rmtree
 
 import logging
 
+from pydantic import PrivateAttr
+
 from src.interface.base_interface import BaseInterface
 from src.interface.target import Target
 from src.models.sort import ShowInfoModel, SortInfoModel
@@ -17,6 +19,8 @@ from src.toc import TOC
 from src.util import rsync, sanitize
 
 class SortInfo(SortInfoModel):
+  _index: int = PrivateAttr(default=0)
+
   def path(self):
     return self.base_path()
 
@@ -24,10 +28,10 @@ class SortInfo(SortInfoModel):
     return f'{sanitize(self.name)} [{self.id_db}-{self.id}]'
 
   def file(self):
-    return f'{self.path()} - {self.index}.mkv'
+    return f'{self.path()} - {self._index}.mkv'
 
   def next_file(self):
-    self.index += 1
+    self._index += 1
     return self.file()
 
   def __str__(self):
@@ -38,7 +42,7 @@ class ShowInfo(ShowInfoModel, SortInfo):
     return path.join(super().path(), f'Season {self.season_number:02d}')
 
   def file(self):
-    return f'{sanitize(self.name)} S{self.season_number:02d}E{self.first_episode + self.index:02d}.mkv'
+    return f'{sanitize(self.name)} S{self.season_number:02d}E{self.first_episode + self._index:02d}.mkv'
 
   def __str__(self):
     return f'{self.path()} - First Episode: {self.first_episode}'
@@ -122,7 +126,7 @@ async def sort_titles(
           interface.print(title, target=Target.SORT)
 
     if features.DO_COPY:
-      rsync(
+      await rsync(
         path.join(rip_path_base, sort_info.base_path()), 
         dest_path_base, 
         interface=interface

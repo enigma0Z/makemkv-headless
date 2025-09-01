@@ -25,7 +25,7 @@ class LogMessage(SocketMessage):
   message: str
 
 class RipStartStopMessage(SocketMessage):
-  index: int
+  index: int = None
   state: Literal['stop', 'start']
 
 # MKV Messages
