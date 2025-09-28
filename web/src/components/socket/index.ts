@@ -1,6 +1,6 @@
 import { store } from "@/api";
 import { socketActions, type SocketState } from "@/api/v1/socket/store";
-import { isRippingStatus, type LogMessage, type ProgressMessage, type ProgressValueMessage, type RipStartStopMessage } from "@/models/socket";
+import { isRippingStatus, type LogMessage, type MkvLogMessage, type ProgressMessage, type ProgressValueMessage, type RipStartStopMessage } from "@/models/socket";
 import { throttle } from "lodash";
 import { SocketConnection } from "./Connection";
 
@@ -26,6 +26,17 @@ socket.on("LogMessage", (value: LogMessage) => {
   }
 
   store.dispatch(socketActions.appendToMessages(value.message))
+})
+
+socket.on("MkvLogMessage", (value: MkvLogMessage) => {
+  if (value.text.startsWith("Copy complete")) {
+    store.dispatch(socketActions.updateSocketState({
+      rip_started: false,
+      current_status: undefined
+    }))
+  }
+
+  store.dispatch(socketActions.appendToMessages(value.text))
 })
 
 const progressMessageHandler = (value: ProgressMessage) => {
