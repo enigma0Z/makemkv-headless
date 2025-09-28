@@ -3,6 +3,8 @@ from enum import Enum
 from typing import Literal
 from pydantic import BaseModel
 
+from re import search as re_search
+
 def get_message_type(raw: str):
   return raw.split(':')[0]
 
@@ -127,6 +129,21 @@ class TrackInfoModel(BaseInfoModel):
     source_index = int(raw.split(':')[1].split(',')[1])
     super().__init__(raw=raw, title_index=title_index, source_index=source_index, id_index=2)
 
+class MkvLogModel(MakeMKVDataModel):
+  '''
+  MSG
+  MSG:4008,16,4,"AV sync issue in stream 4,5,7,8 at 0:43:29.536 with duration of 32ms : 1 frame(s) dropped to reduce audio skew to +22.125ms","AV sync issue in stream %1 at %2 with duration of %3 : %4","4,5,7,8","0:43:29.536","32ms","1 frame(s) dropped to reduce audio skew to +22.125ms"
+  '''
+
+  code: list[int]
+  text: str
+
+  def __init__(self, raw: str, **kwargs):
+    code = raw.split(":")[1].split(",")[0:3]
+    text = re_search(r'.+?:\d+?,\d+?,\d+?,(".+?"|.+?),', raw)[1].replace('"', '')
+    super().__init__(raw=raw, text=text, code=code)
+
+
 class MKVModels(Enum):
   PRGC = CurrentProgressModel
   PRGT = TotalProgressModel
@@ -134,6 +151,7 @@ class MKVModels(Enum):
   CINFO = SourceInfoModel
   TINFO = TitleInfoModel
   SINFO = TrackInfoModel
+  MSG = MkvLogModel
 
 def mkv_model_from_raw(raw: str):
   raw = raw.strip()

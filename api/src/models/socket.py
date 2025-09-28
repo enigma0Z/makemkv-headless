@@ -1,7 +1,7 @@
 from typing import Generic, Literal, TypeVar
 from pydantic import BaseModel
 
-from src.models.makemkv import CurrentProgressModel, ProgressModel, ProgressValueModel, SourceInfoModel, TitleInfoModel, TotalProgressModel, TrackInfoModel, mkv_model_from_raw
+from src.models.makemkv import CurrentProgressModel, MkvLogModel, ProgressModel, ProgressValueModel, SourceInfoModel, TitleInfoModel, TotalProgressModel, TrackInfoModel, mkv_model_from_raw
 
 T = TypeVar('T')
 
@@ -36,6 +36,7 @@ class ProgressValueMessage(ProgressValueModel, SocketMessage): ...
 class SourceInfoMessage(SourceInfoModel, SocketMessage): ...
 class TitleInfoMessage(TitleInfoModel, SocketMessage): ...
 class TrackInfoMessage(TrackInfoModel, SocketMessage): ...
+class MkvLogMessage(MkvLogModel, SocketMessage): ...
 
 def mkv_message_class_from_raw(raw: str):
   model_cls = mkv_model_from_raw(raw)

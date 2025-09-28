@@ -4,7 +4,7 @@ from math import ceil
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from src.api.api_response import APIError, APIResponse, PaginatedAPIResponse
+from src.api.api_response import GenericAPIError, APIResponse, PaginatedAPIResponse
 
 import logging
 
@@ -96,7 +96,7 @@ def put_state(data: StateModel):
     STATE.redux.rip = data.redux.rip
     return data
   except Exception as ex:
-    return APIError(400)
+    return GenericAPIError(400)
 
 @router.get('.reset')
 def reset_state():

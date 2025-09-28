@@ -12,3 +12,4 @@ class ConfigModel(BaseModel):
   log_level: str | None = None
   temp_prefix: str | None = None
   frontend: str | None = None
+  cors_origins: list[str] = []

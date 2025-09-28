@@ -1,3 +1,4 @@
+from socket import socket, AF_INET, SOCK_DGRAM
 
 from asyncio import create_task
 from contextlib import asynccontextmanager
@@ -29,10 +30,24 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+cors_allow_origins = ["http://localhost:3000"]
+
+# try:
+#   logger.debug(f'')
+#   s = socket(AF_INET, SOCK_DGRAM) 
+#   s.connect(("169.254.255.255", 80))
+#   ip = s.getsockname()[0]
+#   s.close()
+#   logger.debug(f'adding {ip} to allowed origins')
+#   cors_allow_origins.append(f'http://{ip}:3000')
+# except:
+#   logger.error(f'Failed to determine origin ip for cors')
+#   pass
+
 app.add_middleware(
   CORSMiddleware,
   # TODO: Add routable IPs
-  allow_origins=["http://localhost:3000"],
+  allow_origins=cors_allow_origins,
   allow_credentials=True,
   allow_methods=['*'],
   allow_headers=['*']

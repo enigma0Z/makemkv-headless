@@ -5,7 +5,7 @@ import os
 from fastapi import APIRouter, BackgroundTasks
 from pydantic import BaseModel
 
-from src.api.api_response import APIError, APIException, APIResponse
+from src.api.api_response import GenericAPIError, APIException, APIResponse
 from src.api.state import STATE
 from src.config import CONFIG
 from src.interface import get_interface
@@ -43,7 +43,7 @@ async def rip_task_fn(data: RequestModel):
       temp_prefix=CONFIG.temp_prefix
     )
 
-    interface.send(RipStartStopMessage(state="stop"))
+    get_interface().send(RipStartStopMessage(state="stop"))
 
 @router.post('')
 @router.post('/')
@@ -70,4 +70,4 @@ async def get_rip_stop():
     return APIResponse(status="stopped")
     
   except Exception as ex:
-    raise APIException(500, APIError("error", ex))
+    raise APIException(500, GenericAPIError("error", ex))

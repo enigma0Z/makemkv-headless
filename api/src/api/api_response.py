@@ -29,10 +29,17 @@ class PaginatedAPIResponse(APIResponse[T]):
   page_size: int
   num_pages: int
 
-class APIError(APIResponse[list[str]]):
+class GenericAPIError(APIResponse[list[str]]):
+  '''
+  Given an exception, returns the lines from the exception trace in the error
+  response
+  '''
   def __init__(self, status: Status, ex: Exception):
     super().__init__(status=status, data=format_exception(ex))
 
 class APIException(HTTPException):
-  def __init__(self, status_code: int, error: APIError ):
-    super().__init__(status_code, error.model_dump())
+  def __init__(self, status_code: int, error: BaseModel | list[BaseModel]):
+    if isinstance(error, list):
+      super().__init__(status_code, [e.model_dump() for e in error])
+    else:
+      super().__init__(status_code, error.model_dump())

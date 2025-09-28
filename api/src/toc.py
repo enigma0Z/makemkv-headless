@@ -7,7 +7,6 @@ from json import dumps
 import re
 import shlex
 from traceback import format_exc
-# import subprocess
 
 from pydantic import PrivateAttr
 
@@ -19,10 +18,14 @@ from src.interface.plaintext_interface import PlaintextInterface
 
 import logging
 
+from src.models.makemkv import from_raw
 from src.models.socket import mkv_message_from_raw
 from src.models.toc import BaseInfoModel, SourceInfoModel, TOCModel, TitleInfoModel, TrackInfoModel
 logger = logging.getLogger(__name__)
 
+failure_statuses = [
+  [5010, 0, 0]
+]
 
 def format_records(lines):
   return [
@@ -40,12 +43,6 @@ def format_records(lines):
 
 class TOC(TOCModel):
   _interface: BaseInterface = PrivateAttr(default_factory=get_interface)
-
-  # def __getitem__(self, item):
-  #   if item == "lines":
-  #     return self.lines
-  #   elif item == "source":
-  #     return self.source
 
   async def get_from_disc(self, source):
     self._interface.print('Loading disc TOC', target=Target.MKV)
@@ -91,6 +88,17 @@ class TOC(TOCModel):
     return {
       'source': self.source
     }
+
+  def get_messages(self):
+    return [ from_raw(line) for line in self.lines if line.find("MSG") > -1 ]
+
+  def get_failures(self):
+    return_messages = []
+
+    for message in self.get_messages():
+      if message.code in failure_statuses: return_messages.append(message)
+
+    return return_messages
 
 class BaseInfo(BaseInfoModel):
   '''
