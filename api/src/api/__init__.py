@@ -3,12 +3,12 @@ from socket import socket, AF_INET, SOCK_DGRAM
 from asyncio import create_task
 from contextlib import asynccontextmanager
 import logging
-from fastapi import APIRouter, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.socket import socket
-from src.config import CONFIG
 
+from src.config import CONFIG
 from src.interface import get_interface, init_interface
 
 from src.interface.async_queue_interface import AsyncQueueInterface
@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
   # Start thread queue interface
-  CONFIG.update_from_file('./config.yaml')
   logger.debug(f'Starting async queue interface with socket {socket}')
   init_interface(AsyncQueueInterface(socket))
   create_task(get_interface().run())
@@ -30,7 +29,9 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-cors_allow_origins = ["http://localhost:3000"]
+cors_allow_origins = ["http://localhost:3000", *CONFIG.cors_origins]
+print(f'Loaded config: {CONFIG}')
+print(f'Allowed CORS Origins: {cors_allow_origins}')
 
 # try:
 #   logger.debug(f'')

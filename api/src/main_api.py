@@ -1,8 +1,10 @@
 import logging
-
 import uvicorn
 
-from src.api import app
+from sys import exit
+from src.config import CONFIG
+
+CONFIG.update_from_file('./config.yaml')
 
 logging.basicConfig(
   style='{', 
@@ -11,7 +13,8 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-logger.info(f'Starting app {app}')
 
 if __name__ == '__main__':
+  from src.api import app
+  logger.info(f'Starting app {app}')
   uvicorn.run(app, host="0.0.0.0", port=4000) 
