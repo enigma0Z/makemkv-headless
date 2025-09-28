@@ -30,7 +30,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-cors_allow_origins = ["http://localhost:3000"]
+cors_allow_origins = ["http://localhost:3000", *CONFIG.cors_origins ]
 
 # try:
 #   logger.debug(f'')
