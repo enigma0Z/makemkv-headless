@@ -4,6 +4,7 @@ import type { Response as ResponseV1 } from "./v1"
 import type { State as StateV1 } from "./v1/state/types"
 import type { TmdbSearchResultMovie, TmdbSearchResultShow } from "./v1/tmdb/types"
 import { fetchBaseQuery } from "@reduxjs/toolkit/query"
+import type { Config } from "./v1/config/types"
 
 type Endpoint = (params?: any) => string
 
@@ -47,6 +48,11 @@ export const endpointsV1 = {
     show: (query: string) => `/api/v1/tmdb/show?${new URLSearchParams({q: query})}`,
     movie: (query: string) => `/api/v1/tmdb/movie?${new URLSearchParams({q: query})}`,
     configuration: () => `/api/v1/tmdb/configuration`
+  },
+  config: {
+    get: () => `/api/v1/config`,
+    put: () => `/api/v1/config`,
+    reload: () => `/api/v1/config.reload`
   }
 }
 
@@ -59,5 +65,7 @@ export type ApiModel = {
     'tmdb/show': ResponseV1<TmdbSearchResultShow[]>;
     'tmdb/movie': ResponseV1<TmdbSearchResultMovie[]>;
     'tmdb/configuration': ResponseV1<TmdbConfiguration>;
+    'config': ResponseV1<Config>;
+    'config.reload': ResponseV1<Config>;
   }
 }
