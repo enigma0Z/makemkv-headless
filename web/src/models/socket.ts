@@ -41,6 +41,11 @@ export type LogMessage = BaseMessageType & {
   message: string
 }
 
+export type MkvLogMessage = BaseMessageType & {
+  raw: string
+  text: string
+}
+
 export type RipStartStopMessage = BaseMessageType & {
   index: number | null;
   state: "start" | "stop";
