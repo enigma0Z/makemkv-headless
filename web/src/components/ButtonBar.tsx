@@ -5,14 +5,17 @@ import { tocActions } from "@/api/v1/toc/store";
 import { ConfirmationDialog } from "./ConfirmationModal";
 import { useState } from "react";
 
+import { StatusWrapper } from "./ButtonBar.styles";
+import { endpoints, type ApiModel } from "@/api/endpoints";
+import { ConfigDialog } from "./config/ConfigDialog";
+
 import MenuIcon from '@mui/icons-material/Menu';
 import EjectIcon from '@mui/icons-material/Eject';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { StatusWrapper } from "./ButtonBar.styles";
-import { endpoints, type ApiModel } from "@/api/endpoints";
-import { ripActions } from "@/api/v1/rip/store";
+import TerminalIcon from '@mui/icons-material/Terminal';
+import { LogDialog } from "./log/LogDialog";
 
 type Props = {}
 
@@ -28,6 +31,8 @@ export const ButtonBar = ({ }: Props) => {
   const ripState = useAppSelector((state) => state.socket.ripState)
 
   const [cancelModalOpen, setCancelModalOpen] = useState<boolean>(false)
+  const [configModalOpen, setConfigModalOpen] = useState<boolean>(false)
+  const [logModalOpen, setLogModalOpen] = useState<boolean>(false)
   const [tocLoading, setTocLoading] = useState<boolean>(false)
 
   let current_progress: SocketProgress | undefined
@@ -87,9 +92,14 @@ export const ButtonBar = ({ }: Props) => {
   return <>
     <AppBar>
       <Toolbar>
-        <Tooltip title="Menu">
-          <IconButton>
+        <Tooltip title="Settings">
+          <IconButton onClick={() => setConfigModalOpen(true)}>
             <MenuIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Log Messages">
+          <IconButton onClick={() => setLogModalOpen(true)}>
+            <TerminalIcon />
           </IconButton>
         </Tooltip>
         <Tooltip title="Eject Disc">
@@ -127,6 +137,8 @@ export const ButtonBar = ({ }: Props) => {
           title={'Cancel Rip?'}
           message={'This disc will not get uploaded if it is cancelled now'}
         />
+        <ConfigDialog open={configModalOpen} onClose={() => setConfigModalOpen(false)} />
+        <LogDialog open={logModalOpen} onClose={() => setLogModalOpen(false)} />
       </Toolbar>
       { ripState?.total_status && <StatusWrapper>
         <Typography variant="caption">
