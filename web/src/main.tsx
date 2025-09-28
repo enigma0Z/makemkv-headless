@@ -9,8 +9,7 @@ import { ThemeProvider } from '@emotion/react'
 import { theme } from './theme'
 import { CssBaseline } from '@mui/material'
 // import SocketConnection from './components/socket/Connection'
-import { StatusScroller } from './components/status/StatusScroller'
-import { socket } from './components/socket'
+import { StatusScroller } from './components/log/StatusScroller'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
