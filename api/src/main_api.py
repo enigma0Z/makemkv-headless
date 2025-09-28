@@ -2,6 +2,10 @@ import logging
 
 import uvicorn
 
+from src.config import CONFIG
+
+CONFIG.update_from_file('./config.yaml')
+
 from src.api import app
 
 logging.basicConfig(

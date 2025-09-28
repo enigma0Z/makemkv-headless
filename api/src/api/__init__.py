@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
   # Start thread queue interface
-  CONFIG.update_from_file('./config.yaml')
   logger.debug(f'Starting async queue interface with socket {socket}')
   init_interface(AsyncQueueInterface(socket))
   create_task(get_interface().run())
@@ -29,6 +28,8 @@ async def lifespan(app: FastAPI):
   logger.info('Shutdown')
 
 app = FastAPI(lifespan=lifespan)
+
+print(f'Config: {CONFIG}')
 
 cors_allow_origins = ["http://localhost:3000", *CONFIG.cors_origins ]
 
