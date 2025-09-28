@@ -1,7 +1,7 @@
 #!/bin/bash
 cd api
 
-# rm -rvf .venv
+rm -rvf .venv
 python3 -m venv .venv
 
 source .venv/bin/activate
