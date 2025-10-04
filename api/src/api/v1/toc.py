@@ -55,7 +55,7 @@ async def get_toc_async(background_tasks: BackgroundTasks):
       return APIResponse("in progress")
     else:
       background_tasks.add_task(get_toc_from_disc, CONFIG.source)
-      return APIResponse("started", toc)
+      return APIResponse("started")
   except TocError as ex:
     logger.error(ex.args[0])
   except Exception as ex:
@@ -67,7 +67,7 @@ async def get_toc_async(background_tasks: BackgroundTasks):
   if lock.locked():
     return APIResponse("in progress")
   else:
-    return APIResponse("done", toc)
+    return APIResponse("done")
 
 @router.get('.cache.clear')
 async def toc_clear_cache():
