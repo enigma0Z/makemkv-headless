@@ -115,9 +115,8 @@ class AsyncQueueInterface(BaseInterface):
     try:
       while True:
         message = await self.queue.get()
-        if isinstance(message, ProgressMessage):
-          logger.info(f'progress message in queue {message}')
-        if (isinstance(message, SocketMessage)):
+        logger.debug(f'{message}')
+        if isinstance(message, SocketMessage):
           if isinstance(message, ProgressMessage):
             logger.info(f'sending progress message {message} to clients {self.socket.active_connections}')
           await self.socket.broadcast(message)
