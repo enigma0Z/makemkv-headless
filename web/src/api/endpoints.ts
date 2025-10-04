@@ -16,6 +16,7 @@ export const endpoints = {
     eject: () => `${BACKEND}/api/v1/disc/eject`,
   },
   toc: () => `${BACKEND}/api/v1/toc`,
+  toc_async: () => `${BACKEND}/api/v1/toc.async`,
   state: {
     get: (path?: string) => `${BACKEND}/api/v1/state${path ? "/" + path : ""}`,
     resetSocket: () => `${BACKEND}/api/v1/state.reset/socket`,

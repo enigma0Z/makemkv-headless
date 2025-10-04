@@ -13,6 +13,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { StatusWrapper } from "./ButtonBar.styles";
 import { endpoints, type ApiModel } from "@/api/endpoints";
 import { ripActions } from "@/api/v1/rip/store";
+import type { Response as ResponseV1 } from "@/api/v1";
 
 type Props = {}
 
@@ -45,14 +46,7 @@ export const ButtonBar = ({ }: Props) => {
     console.info('Fetching TOC')
     setTocLoading(true);
     dispatch(tocActions.setTocData(undefined))
-    // fetch(endpoints.state.resetSocket(), { method: 'GET' })
-    fetch(endpoints.toc(), { method: 'GET' })
-      .then(response => response.json() as Promise<ApiModel['v1']['toc']>)
-      .then(({ data }) => {
-        dispatch(tocActions.setTocData(data))
-      }).then(() => {
-        setTocLoading(false);
-      })
+    fetch(endpoints.toc_async(), { method: 'GET' })
   }
 
   const handleCancelRip = () => {
