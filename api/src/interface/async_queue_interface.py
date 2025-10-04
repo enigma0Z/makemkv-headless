@@ -22,7 +22,7 @@ class AsyncQueueInterface(BaseInterface):
   def __init__(self, socket: SocketConnectionManager = None):
     self.queue = Queue()
     self.socket = socket
-    logger.debug(f'Initializing {self.__class__.__name__} with socket {socket}')
+    logger.debug(f'{hex(id(self))}: Initializing {self.__class__.__name__} with socket {socket}')
 
   def __enter__(self, *args, **kwargs):
     '''Not implemented'''
@@ -44,7 +44,7 @@ class AsyncQueueInterface(BaseInterface):
     return create_task(self._send(message))
 
   async def _send(self, message: SocketMessage):
-    logger.debug(f'{self}._send(): {message}')
+    logger.debug(f'{hex(id(self))} _send(): {message}')
     if isinstance(message, CurrentProgressMessage) or isinstance(message, TotalProgressMessage):
       await self.queue.put(message)
       STATE.update_status(message)
@@ -83,6 +83,7 @@ class AsyncQueueInterface(BaseInterface):
             else: # Before/After Don't both have Total/Current
               send_update = True
       except Exception as ex:
+        logger.error(f'{hex(id(self))}: Exception {ex}')
         logger.error(ex)
         send_update = True
 
@@ -96,7 +97,7 @@ class AsyncQueueInterface(BaseInterface):
     
     else:
       await self.queue.put(message)
-      logger.info(message)
+      logger.info(f'{hex(id(self))} _send(): Putting unidentified message {message}')
 
     return super().send(message)
 
@@ -113,13 +114,16 @@ class AsyncQueueInterface(BaseInterface):
   async def run(self):
     '''Start the queue processing thread'''
     try:
+      logger.info(f'{hex(id(self))} run(): Starting queue loop')
       while True:
         message = await self.queue.get()
-        logger.debug(f'{message}')
+        logger.debug(f'{hex(id(self))} run(): received {message}')
         if isinstance(message, SocketMessage):
           if isinstance(message, ProgressMessage):
             logger.info(f'sending progress message {message} to clients {self.socket.active_connections}')
+          logger.debug(f'{hex(id(self))} run(): sending {message.type}')
           await self.socket.broadcast(message)
+          logger.debug(f'{hex(id(self))} run(): sent {message.type}')
     except QueueShutDown:
       return
 
