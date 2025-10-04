@@ -8,15 +8,16 @@ from fastapi import APIRouter, BackgroundTasks
 from src.api.api_response import GenericAPIError, APIException, APIResponse
 from src.api.state import STATE
 from src.config import CONFIG
-# from src.message.toc_complete_message_event import TOCCompleteMessageEvent
-from src.toc import TOC
+from src.interface import get_interface
+from src.models.socket import TocStatusMessage
+from src.toc import Toc
 
-class TOCError(Exception): ...
+class TocError(Exception): ...
 
 logger = logging.getLogger(__name__)
 
 lock = Lock()
-toc = TOC()
+toc = Toc()
 
 router = APIRouter(prefix="/toc")
 
@@ -25,6 +26,7 @@ async def get_toc_from_disc(source):
   with lock:
     await toc.get_from_disc(source)
     STATE.redux.toc = toc
+    get_interface().send(TocStatusMessage(state="complete"))
     return toc
 
 @router.get('')
@@ -35,11 +37,11 @@ async def get_toc():
     failures = toc.get_failures()
 
     if len(failures) > 0: 
-      raise TOCError(failures)
+      raise TocError(failures)
 
     STATE.redux.toc = toc
     return APIResponse("success", toc)
-  except TOCError as ex:
+  except TocError as ex:
     logger.error(ex.args[0])
     raise APIException(404, failures)
   except Exception as ex:
@@ -54,7 +56,7 @@ async def get_toc_async(background_tasks: BackgroundTasks):
     else:
       background_tasks.add_task(get_toc_from_disc, CONFIG.source)
       return APIResponse("started", toc)
-  except TOCError as ex:
+  except TocError as ex:
     logger.error(ex.args[0])
   except Exception as ex:
     logger.error(format_exc())

@@ -35,6 +35,6 @@ class SourceInfoModel(BaseInfoModel):
   name2: str | None = None
   name3: str | None = None
 
-class TOCModel(BaseModel):
+class TocModel(BaseModel):
   source: SourceInfoModel | None = None
   lines: list[str] = []

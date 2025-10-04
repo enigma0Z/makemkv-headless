@@ -19,7 +19,7 @@ from src.sort import SortInfo, sort_titles
 
 from src.disc import eject_disc
 from src.makemkv import rip_disc
-from src.toc import TOC
+from src.toc import Toc
 
 from src import features
 
@@ -29,7 +29,7 @@ class RipTitlesArgs(TypedDict):
   source: str
   dest_path: str
   sort_info: SortInfo
-  toc: TOC
+  toc: Toc
   rip_all: bool
   interface: BaseInterface
   temp_prefix: str
@@ -43,7 +43,7 @@ class RipTitlesThread(StoppableThread):
       source: str, 
       dest_path: str, 
       sort_info: SortInfo,
-      toc: TOC = None,
+      toc: Toc = None,
       rip_all=False,
       interface: BaseInterface = get_interface(),
       temp_prefix: str = None,

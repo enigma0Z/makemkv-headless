@@ -1,9 +1,9 @@
 import styled from "@emotion/styled";
-import { Collapse, IconButton, RadioGroup } from "@mui/material";
+import { Collapse, RadioGroup } from "@mui/material";
 
 const GridWidth = 24
 
-export const TOCGridContainer = styled.div(({ theme }) => ({
+export const TocGridContainer = styled.div(({ theme }) => ({
   display: "grid",
   gridTemplateColumns: `repeat(${GridWidth}, 1fr)`,
   "> div": {

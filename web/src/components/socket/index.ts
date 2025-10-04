@@ -1,8 +1,10 @@
 import { store } from "@/api";
 import { socketActions, type SocketState } from "@/api/v1/socket/store";
-import { isRippingStatus, type LogMessage, type MkvLogMessage, type ProgressMessage, type ProgressValueMessage, type RipStartStopMessage } from "@/models/socket";
+import { isRippingStatus, type LogMessage, type MkvLogMessage, type ProgressMessage, type ProgressValueMessage, type RipStartStopMessage, type TocStatusMessage } from "@/models/socket";
 import { throttle } from "lodash";
 import { SocketConnection } from "./Connection";
+import { endpoints, type ApiModel } from "@/api/endpoints";
+import { tocActions } from "@/api/v1/toc/store";
 
 export const socket = new SocketConnection(`ws://${window.location.hostname}:4000/api/v1/socket`)
 
@@ -10,7 +12,7 @@ const throttledUpdateSocketState = throttle(
   (newState: SocketState['ripState']) => {
     console.info('Throttled update socket state')
     store.dispatch(socketActions.updateSocketState(newState))
-  }, 
+  },
   500
   // { trailing: true, leading: true }
 )
@@ -39,13 +41,25 @@ socket.on("MkvLogMessage", (value: MkvLogMessage) => {
   store.dispatch(socketActions.appendToMessages(value.text))
 })
 
+socket.on("TocStatusMessage", (value: TocStatusMessage) => {
+  if (value.state === "complete") {
+    fetch(endpoints.state.get("redux/toc"), { method: 'GET' })
+      .then(response => response.json() as Promise<ApiModel['v1']['state']>)
+      .then(({ data }) => {
+        if (data.redux?.toc) {
+          store.dispatch(tocActions.setTocData(data.redux.toc))
+        }
+      })
+  }
+})
+
 const progressMessageHandler = (value: ProgressMessage) => {
   // Set index if current index is undefined
   console.debug('ProgressMessage', value)
   const socketState = store.getState().socket.ripState
-  const nextSocketState: SocketState['ripState'] = { 
-    ...socketState, 
-    current_progress: [ ...(socketState.current_progress ?? []) ]
+  const nextSocketState: SocketState['ripState'] = {
+    ...socketState,
+    current_progress: [...(socketState.current_progress ?? [])]
   }
 
   if (value.progress_type === "current" && socketState.current_title !== null && socketState.current_title !== undefined) {
@@ -53,25 +67,25 @@ const progressMessageHandler = (value: ProgressMessage) => {
       socketState.rip_started
       && isRippingStatus(socketState.current_status)
       && (
-        socketState.current_title === undefined 
+        socketState.current_title === undefined
         || socketState.current_title === null
         || value.index > socketState.current_title
       )
     ) {
       console.info('Starting next title')
       nextSocketState.current_title = value.index
-    } 
+    }
 
     nextSocketState.current_status = value.name
 
     if ( // We have advanced to the next title
       nextSocketState.current_progress !== undefined
-      && socketState.current_title !== undefined 
+      && socketState.current_title !== undefined
       && nextSocketState.current_title !== undefined
       && nextSocketState.current_title !== null
       && socketState.current_title < nextSocketState.current_title
     ) {
-      nextSocketState.current_progress[socketState.current_title] = {buffer: 1, progress: 1}
+      nextSocketState.current_progress[socketState.current_title] = { buffer: 1, progress: 1 }
     }
   } else if (value.progress_type === "total") {
     nextSocketState.total_status = value.name
@@ -92,19 +106,19 @@ socket.on("ProgressValueMessage", (value: ProgressValueMessage) => {
   const socketState = store.getState().socket.ripState
   const nextSocketState: SocketState['ripState'] = {
     current_progress: socketState.current_progress?.slice(),
-    total_progress: { ... socketState.total_progress }
+    total_progress: { ...socketState.total_progress }
   }
 
   // Set progress value for current index
   if (socketState.current_title !== undefined && socketState.current_title !== null) {
     if (nextSocketState.current_progress === undefined) {
-      nextSocketState.current_progress = []; 
+      nextSocketState.current_progress = [];
     }
 
     if (nextSocketState.current_progress[socketState.current_title] === undefined) {
-      nextSocketState.current_progress[socketState.current_title] = {progress: 0, buffer: undefined}
+      nextSocketState.current_progress[socketState.current_title] = { progress: 0, buffer: undefined }
     }
-    
+
     if (socketState.current_status === "Analyzing seamless segments") {
       nextSocketState.current_progress[socketState.current_title] = {
         buffer: value.current / value.max
@@ -115,10 +129,10 @@ socket.on("ProgressValueMessage", (value: ProgressValueMessage) => {
         progress: value.current / value.max
       }
     }
-  } 
+  }
 
   if (nextSocketState.total_progress === undefined) {
-    nextSocketState.total_progress = {progress: 0, buffer: 0}
+    nextSocketState.total_progress = { progress: 0, buffer: 0 }
   }
 
   if (socketState.rip_started) {
@@ -137,7 +151,7 @@ socket.on("ProgressValueMessage", (value: ProgressValueMessage) => {
 
 socket.on("RipStartStopMessage", (value: RipStartStopMessage) => {
   const socketState = store.getState().socket.ripState
-  const nextSocketState: SocketState['ripState'] = { }
+  const nextSocketState: SocketState['ripState'] = {}
 
   nextSocketState.rip_started = value.state === "start"
 
@@ -148,12 +162,12 @@ socket.on("RipStartStopMessage", (value: RipStartStopMessage) => {
   if ( // We have advanced to the nextSocketState title
     nextSocketState.current_progress
     && socketState.current_title !== null
-    && socketState.current_title !== undefined 
+    && socketState.current_title !== undefined
     && nextSocketState.current_title !== null
     && nextSocketState.current_title !== undefined
     && socketState.current_title < nextSocketState.current_title
   ) {
-    nextSocketState.current_progress[socketState.current_title] = {buffer: 1, progress: 1}
+    nextSocketState.current_progress[socketState.current_title] = { buffer: 1, progress: 1 }
   }
 
   store.dispatch(socketActions.updateSocketState(nextSocketState))

@@ -13,7 +13,7 @@ from src.message.rip_start_stop_message_event import RipStartStopMessageEvent
 from src.models.socket import RipStartStopMessage
 from src.rip_titles.asyncio import rip_titles
 from src.sort import ShowInfo, SortInfo
-from src.toc import TOC
+from src.toc import Toc
 
 interface = get_interface()
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ async def rip_task_fn(data: RequestModel):
   async with LOCK:
     logger.debug(f'rip_task_fn(), {rip_task}')
     STATE.reset_socket()
-    toc = TOC()
+    toc = Toc()
     await toc.get_from_disc(CONFIG.source)
     await rip_titles(
       source=CONFIG.source,

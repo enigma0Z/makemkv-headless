@@ -41,6 +41,10 @@ export type LogMessage = BaseMessageType & {
   message: string
 }
 
+export type TocStatusMessage = BaseMessageType & {
+  state: "running" | "complete";
+}
+
 export type RipStartStopMessage = BaseMessageType & {
   index: number | null;
   state: "start" | "stop";

@@ -3,11 +3,11 @@ from unittest import TestCase
 from unittest.mock import DEFAULT, MagicMock, patch
 
 from src.sort import ShowInfo, SortInfo, sort_titles
-from src.toc import TOC
+from src.toc import Toc
 
 from test.data.toc_test_data import generate_CINFO, generate_SINFO, generate_TINFO
 
-mock_toc = TOC()
+mock_toc = Toc()
 mock_toc.get_from_list(
   generate_CINFO() + 
   generate_TINFO() + 

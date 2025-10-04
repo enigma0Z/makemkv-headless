@@ -3,9 +3,9 @@
 from unittest import TestCase
 
 from test.data.toc_test_data import generate_CINFO, generate_TINFO, generate_SINFO
-from src.toc import TOC, TrackInfo, format_records
+from src.toc import Toc, TrackInfo, format_records
 
-class TOCTest(TestCase):
+class TocTest(TestCase):
   def test_format_records(self):
     [record] = format_records(['CINFO:2,0,"title: subtitle"'])
     print(record)
@@ -13,13 +13,13 @@ class TOCTest(TestCase):
     self.assertEqual('"title: subtitle"', record[3], "Colons after the first colon are ignored")
     self.assertEqual(4, len(record))
 
-  def test_TOC_from_disc(self):
-    # TOC.get_from_disc
+  def test_Toc_from_disc(self):
+    # Toc.get_from_disc
     pass
 
-  def test_TOC_from_list(self):
-    # TOC.get_from_list
-    list_toc = TOC()
+  def test_Toc_from_list(self):
+    # Toc.get_from_list
+    list_toc = Toc()
     list_toc.get_from_list(generate_CINFO() + generate_TINFO() + generate_SINFO())
 
     self.assertEqual('name1', list_toc.source.name)
@@ -47,5 +47,5 @@ class TOCTest(TestCase):
 
     self.assertEqual('Stereo', list_toc.source.titles[0].tracks[1].audio_format)
 
-    # TOC serializes to JSON w/ exception
-    # self.assertTrue(list_toc.to_json != '', 'TOC serializes to JSON')
+    # Toc serializes to JSON w/ exception
+    # self.assertTrue(list_toc.to_json != '', 'Toc serializes to JSON')

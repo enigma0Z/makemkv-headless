@@ -1,0 +1,367 @@
+2025-10-04 17:08:10,720 [DEBUG] async_queue_interface.py:25 MainThread - Initializing AsyncQueueInterface with socket None
+2025-10-04 17:08:10,746 [INFO] main_api.py:20 MainThread - Starting app <fastapi.applications.FastAPI object at 0x106869e80>
+2025-10-04 17:08:10,791 [DEBUG] __init__.py:23 MainThread - Starting async queue interface with socket <src.api.socket.SocketConnectionManager object at 0x1068682f0>
+2025-10-04 17:08:10,791 [DEBUG] async_queue_interface.py:25 MainThread - Initializing AsyncQueueInterface with socket <src.api.socket.SocketConnectionManager object at 0x1068682f0>
+2025-10-04 17:08:19,151 [DEBUG] socket.py:15 MainThread - <src.api.socket.SocketConnectionManager object at 0x1068682f0> Connection established with <starlette.websockets.WebSocket object at 0x106a43110>, active connections: [<starlette.websockets.WebSocket object at 0x106a43110>]
+2025-10-04 17:08:19,163 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['socket']
+2025-10-04 17:08:19,163 [DEBUG] state.py:31 AnyIO worker thread - path_part: socket
+2025-10-04 17:09:18,065 [DEBUG] socket.py:15 MainThread - <src.api.socket.SocketConnectionManager object at 0x1068682f0> Connection established with <starlette.websockets.WebSocket object at 0x106a9e3f0>, active connections: [<starlette.websockets.WebSocket object at 0x106a43110>, <starlette.websockets.WebSocket object at 0x106a9e3f0>]
+2025-10-04 17:09:18,089 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:09:18,089 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:09:18,166 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'toc']
+2025-10-04 17:09:18,166 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:09:18,166 [DEBUG] state.py:31 AnyIO worker thread - path_part: toc
+2025-10-04 17:09:18,167 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'toc']
+2025-10-04 17:09:18,167 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:09:18,167 [DEBUG] state.py:31 AnyIO worker thread - path_part: toc
+2025-10-04 17:09:18,175 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:09:18,175 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:09:18,201 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:09:18,202 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:09:18,231 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'rip']
+2025-10-04 17:09:18,231 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:09:18,231 [DEBUG] state.py:31 AnyIO worker thread - path_part: rip
+2025-10-04 17:09:18,239 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['socket']
+2025-10-04 17:09:18,239 [DEBUG] state.py:31 AnyIO worker thread - path_part: socket
+2025-10-04 17:09:18,280 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:09:18,281 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:09:19,143 [DEBUG] socket.py:28 MainThread - Socket disconnect
+2025-10-04 17:09:19,143 [DEBUG] socket.py:19 MainThread - Connection closed with <starlette.websockets.WebSocket object at 0x106a43110>, active connections: [<starlette.websockets.WebSocket object at 0x106a9e3f0>]
+2025-10-04 17:09:19,144 [DEBUG] socket.py:15 MainThread - <src.api.socket.SocketConnectionManager object at 0x1068682f0> Connection established with <starlette.websockets.WebSocket object at 0x106aab650>, active connections: [<starlette.websockets.WebSocket object at 0x106a9e3f0>, <starlette.websockets.WebSocket object at 0x106aab650>]
+2025-10-04 17:09:19,146 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['socket']
+2025-10-04 17:09:19,146 [DEBUG] state.py:31 AnyIO worker thread - path_part: socket
+2025-10-04 17:09:27,241 [DEBUG] socket.py:28 MainThread - Socket disconnect
+2025-10-04 17:09:27,241 [DEBUG] socket.py:19 MainThread - Connection closed with <starlette.websockets.WebSocket object at 0x106a9e3f0>, active connections: [<starlette.websockets.WebSocket object at 0x106aab650>]
+2025-10-04 17:09:27,242 [DEBUG] socket.py:28 MainThread - Socket disconnect
+2025-10-04 17:09:27,242 [DEBUG] socket.py:19 MainThread - Connection closed with <starlette.websockets.WebSocket object at 0x106aab650>, active connections: []
+2025-10-04 17:09:27,342 [INFO] __init__.py:28 MainThread - Shutdown
+2025-10-04 17:16:19,108 [DEBUG] async_queue_interface.py:25 MainThread - Initializing AsyncQueueInterface with socket None
+2025-10-04 17:16:19,131 [INFO] main_api.py:20 MainThread - Starting app <fastapi.applications.FastAPI object at 0x103d31d30>
+2025-10-04 17:16:19,170 [DEBUG] __init__.py:23 MainThread - Starting async queue interface with socket <src.api.socket.SocketConnectionManager object at 0x103d302f0>
+2025-10-04 17:16:19,170 [DEBUG] async_queue_interface.py:25 MainThread - Initializing AsyncQueueInterface with socket <src.api.socket.SocketConnectionManager object at 0x103d302f0>
+2025-10-04 17:16:21,306 [DEBUG] socket.py:15 MainThread - <src.api.socket.SocketConnectionManager object at 0x103d302f0> Connection established with <starlette.websockets.WebSocket object at 0x103f0b110>, active connections: [<starlette.websockets.WebSocket object at 0x103f0b110>]
+2025-10-04 17:16:21,327 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['socket']
+2025-10-04 17:16:21,327 [DEBUG] state.py:31 AnyIO worker thread - path_part: socket
+2025-10-04 17:16:23,101 [DEBUG] socket.py:28 MainThread - Socket disconnect
+2025-10-04 17:16:23,101 [DEBUG] socket.py:19 MainThread - Connection closed with <starlette.websockets.WebSocket object at 0x103f0b110>, active connections: []
+2025-10-04 17:16:23,275 [DEBUG] socket.py:15 MainThread - <src.api.socket.SocketConnectionManager object at 0x103d302f0> Connection established with <starlette.websockets.WebSocket object at 0x103f6d810>, active connections: [<starlette.websockets.WebSocket object at 0x103f6d810>]
+2025-10-04 17:16:23,298 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:16:23,299 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:16:23,368 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'toc']
+2025-10-04 17:16:23,369 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:16:23,369 [DEBUG] state.py:31 AnyIO worker thread - path_part: toc
+2025-10-04 17:16:23,371 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'toc']
+2025-10-04 17:16:23,371 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:16:23,371 [DEBUG] state.py:31 AnyIO worker thread - path_part: toc
+2025-10-04 17:16:23,377 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:16:23,377 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:16:23,411 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:16:23,411 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:16:23,434 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'rip']
+2025-10-04 17:16:23,435 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:16:23,435 [DEBUG] state.py:31 AnyIO worker thread - path_part: rip
+2025-10-04 17:16:23,441 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['socket']
+2025-10-04 17:16:23,441 [DEBUG] state.py:31 AnyIO worker thread - path_part: socket
+2025-10-04 17:16:23,468 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:16:23,485 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:17:19,145 [DEBUG] socket.py:15 MainThread - <src.api.socket.SocketConnectionManager object at 0x103d302f0> Connection established with <starlette.websockets.WebSocket object at 0x10450be30>, active connections: [<starlette.websockets.WebSocket object at 0x103f6d810>, <starlette.websockets.WebSocket object at 0x10450be30>]
+2025-10-04 17:17:19,148 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['socket']
+2025-10-04 17:17:19,149 [DEBUG] state.py:31 AnyIO worker thread - path_part: socket
+2025-10-04 17:18:19,849 [DEBUG] async_queue_interface.py:25 MainThread - Initializing AsyncQueueInterface with socket None
+2025-10-04 17:18:19,871 [INFO] main_api.py:20 MainThread - Starting app <fastapi.applications.FastAPI object at 0x10756de80>
+2025-10-04 17:18:19,909 [DEBUG] __init__.py:23 MainThread - Starting async queue interface with socket <src.api.socket.SocketConnectionManager object at 0x10756c440>
+2025-10-04 17:18:19,909 [DEBUG] async_queue_interface.py:25 MainThread - Initializing AsyncQueueInterface with socket <src.api.socket.SocketConnectionManager object at 0x10756c440>
+2025-10-04 17:18:22,011 [DEBUG] socket.py:15 MainThread - <src.api.socket.SocketConnectionManager object at 0x10756c440> Connection established with <starlette.websockets.WebSocket object at 0x107843250>, active connections: [<starlette.websockets.WebSocket object at 0x107843250>]
+2025-10-04 17:18:22,034 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:18:22,034 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:18:22,086 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'toc']
+2025-10-04 17:18:22,086 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:18:22,087 [DEBUG] state.py:31 AnyIO worker thread - path_part: toc
+2025-10-04 17:18:22,088 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'toc']
+2025-10-04 17:18:22,088 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:18:22,088 [DEBUG] state.py:31 AnyIO worker thread - path_part: toc
+2025-10-04 17:18:22,095 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:18:22,095 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:18:22,131 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:18:22,131 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:18:22,153 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'rip']
+2025-10-04 17:18:22,153 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:18:22,153 [DEBUG] state.py:31 AnyIO worker thread - path_part: rip
+2025-10-04 17:18:22,163 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['socket']
+2025-10-04 17:18:22,163 [DEBUG] state.py:31 AnyIO worker thread - path_part: socket
+2025-10-04 17:18:22,187 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:18:22,191 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:18:24,146 [DEBUG] socket.py:15 MainThread - <src.api.socket.SocketConnectionManager object at 0x10756c440> Connection established with <starlette.websockets.WebSocket object at 0x1078a7950>, active connections: [<starlette.websockets.WebSocket object at 0x107843250>, <starlette.websockets.WebSocket object at 0x1078a7950>]
+2025-10-04 17:18:24,155 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['socket']
+2025-10-04 17:18:24,155 [DEBUG] state.py:31 AnyIO worker thread - path_part: socket
+2025-10-04 17:18:24,915 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='Loading disc Toc'
+2025-10-04 17:18:24,915 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='Loading disc Toc'
+2025-10-04 17:18:24,915 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='Loading disc Toc'
+2025-10-04 17:18:25,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='MkvLogMessage' raw='MSG:1005,0,1,"MakeMKV v1.18.1 darwin(arm64-release) started","%1 started","MakeMKV v1.18.1 darwin(arm64-release)"' mkv_type='MSG' code=[1005, 0, 1] text='MakeMKV v1.18.1 darwin(arm64-release) started'
+2025-10-04 17:18:25,123 [INFO] async_queue_interface.py:99 MainThread - type='MkvLogMessage' raw='MSG:1005,0,1,"MakeMKV v1.18.1 darwin(arm64-release) started","%1 started","MakeMKV v1.18.1 darwin(arm64-release)"' mkv_type='MSG' code=[1005, 0, 1] text='MakeMKV v1.18.1 darwin(arm64-release) started'
+2025-10-04 17:18:25,124 [DEBUG] async_queue_interface.py:118 MainThread - type='MkvLogMessage' raw='MSG:1005,0,1,"MakeMKV v1.18.1 darwin(arm64-release) started","%1 started","MakeMKV v1.18.1 darwin(arm64-release)"' mkv_type='MSG' code=[1005, 0, 1] text='MakeMKV v1.18.1 darwin(arm64-release) started'
+2025-10-04 17:18:25,124 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='MkvLogMessage' raw='MSG:1004,131072,1,"Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt","Debug logging enabled, log will be saved as %1","file:///Users/enigma/MakeMKV_log.txt"' mkv_type='MSG' code=[1004, 131072, 1] text='Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt'
+2025-10-04 17:18:25,124 [INFO] async_queue_interface.py:99 MainThread - type='MkvLogMessage' raw='MSG:1004,131072,1,"Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt","Debug logging enabled, log will be saved as %1","file:///Users/enigma/MakeMKV_log.txt"' mkv_type='MSG' code=[1004, 131072, 1] text='Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt'
+2025-10-04 17:18:25,124 [DEBUG] async_queue_interface.py:118 MainThread - type='MkvLogMessage' raw='MSG:1004,131072,1,"Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt","Debug logging enabled, log will be saved as %1","file:///Users/enigma/MakeMKV_log.txt"' mkv_type='MSG' code=[1004, 131072, 1] text='Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt'
+2025-10-04 17:18:25,382 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='MkvLogMessage' raw='MSG:5042,0,0,"The program can\'t find any usable optical drives.","The program can\'t find any usable optical drives."' mkv_type='MSG' code=[5042, 0, 0] text="The program can't find any usable optical drives."
+2025-10-04 17:18:25,382 [INFO] async_queue_interface.py:99 MainThread - type='MkvLogMessage' raw='MSG:5042,0,0,"The program can\'t find any usable optical drives.","The program can\'t find any usable optical drives."' mkv_type='MSG' code=[5042, 0, 0] text="The program can't find any usable optical drives."
+2025-10-04 17:18:25,382 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:0,256,999,0,"","",""'
+2025-10-04 17:18:25,382 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:0,256,999,0,"","",""'
+2025-10-04 17:18:25,382 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:1,256,999,0,"","",""'
+2025-10-04 17:18:25,382 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:1,256,999,0,"","",""'
+2025-10-04 17:18:25,382 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:2,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:2,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:3,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:3,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:4,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:4,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:5,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:5,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:6,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:6,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:7,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:7,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:8,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:8,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:9,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:9,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:10,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:10,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:11,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:11,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:12,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:12,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:13,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:13,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:14,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:14,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:118 MainThread - type='MkvLogMessage' raw='MSG:5042,0,0,"The program can\'t find any usable optical drives.","The program can\'t find any usable optical drives."' mkv_type='MSG' code=[5042, 0, 0] text="The program can't find any usable optical drives."
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:0,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:1,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:2,256,999,0,"","",""'
+2025-10-04 17:18:25,383 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:3,256,999,0,"","",""'
+2025-10-04 17:18:25,384 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:4,256,999,0,"","",""'
+2025-10-04 17:18:25,384 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:5,256,999,0,"","",""'
+2025-10-04 17:18:25,384 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:6,256,999,0,"","",""'
+2025-10-04 17:18:25,384 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:7,256,999,0,"","",""'
+2025-10-04 17:18:25,384 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:8,256,999,0,"","",""'
+2025-10-04 17:18:25,384 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:9,256,999,0,"","",""'
+2025-10-04 17:18:25,384 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:10,256,999,0,"","",""'
+2025-10-04 17:18:25,384 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:11,256,999,0,"","",""'
+2025-10-04 17:18:25,384 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:12,256,999,0,"","",""'
+2025-10-04 17:18:25,384 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:13,256,999,0,"","",""'
+2025-10-04 17:18:25,384 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:14,256,999,0,"","",""'
+2025-10-04 17:18:25,384 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='DRV:15,256,999,0,"","",""'
+2025-10-04 17:18:25,384 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:15,256,999,0,"","",""'
+2025-10-04 17:18:25,384 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:15,256,999,0,"","",""'
+2025-10-04 17:18:25,436 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='MkvLogMessage' raw='MSG:2024,16777216,1,"Unknown device - \'/dev/disk8\'","Unknown device - \'%1\'","/dev/disk8"' mkv_type='MSG' code=[2024, 16777216, 1] text="Unknown device - '/dev/disk8'"
+2025-10-04 17:18:25,437 [INFO] async_queue_interface.py:99 MainThread - type='MkvLogMessage' raw='MSG:2024,16777216,1,"Unknown device - \'/dev/disk8\'","Unknown device - \'%1\'","/dev/disk8"' mkv_type='MSG' code=[2024, 16777216, 1] text="Unknown device - '/dev/disk8'"
+2025-10-04 17:18:25,437 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='MkvLogMessage' raw='MSG:5010,0,0,"Failed to open disc","Failed to open disc"' mkv_type='MSG' code=[5010, 0, 0] text='Failed to open disc'
+2025-10-04 17:18:25,437 [INFO] async_queue_interface.py:99 MainThread - type='MkvLogMessage' raw='MSG:5010,0,0,"Failed to open disc","Failed to open disc"' mkv_type='MSG' code=[5010, 0, 0] text='Failed to open disc'
+2025-10-04 17:18:25,437 [DEBUG] async_queue_interface.py:118 MainThread - type='MkvLogMessage' raw='MSG:2024,16777216,1,"Unknown device - \'/dev/disk8\'","Unknown device - \'%1\'","/dev/disk8"' mkv_type='MSG' code=[2024, 16777216, 1] text="Unknown device - '/dev/disk8'"
+2025-10-04 17:18:25,437 [DEBUG] async_queue_interface.py:118 MainThread - type='MkvLogMessage' raw='MSG:5010,0,0,"Failed to open disc","Failed to open disc"' mkv_type='MSG' code=[5010, 0, 0] text='Failed to open disc'
+2025-10-04 17:18:25,437 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message='TCOUNT:0'
+2025-10-04 17:18:25,437 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='TCOUNT:0'
+2025-10-04 17:18:25,437 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='TCOUNT:0'
+2025-10-04 17:18:25,461 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107842850>._send(): type='LogMessage' message=''
+2025-10-04 17:18:25,461 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message=''
+2025-10-04 17:18:25,461 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message=''
+2025-10-04 17:18:51,903 [DEBUG] socket.py:28 MainThread - Socket disconnect
+2025-10-04 17:18:51,903 [DEBUG] socket.py:19 MainThread - Connection closed with <starlette.websockets.WebSocket object at 0x107843250>, active connections: [<starlette.websockets.WebSocket object at 0x1078a7950>]
+2025-10-04 17:18:52,110 [DEBUG] socket.py:15 MainThread - <src.api.socket.SocketConnectionManager object at 0x10756c440> Connection established with <starlette.websockets.WebSocket object at 0x1078ab1d0>, active connections: [<starlette.websockets.WebSocket object at 0x1078a7950>, <starlette.websockets.WebSocket object at 0x1078ab1d0>]
+2025-10-04 17:18:52,206 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'toc']
+2025-10-04 17:18:52,206 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:18:52,206 [DEBUG] state.py:31 AnyIO worker thread - path_part: toc
+2025-10-04 17:18:52,209 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'toc']
+2025-10-04 17:18:52,209 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:18:52,209 [DEBUG] state.py:31 AnyIO worker thread - path_part: toc
+2025-10-04 17:18:52,272 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'rip']
+2025-10-04 17:18:52,272 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:18:52,272 [DEBUG] state.py:31 AnyIO worker thread - path_part: rip
+2025-10-04 17:18:52,281 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['socket']
+2025-10-04 17:18:52,282 [DEBUG] state.py:31 AnyIO worker thread - path_part: socket
+2025-10-04 17:18:57,610 [DEBUG] async_queue_interface.py:25 MainThread - Initializing AsyncQueueInterface with socket None
+2025-10-04 17:18:57,634 [INFO] main_api.py:20 MainThread - Starting app <fastapi.applications.FastAPI object at 0x10786dfd0>
+2025-10-04 17:18:57,671 [DEBUG] __init__.py:23 MainThread - Starting async queue interface with socket <src.api.socket.SocketConnectionManager object at 0x10786c440>
+2025-10-04 17:18:57,672 [DEBUG] async_queue_interface.py:25 MainThread - Initializing AsyncQueueInterface with socket <src.api.socket.SocketConnectionManager object at 0x10786c440>
+2025-10-04 17:18:58,898 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='Loading disc Toc'
+2025-10-04 17:18:58,898 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='Loading disc Toc'
+2025-10-04 17:18:58,899 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='Loading disc Toc'
+2025-10-04 17:18:58,920 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='MkvLogMessage' raw='MSG:1005,0,1,"MakeMKV v1.18.1 darwin(arm64-release) started","%1 started","MakeMKV v1.18.1 darwin(arm64-release)"' mkv_type='MSG' code=[1005, 0, 1] text='MakeMKV v1.18.1 darwin(arm64-release) started'
+2025-10-04 17:18:58,920 [INFO] async_queue_interface.py:99 MainThread - type='MkvLogMessage' raw='MSG:1005,0,1,"MakeMKV v1.18.1 darwin(arm64-release) started","%1 started","MakeMKV v1.18.1 darwin(arm64-release)"' mkv_type='MSG' code=[1005, 0, 1] text='MakeMKV v1.18.1 darwin(arm64-release) started'
+2025-10-04 17:18:58,920 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='MkvLogMessage' raw='MSG:1004,131072,1,"Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt","Debug logging enabled, log will be saved as %1","file:///Users/enigma/MakeMKV_log.txt"' mkv_type='MSG' code=[1004, 131072, 1] text='Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt'
+2025-10-04 17:18:58,920 [INFO] async_queue_interface.py:99 MainThread - type='MkvLogMessage' raw='MSG:1004,131072,1,"Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt","Debug logging enabled, log will be saved as %1","file:///Users/enigma/MakeMKV_log.txt"' mkv_type='MSG' code=[1004, 131072, 1] text='Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt'
+2025-10-04 17:18:58,921 [DEBUG] async_queue_interface.py:118 MainThread - type='MkvLogMessage' raw='MSG:1005,0,1,"MakeMKV v1.18.1 darwin(arm64-release) started","%1 started","MakeMKV v1.18.1 darwin(arm64-release)"' mkv_type='MSG' code=[1005, 0, 1] text='MakeMKV v1.18.1 darwin(arm64-release) started'
+2025-10-04 17:18:58,921 [DEBUG] async_queue_interface.py:118 MainThread - type='MkvLogMessage' raw='MSG:1004,131072,1,"Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt","Debug logging enabled, log will be saved as %1","file:///Users/enigma/MakeMKV_log.txt"' mkv_type='MSG' code=[1004, 131072, 1] text='Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt'
+2025-10-04 17:18:59,263 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='MkvLogMessage' raw='MSG:5042,0,0,"The program can\'t find any usable optical drives.","The program can\'t find any usable optical drives."' mkv_type='MSG' code=[5042, 0, 0] text="The program can't find any usable optical drives."
+2025-10-04 17:18:59,263 [INFO] async_queue_interface.py:99 MainThread - type='MkvLogMessage' raw='MSG:5042,0,0,"The program can\'t find any usable optical drives.","The program can\'t find any usable optical drives."' mkv_type='MSG' code=[5042, 0, 0] text="The program can't find any usable optical drives."
+2025-10-04 17:18:59,263 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:0,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:0,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:1,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:1,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:2,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:2,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:3,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:3,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:4,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:4,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:5,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:5,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:6,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:6,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:7,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:7,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:8,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:8,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:9,256,999,0,"","",""'
+2025-10-04 17:18:59,263 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:9,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:118 MainThread - type='MkvLogMessage' raw='MSG:5042,0,0,"The program can\'t find any usable optical drives.","The program can\'t find any usable optical drives."' mkv_type='MSG' code=[5042, 0, 0] text="The program can't find any usable optical drives."
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:0,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:1,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:2,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:3,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:4,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:5,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:6,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:7,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:8,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:9,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:10,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:10,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:11,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:11,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:12,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:12,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:13,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:13,256,999,0,"","",""'
+2025-10-04 17:18:59,264 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:14,256,999,0,"","",""'
+2025-10-04 17:18:59,265 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:14,256,999,0,"","",""'
+2025-10-04 17:18:59,265 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:15,256,999,0,"","",""'
+2025-10-04 17:18:59,265 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:15,256,999,0,"","",""'
+2025-10-04 17:18:59,265 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:10,256,999,0,"","",""'
+2025-10-04 17:18:59,265 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:11,256,999,0,"","",""'
+2025-10-04 17:18:59,265 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:12,256,999,0,"","",""'
+2025-10-04 17:18:59,265 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:13,256,999,0,"","",""'
+2025-10-04 17:18:59,265 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:14,256,999,0,"","",""'
+2025-10-04 17:18:59,265 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:15,256,999,0,"","",""'
+2025-10-04 17:18:59,318 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='MkvLogMessage' raw='MSG:2024,16777216,1,"Unknown device - \'/dev/disk8\'","Unknown device - \'%1\'","/dev/disk8"' mkv_type='MSG' code=[2024, 16777216, 1] text="Unknown device - '/dev/disk8'"
+2025-10-04 17:18:59,318 [INFO] async_queue_interface.py:99 MainThread - type='MkvLogMessage' raw='MSG:2024,16777216,1,"Unknown device - \'/dev/disk8\'","Unknown device - \'%1\'","/dev/disk8"' mkv_type='MSG' code=[2024, 16777216, 1] text="Unknown device - '/dev/disk8'"
+2025-10-04 17:18:59,318 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='MkvLogMessage' raw='MSG:5010,0,0,"Failed to open disc","Failed to open disc"' mkv_type='MSG' code=[5010, 0, 0] text='Failed to open disc'
+2025-10-04 17:18:59,319 [INFO] async_queue_interface.py:99 MainThread - type='MkvLogMessage' raw='MSG:5010,0,0,"Failed to open disc","Failed to open disc"' mkv_type='MSG' code=[5010, 0, 0] text='Failed to open disc'
+2025-10-04 17:18:59,319 [DEBUG] async_queue_interface.py:118 MainThread - type='MkvLogMessage' raw='MSG:2024,16777216,1,"Unknown device - \'/dev/disk8\'","Unknown device - \'%1\'","/dev/disk8"' mkv_type='MSG' code=[2024, 16777216, 1] text="Unknown device - '/dev/disk8'"
+2025-10-04 17:18:59,319 [DEBUG] async_queue_interface.py:118 MainThread - type='MkvLogMessage' raw='MSG:5010,0,0,"Failed to open disc","Failed to open disc"' mkv_type='MSG' code=[5010, 0, 0] text='Failed to open disc'
+2025-10-04 17:18:59,320 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='TCOUNT:0'
+2025-10-04 17:18:59,320 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='TCOUNT:0'
+2025-10-04 17:18:59,320 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='TCOUNT:0'
+2025-10-04 17:18:59,339 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message=''
+2025-10-04 17:18:59,339 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message=''
+2025-10-04 17:18:59,339 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='TocStatusMessage' state='complete'
+2025-10-04 17:18:59,339 [INFO] async_queue_interface.py:99 MainThread - type='TocStatusMessage' state='complete'
+2025-10-04 17:18:59,339 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message=''
+2025-10-04 17:18:59,339 [DEBUG] async_queue_interface.py:118 MainThread - type='TocStatusMessage' state='complete'
+2025-10-04 17:19:01,004 [DEBUG] socket.py:15 MainThread - <src.api.socket.SocketConnectionManager object at 0x10786c440> Connection established with <starlette.websockets.WebSocket object at 0x107a43110>, active connections: [<starlette.websockets.WebSocket object at 0x107a43110>]
+2025-10-04 17:19:01,019 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['socket']
+2025-10-04 17:19:01,019 [DEBUG] state.py:31 AnyIO worker thread - path_part: socket
+2025-10-04 17:19:01,142 [DEBUG] socket.py:15 MainThread - <src.api.socket.SocketConnectionManager object at 0x10786c440> Connection established with <starlette.websockets.WebSocket object at 0x107aa5a70>, active connections: [<starlette.websockets.WebSocket object at 0x107a43110>, <starlette.websockets.WebSocket object at 0x107aa5a70>]
+2025-10-04 17:19:01,145 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['socket']
+2025-10-04 17:19:01,145 [DEBUG] state.py:31 AnyIO worker thread - path_part: socket
+2025-10-04 17:19:13,624 [DEBUG] socket.py:28 MainThread - Socket disconnect
+2025-10-04 17:19:13,625 [DEBUG] socket.py:19 MainThread - Connection closed with <starlette.websockets.WebSocket object at 0x107a43110>, active connections: [<starlette.websockets.WebSocket object at 0x107aa5a70>]
+2025-10-04 17:19:13,817 [DEBUG] socket.py:15 MainThread - <src.api.socket.SocketConnectionManager object at 0x10786c440> Connection established with <starlette.websockets.WebSocket object at 0x107cf0dd0>, active connections: [<starlette.websockets.WebSocket object at 0x107aa5a70>, <starlette.websockets.WebSocket object at 0x107cf0dd0>]
+2025-10-04 17:19:13,840 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:19:13,841 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:19:13,910 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'toc']
+2025-10-04 17:19:13,911 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:19:13,911 [DEBUG] state.py:31 AnyIO worker thread - path_part: toc
+2025-10-04 17:19:13,912 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'toc']
+2025-10-04 17:19:13,912 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:19:13,912 [DEBUG] state.py:31 AnyIO worker thread - path_part: toc
+2025-10-04 17:19:13,917 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:19:13,918 [DEBUG] connectionpool.py:1051 AnyIO worker thread - Starting new HTTPS connection (1): api.themoviedb.org:443
+2025-10-04 17:19:13,938 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:19:13,938 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:19:13,974 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'rip']
+2025-10-04 17:19:13,974 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:19:13,974 [DEBUG] state.py:31 AnyIO worker thread - path_part: rip
+2025-10-04 17:19:13,983 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['socket']
+2025-10-04 17:19:13,983 [DEBUG] state.py:31 AnyIO worker thread - path_part: socket
+2025-10-04 17:19:13,992 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:19:14,000 [DEBUG] connectionpool.py:546 AnyIO worker thread - https://api.themoviedb.org:443 "GET /3/configuration HTTP/11" 200 None
+2025-10-04 17:19:33,808 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='Loading disc Toc'
+2025-10-04 17:19:33,808 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='Loading disc Toc'
+2025-10-04 17:19:33,810 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='Loading disc Toc'
+2025-10-04 17:19:33,826 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='MkvLogMessage' raw='MSG:1005,0,1,"MakeMKV v1.18.1 darwin(arm64-release) started","%1 started","MakeMKV v1.18.1 darwin(arm64-release)"' mkv_type='MSG' code=[1005, 0, 1] text='MakeMKV v1.18.1 darwin(arm64-release) started'
+2025-10-04 17:19:33,827 [INFO] async_queue_interface.py:99 MainThread - type='MkvLogMessage' raw='MSG:1005,0,1,"MakeMKV v1.18.1 darwin(arm64-release) started","%1 started","MakeMKV v1.18.1 darwin(arm64-release)"' mkv_type='MSG' code=[1005, 0, 1] text='MakeMKV v1.18.1 darwin(arm64-release) started'
+2025-10-04 17:19:33,827 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='MkvLogMessage' raw='MSG:1004,131072,1,"Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt","Debug logging enabled, log will be saved as %1","file:///Users/enigma/MakeMKV_log.txt"' mkv_type='MSG' code=[1004, 131072, 1] text='Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt'
+2025-10-04 17:19:33,827 [INFO] async_queue_interface.py:99 MainThread - type='MkvLogMessage' raw='MSG:1004,131072,1,"Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt","Debug logging enabled, log will be saved as %1","file:///Users/enigma/MakeMKV_log.txt"' mkv_type='MSG' code=[1004, 131072, 1] text='Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt'
+2025-10-04 17:19:33,827 [DEBUG] async_queue_interface.py:118 MainThread - type='MkvLogMessage' raw='MSG:1005,0,1,"MakeMKV v1.18.1 darwin(arm64-release) started","%1 started","MakeMKV v1.18.1 darwin(arm64-release)"' mkv_type='MSG' code=[1005, 0, 1] text='MakeMKV v1.18.1 darwin(arm64-release) started'
+2025-10-04 17:19:33,827 [DEBUG] async_queue_interface.py:118 MainThread - type='MkvLogMessage' raw='MSG:1004,131072,1,"Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt","Debug logging enabled, log will be saved as %1","file:///Users/enigma/MakeMKV_log.txt"' mkv_type='MSG' code=[1004, 131072, 1] text='Debug logging enabled, log will be saved as file:///Users/enigma/MakeMKV_log.txt'
+2025-10-04 17:19:34,122 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='MkvLogMessage' raw='MSG:5042,0,0,"The program can\'t find any usable optical drives.","The program can\'t find any usable optical drives."' mkv_type='MSG' code=[5042, 0, 0] text="The program can't find any usable optical drives."
+2025-10-04 17:19:34,122 [INFO] async_queue_interface.py:99 MainThread - type='MkvLogMessage' raw='MSG:5042,0,0,"The program can\'t find any usable optical drives.","The program can\'t find any usable optical drives."' mkv_type='MSG' code=[5042, 0, 0] text="The program can't find any usable optical drives."
+2025-10-04 17:19:34,122 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:0,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:0,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:1,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:1,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:2,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:2,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:3,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:3,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:4,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:4,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:5,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:5,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:6,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:6,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:7,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:7,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:8,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:8,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:9,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:9,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:10,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:10,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:11,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:11,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:12,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:12,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:13,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:13,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:14,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:14,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='DRV:15,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='DRV:15,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:118 MainThread - type='MkvLogMessage' raw='MSG:5042,0,0,"The program can\'t find any usable optical drives.","The program can\'t find any usable optical drives."' mkv_type='MSG' code=[5042, 0, 0] text="The program can't find any usable optical drives."
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:0,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:1,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:2,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:3,256,999,0,"","",""'
+2025-10-04 17:19:34,123 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:4,256,999,0,"","",""'
+2025-10-04 17:19:34,124 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:5,256,999,0,"","",""'
+2025-10-04 17:19:34,124 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:6,256,999,0,"","",""'
+2025-10-04 17:19:34,124 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:7,256,999,0,"","",""'
+2025-10-04 17:19:34,124 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:8,256,999,0,"","",""'
+2025-10-04 17:19:34,124 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:9,256,999,0,"","",""'
+2025-10-04 17:19:34,124 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:10,256,999,0,"","",""'
+2025-10-04 17:19:34,124 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:11,256,999,0,"","",""'
+2025-10-04 17:19:34,124 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:12,256,999,0,"","",""'
+2025-10-04 17:19:34,124 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:13,256,999,0,"","",""'
+2025-10-04 17:19:34,124 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:14,256,999,0,"","",""'
+2025-10-04 17:19:34,124 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='DRV:15,256,999,0,"","",""'
+2025-10-04 17:19:34,176 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='MkvLogMessage' raw='MSG:2024,16777216,1,"Unknown device - \'/dev/disk8\'","Unknown device - \'%1\'","/dev/disk8"' mkv_type='MSG' code=[2024, 16777216, 1] text="Unknown device - '/dev/disk8'"
+2025-10-04 17:19:34,176 [INFO] async_queue_interface.py:99 MainThread - type='MkvLogMessage' raw='MSG:2024,16777216,1,"Unknown device - \'/dev/disk8\'","Unknown device - \'%1\'","/dev/disk8"' mkv_type='MSG' code=[2024, 16777216, 1] text="Unknown device - '/dev/disk8'"
+2025-10-04 17:19:34,176 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='MkvLogMessage' raw='MSG:5010,0,0,"Failed to open disc","Failed to open disc"' mkv_type='MSG' code=[5010, 0, 0] text='Failed to open disc'
+2025-10-04 17:19:34,176 [INFO] async_queue_interface.py:99 MainThread - type='MkvLogMessage' raw='MSG:5010,0,0,"Failed to open disc","Failed to open disc"' mkv_type='MSG' code=[5010, 0, 0] text='Failed to open disc'
+2025-10-04 17:19:34,176 [DEBUG] async_queue_interface.py:118 MainThread - type='MkvLogMessage' raw='MSG:2024,16777216,1,"Unknown device - \'/dev/disk8\'","Unknown device - \'%1\'","/dev/disk8"' mkv_type='MSG' code=[2024, 16777216, 1] text="Unknown device - '/dev/disk8'"
+2025-10-04 17:19:34,176 [DEBUG] async_queue_interface.py:118 MainThread - type='MkvLogMessage' raw='MSG:5010,0,0,"Failed to open disc","Failed to open disc"' mkv_type='MSG' code=[5010, 0, 0] text='Failed to open disc'
+2025-10-04 17:19:34,177 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message='TCOUNT:0'
+2025-10-04 17:19:34,177 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message='TCOUNT:0'
+2025-10-04 17:19:34,177 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message='TCOUNT:0'
+2025-10-04 17:19:34,190 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='LogMessage' message=''
+2025-10-04 17:19:34,190 [INFO] async_queue_interface.py:99 MainThread - type='LogMessage' message=''
+2025-10-04 17:19:34,190 [DEBUG] async_queue_interface.py:47 MainThread - <src.interface.async_queue_interface.AsyncQueueInterface object at 0x107a42710>._send(): type='TocStatusMessage' state='complete'
+2025-10-04 17:19:34,190 [INFO] async_queue_interface.py:99 MainThread - type='TocStatusMessage' state='complete'
+2025-10-04 17:19:34,190 [DEBUG] async_queue_interface.py:118 MainThread - type='LogMessage' message=''
+2025-10-04 17:19:34,190 [DEBUG] async_queue_interface.py:118 MainThread - type='TocStatusMessage' state='complete'
+2025-10-04 17:19:34,215 [DEBUG] state.py:29 AnyIO worker thread - path_parts: ['redux', 'toc']
+2025-10-04 17:19:34,215 [DEBUG] state.py:31 AnyIO worker thread - path_part: redux
+2025-10-04 17:19:34,215 [DEBUG] state.py:31 AnyIO worker thread - path_part: toc

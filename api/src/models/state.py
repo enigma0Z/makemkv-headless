@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from src.message.progress_message_event import StatusMessage
 from src.models.tmdb import TMDBMovieSearchResultModel, TMDBShowSearchResultModel
-from src.models.toc import TOCModel
+from src.models.toc import TocModel
 
 
 class RipDestinationModel(BaseModel):
@@ -31,7 +31,7 @@ class ReduxRipStateModel(BaseModel):
 
 class ReduxStateModel(BaseModel):
   rip: ReduxRipStateModel = ReduxRipStateModel()
-  toc: TOCModel = TOCModel()
+  toc: TocModel = TocModel()
 
 class ProgressStateModel(BaseModel):
   buffer: float | None = None

@@ -43,7 +43,7 @@ export const ButtonBar = ({ }: Props) => {
   }
 
   const handleLoadToc = () => {
-    console.info('Fetching TOC')
+    console.info('Fetching Toc')
     setTocLoading(true);
     dispatch(tocActions.setTocData(undefined))
     fetch(endpoints.toc_async(), { method: 'GET' })
