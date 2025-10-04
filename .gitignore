@@ -1,6 +1,5 @@
 .venv
 __pycache__
-
 _TOKEN.py
 config.json
 application.log
@@ -13,3 +12,6 @@ makemkv-oss*.tar.gz
 node_modules
 api/dist
 test.py
+
+api.log
+api/api.log
