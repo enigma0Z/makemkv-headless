@@ -29,6 +29,7 @@ async def rip_disc(
     rip_titles=['all'],
 ):
   interface = get_interface()
+  logger.debug(f'rip_disc() interface {interface}')
   logger.info(f'Backing up {source} to {dest}')
   interface.print(f'Backing up {source} to {dest}', target=Target.SORT)
 

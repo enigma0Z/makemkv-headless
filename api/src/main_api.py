@@ -9,7 +9,8 @@ CONFIG.update_from_file('./config.yaml')
 logging.basicConfig(
   style='{', 
   format='{asctime} [{levelname}] {filename}:{lineno} {threadName} - {message}', 
-  level=logging.DEBUG
+  level=logging.DEBUG,
+  filename='api.log'
 )
 
 logger = logging.getLogger(__name__)

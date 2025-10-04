@@ -44,7 +44,7 @@ class AsyncQueueInterface(BaseInterface):
     return create_task(self._send(message))
 
   async def _send(self, message: SocketMessage):
-    # logger.debug(f'{message}')
+    logger.debug(f'{self}._send(): {message}')
     if isinstance(message, CurrentProgressMessage) or isinstance(message, TotalProgressMessage):
       await self.queue.put(message)
       STATE.update_status(message)
