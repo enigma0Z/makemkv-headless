@@ -17,13 +17,13 @@ class TocError(Exception): ...
 logger = logging.getLogger(__name__)
 
 lock = Lock()
-toc = Toc()
 
 router = APIRouter(prefix="/toc")
 
 # @lru_cache
 async def get_toc_from_disc(source):
   with lock:
+    toc = Toc()
     await toc.get_from_disc(source)
     STATE.redux.toc = toc
     get_interface().send(TocStatusMessage(state="complete"))
