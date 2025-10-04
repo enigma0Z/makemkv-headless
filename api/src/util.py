@@ -3,6 +3,8 @@
 from asyncio import create_subprocess_shell
 from asyncio.subprocess import PIPE
 from math import trunc
+from sys import platform
+
 import os
 import re
 import shlex
@@ -32,14 +34,17 @@ def seconds_to_hms(seconds):
   return f'{hours}:{minutes:02d}:{seconds:02d}'
 
 def notify(message):
-  subprocess.Popen(
-    [
-      'osascript', '-e',
-      f'display notification "{message}" with title "Disc Backup"'
-    ],
-    stdout=subprocess.PIPE,
-    stderr=subprocess.PIPE,
-  )
+  if platform == 'darwin':
+    subprocess.Popen(
+      [
+        'osascript', '-e',
+        f'display notification "{message}" with title "Disc Backup"'
+      ],
+      stdout=subprocess.PIPE,
+      stderr=subprocess.PIPE,
+    )
+  if platform == 'linxu':
+    logger.info('Notification not supported')
 
 def clearing_line(line=' '):
   if len(line) == 0: line = ' '
