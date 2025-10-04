@@ -12,7 +12,8 @@
       "name": "Debug API",
       "type": "debugpy",
       "request": "launch",
-      "program": "api/src/main_api.py",
+      "module": "src.main_api",
+      "cwd": "${workspaceFolder}/api",
       "console": "integratedTerminal"
     },
     {
