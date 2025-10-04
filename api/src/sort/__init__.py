@@ -93,7 +93,7 @@ async def sort_titles(
             except FileNotFoundError as ex:
               interface.print('Failed to rename segment', segment_index, target=Target.SORT)
               interface.print(ex, target=Target.SORT)
-              failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}, Segment {segment_index}\n{ex}')
+              failed_titles.append(f'{index}: {title.filename}, {title.runtime}, Segment {segment_index}\n{ex}')
           if (features.DO_CLEANUP):
             remove(path.join(rip_path, title.filename))
         else:
@@ -106,7 +106,7 @@ async def sort_titles(
               path.join(rip_path, sort_file)
             )
           except FileNotFoundError as ex:
-            failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}\n{ex}')
+            failed_titles.append(f'{index}: {title.filename}, {title.runtime}\n{ex}')
 
       for index in sort_info.extra_indexes:
         title = toc.source.titles[int(index)]
@@ -117,7 +117,7 @@ async def sort_titles(
             path.join(rip_path, 'extras', f'{sanitize(toc.source.name)}___{title.filename}')
           )
         except FileNotFoundError as ex:
-          failed_titles.append(f'{title.index}: {title.filename}, {title.runtime}\n{ex}')
+          failed_titles.append(f'{index}: {title.filename}, {title.runtime}\n{ex}')
 
       if len(failed_titles) > 0:
         logger.error(f"Some titles failed to rip or copy, {failed_titles}")
