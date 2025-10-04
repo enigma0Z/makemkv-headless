@@ -7,6 +7,7 @@ import time
 
 from sys import platform
 
+from src.config import CONFIG
 from src.interface import get_interface
 from src.interface.plaintext_interface import PlaintextInterface
 from src.interface.target import Target
@@ -18,8 +19,8 @@ def disc_inserted(source):
       case 'darwin':
         return not grep('please insert', os.popen(shlex.join(['drutil', 'discinfo'])).readlines())
       case 'linux':
-        # TODO: Figure out what SOMETHING is here.
-        return not grep('SOMETHING', os.popen(shlex.join(['eject', '--noop', source.split(':')[1]])))  
+        # TODO: Figure out error status here
+        return os.popen(shlex.join(['eject', '--noop', source.split(':')[1]]))
   else:
     return True
 
@@ -39,5 +40,9 @@ async def eject_disc(
   ):
   if (source.startswith('disc') or source.startswith('dev')):
     interface.print("Ejecting Disc", target=Target.INPUT)
-    await create_subprocess_shell(shlex.join([ 'drutil', 'eject' ]))
-    await create_subprocess_shell(shlex.join([ 'diskutil', 'eject' ]))
+    match platform:
+        case 'darwin':
+          await create_subprocess_shell(shlex.join([ 'drutil', 'eject' ]))
+          await create_subprocess_shell(shlex.join([ 'diskutil', 'eject' ]))
+        case 'linux':
+          await create_subprocess_shell(shlex.join([ 'eject', CONFIG.source.split(':')[1]]))
