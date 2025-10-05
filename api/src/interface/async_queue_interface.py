@@ -124,7 +124,9 @@ class AsyncQueueInterface(BaseInterface):
           logger.debug(f'{hex(id(self))} run(): sending {message.type}')
           await self.socket.broadcast(message)
           logger.debug(f'{hex(id(self))} run(): sent {message.type}')
-    except QueueShutDown:
+    except QueueShutDown as ex:
+      logger.debug(f'{hex(id(self))} run(): Shutting Down {ex}')
+      logger.debug(ex)
       return
 
 INTERFACE = AsyncQueueInterface()
