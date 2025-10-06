@@ -38,7 +38,7 @@ export const ButtonBar = ({ }: Props) => {
 
   const handleEject = () => {
     console.info('Ejecting disc')
-    dispatch(socketActions.resetSocketState({}))
+    dispatch(socketActions.setSocketState())
     fetch(endpoints.disc.eject(), { method: 'GET' })
   }
 
@@ -46,6 +46,7 @@ export const ButtonBar = ({ }: Props) => {
     console.info('Fetching Toc')
     dispatch(tocActions.setTocLoading(true))
     dispatch(tocActions.setTocData(undefined))
+	dispatch(socketActions.setSocketState())
     fetch(endpoints.toc_async(), { method: 'GET' })
   }
 
@@ -63,7 +64,7 @@ export const ButtonBar = ({ }: Props) => {
     if (ripState?.rip_started) {
       setCancelModalOpen(true)
     } else {
-      dispatch(socketActions.resetSocketState({ rip_started: true }))
+      dispatch(socketActions.setSocketState({ rip_started: true }))
       fetch(endpoints.rip.start(), {
         method: 'POST',
         body: JSON.stringify({
