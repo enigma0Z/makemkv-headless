@@ -41,6 +41,11 @@ export type LogMessage = BaseMessageType & {
   message: string
 }
 
+export type MkvLogMessage = BaseMessageType & {
+  code: number[];
+  text: string;
+}
+
 export type TocStatusMessage = BaseMessageType & {
   state: "running" | "complete";
 }
