@@ -28,6 +28,9 @@ class RipStartStopMessage(SocketMessage):
   index: int = None
   state: Literal['stop', 'start']
 
+class TocStatusMessage(SocketMessage):
+  state: Literal['running', 'complete']
+
 # MKV Messages
 class ProgressMessage(SocketMessage): ...
 class CurrentProgressMessage(CurrentProgressModel, ProgressMessage): ...

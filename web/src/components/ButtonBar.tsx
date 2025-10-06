@@ -13,6 +13,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { StatusWrapper } from "./ButtonBar.styles";
 import { endpoints, type ApiModel } from "@/api/endpoints";
 import { ripActions } from "@/api/v1/rip/store";
+import type { Response as ResponseV1 } from "@/api/v1";
 
 type Props = {}
 
@@ -24,11 +25,11 @@ export const ButtonBar = ({ }: Props) => {
   const media = useAppSelector((state) => state.rip.destination?.media)
   const content = useAppSelector((state) => state.rip.destination?.content)
   const ripAll = useAppSelector((state) => state.rip.rip_all)
-
   const ripState = useAppSelector((state) => state.socket.ripState)
 
+  const tocLoading = useAppSelector((state) => state.toc.loading)
+
   const [cancelModalOpen, setCancelModalOpen] = useState<boolean>(false)
-  const [tocLoading, setTocLoading] = useState<boolean>(false)
 
   let current_progress: SocketProgress | undefined
   if (ripState.current_title !== null && ripState.current_title !== undefined) {
@@ -37,22 +38,16 @@ export const ButtonBar = ({ }: Props) => {
 
   const handleEject = () => {
     console.info('Ejecting disc')
-    dispatch(socketActions.resetSocketState({}))
+    dispatch(socketActions.setSocketState())
     fetch(endpoints.disc.eject(), { method: 'GET' })
   }
 
   const handleLoadToc = () => {
-    console.info('Fetching TOC')
-    setTocLoading(true);
+    console.info('Fetching Toc')
+    dispatch(tocActions.setTocLoading(true))
     dispatch(tocActions.setTocData(undefined))
-    // fetch(endpoints.state.resetSocket(), { method: 'GET' })
-    fetch(endpoints.toc(), { method: 'GET' })
-      .then(response => response.json() as Promise<ApiModel['v1']['toc']>)
-      .then(({ data }) => {
-        dispatch(tocActions.setTocData(data))
-      }).then(() => {
-        setTocLoading(false);
-      })
+	dispatch(socketActions.setSocketState())
+    fetch(endpoints.toc_async(), { method: 'GET' })
   }
 
   const handleCancelRip = () => {
@@ -69,7 +64,7 @@ export const ButtonBar = ({ }: Props) => {
     if (ripState?.rip_started) {
       setCancelModalOpen(true)
     } else {
-      dispatch(socketActions.resetSocketState({ rip_started: true }))
+      dispatch(socketActions.setSocketState({ rip_started: true }))
       fetch(endpoints.rip.start(), {
         method: 'POST',
         body: JSON.stringify({

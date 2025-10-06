@@ -20,7 +20,7 @@ import logging
 
 from src.models.makemkv import from_raw
 from src.models.socket import mkv_message_from_raw
-from src.models.toc import BaseInfoModel, SourceInfoModel, TOCModel, TitleInfoModel, TrackInfoModel
+from src.models.toc import BaseInfoModel, SourceInfoModel, TocModel, TitleInfoModel, TrackInfoModel
 logger = logging.getLogger(__name__)
 
 failure_statuses = [
@@ -41,13 +41,12 @@ def format_records(lines):
     ]
   ]
 
-class TOC(TOCModel):
-  _interface: BaseInterface = PrivateAttr(default_factory=get_interface)
-
+class Toc(TocModel):
   async def get_from_disc(self, source):
-    self._interface.print('Loading disc TOC', target=Target.MKV)
+    interface = get_interface()
+    interface.print('Loading disc Toc', target=Target.MKV)
 
-    # Load the disc TOC from makemkvcon output
+    # Load the disc Toc from makemkvcon output
     process = await create_subprocess_shell(
       shlex.join([CONFIG.makemkvcon_path, '--noscan', '--robot', 'info', source]),
       stdout=PIPE,
@@ -58,7 +57,7 @@ class TOC(TOCModel):
       stdout = await process.stdout.readline()
       self.lines.append(stdout.decode().strip())
       try:
-        self._interface.send(mkv_message_from_raw(self.lines[-1]))
+        interface.send(mkv_message_from_raw(self.lines[-1]))
       except Exception as ex:
         logger.error(f'Failed to send {self.lines[-1]} to FE with error {ex}, {format_exc()}')
         raise ex
@@ -71,7 +70,7 @@ class TOC(TOCModel):
 
   def load(self):
     '''
-    Loads disc TOC from input array of lines from `makemkvcon --robot` output
+    Loads disc Toc from input array of lines from `makemkvcon --robot` output
     '''
     records = format_records(self.lines)
 

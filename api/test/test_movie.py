@@ -6,7 +6,7 @@ from unittest.mock import DEFAULT, MagicMock, Mock, patch
 
 from src.rip_titles.rip_titles import rip_titles
 from src.sort import SortInfo
-from src.toc import TOC
+from src.toc import Toc
 
 from test.data.toc_test_data import generate_CINFO, generate_SINFO, generate_TINFO
 
@@ -28,7 +28,7 @@ class MovieTest(TestCase):
 
     mock['mkdtemp'].return_value = 'temp_dir'
 
-    mock_toc = TOC()
+    mock_toc = Toc()
     mock_toc.get_from_list(
       generate_CINFO() + 
       generate_TINFO() + 

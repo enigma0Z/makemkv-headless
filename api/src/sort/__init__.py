@@ -15,7 +15,7 @@ from src import features
 from src.interface import get_interface
 from src.json_serializable import JSONSerializable
 from src.mkvtoolnix import split_mkv
-from src.toc import TOC
+from src.toc import Toc
 from src.util import rsync, sanitize
 
 class SortInfo(SortInfoModel):
@@ -48,7 +48,7 @@ class ShowInfo(ShowInfoModel, SortInfo):
     return f'{self.path()} - First Episode: {self.first_episode}'
 
 async def sort_titles(
-    toc: TOC,
+    toc: Toc,
     rip_path_base: str,  # /tmp/XXXXXX
     dest_path_base: str, # user@host:/path/to/media/library
     sort_info: SortInfo,

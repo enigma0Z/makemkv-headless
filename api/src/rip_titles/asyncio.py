@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 from src.sort import SortInfo, sort_titles
 
-from src.toc import TOC
+from src.toc import Toc
 
 
 EPISODE_LENGTH_TOLERANCE = 90
@@ -23,7 +23,7 @@ async def rip_titles(
     source: str, 
     dest_path: str, 
     sort_info: SortInfo,
-    toc: TOC,
+    toc: Toc,
     rip_all=False,
     temp_prefix: str = None,
   ):

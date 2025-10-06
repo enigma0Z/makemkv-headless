@@ -8,7 +8,7 @@ import { tocActions } from '@/api/v1/toc/store'
 import { tmdbActions } from '@/api/v1/tmdb/store'
 import { ripActions } from '@/api/v1/rip/store'
 import { StatusScroller } from '@/components/status/StatusScroller'
-import { TOCGrid } from '@/components/toc/TOCGrid'
+import { TocGrid } from '@/components/toc/TocGrid'
 import { useGetStateByPathQuery, useGetStateQuery } from '@/api/v1/state/api'
 
 function App() {
@@ -42,7 +42,7 @@ function App() {
     <AppContainer>
       <ButtonBar />
       <CombinedShowMovieForm />
-      <TOCGrid />
+      <TocGrid />
       <StatusScroller /> 
     </AppContainer>
   )

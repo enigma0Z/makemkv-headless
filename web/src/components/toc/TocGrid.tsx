@@ -3,9 +3,8 @@ import { ripActions } from "@/api/v1/rip/store"
 import { hmsToSeconds } from "@/util/string"
 import { Box, Card, Checkbox, Collapse, Divider, IconButton, LinearProgress, Radio, Typography } from "@mui/material"
 import { Fragment, useEffect, useState } from "react"
-import type { TitleInfo, Toc } from "@/api/v1/toc/store"
 
-import { BorderCell, CheckboxCell, CollapseRow, DetailsWrapper, DividerCell, EpisodeCell, FilenameCell, FilenameContent, FilenameHead, FullWidthRow, MainExtraCell, MainExtrasRadioGroup, RuntimeCell, StatusWrapperCell, TOCGridContainer } from "./TOCGrid.styles"
+import { BorderCell, CheckboxCell, CollapseRow, DetailsWrapper, DividerCell, EpisodeCell, FilenameCell, FilenameContent, FilenameHead, FullWidthRow, MainExtraCell, MainExtrasRadioGroup, RuntimeCell, StatusWrapperCell, TocGridContainer } from "./TocGrid.styles"
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -13,6 +12,7 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import { isRippingStatus } from "@/models/socket"
+import type { TitleInfo, Toc } from "@/api/v1/toc/types"
 
 
 type Props = {
@@ -32,7 +32,7 @@ const episodeId = (seasonNumber: number, episodeNumber: number) => {
   return "S" + `${seasonNumber}`.padStart(2, "0") + "E" + `${episodeNumber}`.padStart(2, "0")
 }
 
-export const TOCGrid = ({ }: Props) => {
+export const TocGrid = ({ }: Props) => {
 
   const dispatch = useAppDispatch()
 
@@ -177,7 +177,7 @@ export const TOCGrid = ({ }: Props) => {
   }
 
   return (<Card>
-    <TOCGridContainer>
+    <TocGridContainer>
       <BorderCell />
       <CheckboxCell>
         <IconButton>
@@ -229,7 +229,7 @@ export const TOCGrid = ({ }: Props) => {
             return (
               <Fragment key={index}>
                 <DividerCell />
-                <TOCGridRow
+                <TocGridRow
                   key={index}
                   index={index}
                   data={title}
@@ -256,7 +256,7 @@ export const TOCGrid = ({ }: Props) => {
         )
       }
       <BorderCell />
-    </TOCGridContainer>
+    </TocGridContainer>
   </Card> )
 }
 
@@ -272,7 +272,7 @@ type RowProps = {
   minimized?: boolean;
 }
 
-export const TOCGridRow = ({ index, data, statusText, titleType, episodeNumber, minimized: minimizedProp, episodes }: RowProps) => {
+export const TocGridRow = ({ index, data, statusText, titleType, episodeNumber, minimized: minimizedProp, episodes }: RowProps) => {
   const dispatch = useAppDispatch()
 
   const [minimized, setMinimized] = useState<boolean>(minimizedProp ?? true)

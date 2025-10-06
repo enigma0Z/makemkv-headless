@@ -3,7 +3,8 @@ import type { Toc } from "./types";
 
 const initialState: Partial<Toc> = {
   lines: [],
-  source: undefined
+  source: undefined,
+  loading: false
 }
 
 const tocSlice = createSlice({
@@ -18,6 +19,9 @@ const tocSlice = createSlice({
         state.lines = []
         state.source = undefined
       }
+    },
+    setTocLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload
     }
   }
 })

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 from disc import eject_disc, wait_for_disc_inserted
 from interface import BaseInterface, PlaintextInterface, Target
 from makemkv import rip_disc
-from toc import TOC
+from toc import Toc
 from util import hms_to_seconds, rsync, sanitize, string_to_list_int
 
 import api.src.tmdb_search.search as search
@@ -23,7 +23,7 @@ import features
 def rip_movie(
     source: str, 
     dest_path: str, 
-    toc: TOC,
+    toc: Toc,
     sort_info: SortInfo,
     rip_all=False,
     interface: BaseInterface = PlaintextInterface(),
@@ -100,7 +100,7 @@ def rip_movie_interactive(
     wait_for_disc_inserted(source)
     extras_indexes = None # Reset per loop
 
-    toc = TOC(interface=interface)
+    toc = Toc(interface=interface)
 
     thread = threading.Thread(target=toc.get_from_disc, args=[source])
 
@@ -126,8 +126,8 @@ def rip_movie_interactive(
 
     id = interface.get_input(f'What is the {id_key} of this movie?', id)
 
-    interface.print('Waiting for TOC read to complete...', target=Target.STATUS)
-    interface.title('Waiting for TOC read to complete...', target=Target.MKV)
+    interface.print('Waiting for Toc read to complete...', target=Target.STATUS)
+    interface.title('Waiting for Toc read to complete...', target=Target.MKV)
     thread.join()
 
     interface.print("All Titles", target=Target.MKV)

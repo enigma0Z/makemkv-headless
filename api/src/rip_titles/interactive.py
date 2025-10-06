@@ -9,7 +9,7 @@ from src.interface.plaintext_interface import PlaintextInterface
 from src.rip_titles.rip_titles import rip_titles
 from src.sort import ShowInfo, SortInfo
 from src.disc import wait_for_disc_inserted
-from src.toc import TOC
+from src.toc import Toc
 from src.util import hms_to_seconds, string_to_list_int
 
 from src.tmdb import search
@@ -37,7 +37,7 @@ def rip_movie_interactive(
     wait_for_disc_inserted(source)
     extras_indexes = None # Reset per loop
 
-    toc = TOC(interface=interface)
+    toc = Toc(interface=interface)
 
     thread = threading.Thread(target=toc.get_from_disc, args=[source])
 
@@ -60,8 +60,8 @@ def rip_movie_interactive(
 
     id = interface.get_input(f'What is the {id_key} of this movie?', id)
 
-    interface.print('Waiting for TOC read to complete...', target=Target.STATUS)
-    interface.title('Waiting for TOC read to complete...', target=Target.MKV)
+    interface.print('Waiting for Toc read to complete...', target=Target.STATUS)
+    interface.title('Waiting for Toc read to complete...', target=Target.MKV)
     thread.join()
 
     interface.print("All Titles", target=Target.MKV)
@@ -144,7 +144,7 @@ def rip_show_interactive(
 
   while True:
     wait_for_disc_inserted(source, interface)
-    toc = TOC(interface=interface)
+    toc = Toc(interface=interface)
 
     thread = threading.Thread(target=toc.get_from_disc, args=[source])
 
@@ -171,8 +171,8 @@ def rip_show_interactive(
     season_number = int(interface.get_input(f'What season is this disc?', season_number))
     first_ep = int(interface.get_input(f'What is the first episode number on this disc?', next_first_ep))
 
-    interface.print('Waiting for TOC read to complete...', target=Target.STATUS)
-    interface.title('Waiting for TOC read to complete...', target=Target.MKV)
+    interface.print('Waiting for Toc read to complete...', target=Target.STATUS)
+    interface.title('Waiting for Toc read to complete...', target=Target.MKV)
     thread.join()
 
     interface.print("All Titles", target=Target.MKV)
