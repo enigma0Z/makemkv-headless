@@ -113,20 +113,18 @@ class AsyncQueueInterface(BaseInterface):
 
   async def run(self):
     '''Start the queue processing thread'''
-    try:
-      logger.info(f'{hex(id(self))} run(): Starting queue loop')
-      while True:
+    logger.info(f'{hex(id(self))} run(): Starting queue loop')
+    while True:
+      try:
         message = await self.queue.get()
-        logger.debug(f'{hex(id(self))} run(): received {message}')
         if isinstance(message, SocketMessage):
-          if isinstance(message, ProgressMessage):
-            logger.info(f'sending progress message {message} to clients {self.socket.active_connections}')
-          logger.debug(f'{hex(id(self))} run(): sending {message.type}')
           await self.socket.broadcast(message)
-          logger.debug(f'{hex(id(self))} run(): sent {message.type}')
-    except QueueShutDown as ex:
-      logger.debug(f'{hex(id(self))} run(): Shutting Down {ex}')
-      logger.debug(ex)
-      return
+      except QueueShutDown as ex:
+        logger.debug(f'{hex(id(self))} run(): Shutting Down {ex}')
+        logger.debug(ex)
+        return
+      except Exception as ex:
+        logger.error(f'Unhandled exception in async_queue_interface.py:run()')
+        logger.error(ex)
 
 INTERFACE = AsyncQueueInterface()
