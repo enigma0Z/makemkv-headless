@@ -5,12 +5,12 @@ A headless interface for [makemkv](https://makemkv.com).
 ## Overview and features
 
 * Designed to integrate tightly with [Jellyfin](https://jellyfin.org)'s
-  organization schema for files
+	organization schema for files
 * Built-in [TMDB](https://www.themoviedb.org) lookup for media titles, name
-  (formatting), etc. to make it easier for Jellyfin to find your media
+	(formatting), etc. to make it easier for Jellyfin to find your media
 * Mobile or desktop friendly interface
 * Frontend web interface built in Typescript using [React](https://react.dev)
-  with [Vite](https://vite.dev/guide/)
+	with [Vite](https://vite.dev/guide/)
 * Backend built in Python with [FastApi](https://fastapi.tiangolo.com)
 
 ## Installation
@@ -34,27 +34,38 @@ case, you'll need to wait for a fix and update, or manually roll back to a
 previous commit.
 
 ### The easy way
-  
+	
 > _Sorry, this way doesn't exist yet.  When it does, it'll be something like
 > "install the deb etc then just run it 5head"_
 
 ### The "advanced" way
 
 1. `git clone` the repo
-2. `./start.sh`
+2. `./web.sh`
 3. Install the dependencies you probably missed
 4. Install the dependencies **I** probably missed writing down
-5. Repeat #2 again
-
-This will launch a screen session for each of the web and api apps.  The API is
-accessible on port `4000` on your local system.  The web interface is accessible
-on port `3000`.  Typically at this point you'd open up a browser and go to
-http://localhost:3000 or similar.
-
-You can stop the running services by running `./stop.sh` and pairing them
-together (stop then start) will restart things if they are already running.
+5. Kill the web interface
+6. `./api.sh`
+7. Repeat #3 and #4 above
 
 ## Usage
+
+1. Configure it: copy `api/config.example.yaml` to `api/config.yaml`
+	* See the comments from the example on how to configure each field
+	* Note that you will need to get your own TMDB API key
+2. Run it: `./start.sh`
+	* This will create a screen session for each of web and api
+	* You can run `screen -R makemkv-headless-api` (for example) to attach to
+		the running session and see active output from the api server
+	* If you borked up any dependencies, you may not see both running when you
+		check via `screen -ls` or similar, review the installation steps in that
+		case
+3. Access and use the web interface
+	* Fill out the form fields
+	* Hit the load TOC button to load the table of contents from the disk
+	* Make sure mains/extras are set right and the tracks you want to rip are
+    	selected
+	* Click "Rip Disk" to start
 
 ### Configuration
 

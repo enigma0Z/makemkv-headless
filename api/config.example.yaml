@@ -12,7 +12,8 @@ source: dev:/dev/disk8
 # Where to rsync files to once they're extracted, in rsync cli format, ala
 # [[user@]host:]path/to/destination -- Note that rsync will also copy files
 # around locally, no need to include the `user@host:` part if you are copying
-# locally.
+# locally.  This will create folders at the destination in the following format
+# (from the frontend form): <destination (this part here)>/<library>/<format>/<content>/<name>
 destination: 
 
 # Where to store files directly after they are ripped.  This is where
