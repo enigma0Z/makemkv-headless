@@ -25,11 +25,11 @@ export const ButtonBar = ({ }: Props) => {
   const media = useAppSelector((state) => state.rip.destination?.media)
   const content = useAppSelector((state) => state.rip.destination?.content)
   const ripAll = useAppSelector((state) => state.rip.rip_all)
-
   const ripState = useAppSelector((state) => state.socket.ripState)
 
+  const tocLoading = useAppSelector((state) => state.toc.loading)
+
   const [cancelModalOpen, setCancelModalOpen] = useState<boolean>(false)
-  const [tocLoading, setTocLoading] = useState<boolean>(false)
 
   let current_progress: SocketProgress | undefined
   if (ripState.current_title !== null && ripState.current_title !== undefined) {
@@ -44,7 +44,7 @@ export const ButtonBar = ({ }: Props) => {
 
   const handleLoadToc = () => {
     console.info('Fetching Toc')
-    setTocLoading(true);
+    dispatch(tocActions.setTocLoading(true))
     dispatch(tocActions.setTocData(undefined))
     fetch(endpoints.toc_async(), { method: 'GET' })
   }

@@ -1,6 +1,7 @@
 export type Toc = {
   lines: string[];
   source: BaseInfo & SourceInfo;
+  loading: boolean;
 }
 
 export type BaseInfo = {

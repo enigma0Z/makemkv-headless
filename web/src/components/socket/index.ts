@@ -48,6 +48,7 @@ socket.on("TocStatusMessage", (value: TocStatusMessage) => {
       .then(({ data }) => {
         if (data.redux?.toc) {
           store.dispatch(tocActions.setTocData(data.redux.toc))
+          store.dispatch(tocActions.setTocLoading(false))
         }
       })
   }
