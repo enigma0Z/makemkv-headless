@@ -17,3 +17,7 @@ api.log
 api/api.log
 api/mkvtoolnix.log
 notes.md
+dot-ssh.tgz
+/test*.py
+/test*.ts
+/tmp
