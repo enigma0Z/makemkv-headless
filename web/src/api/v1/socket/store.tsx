@@ -37,7 +37,7 @@ const socketSlice = createSlice({
         state.ripState = { ...state.ripState, ...action.payload }
       }
     },
-    setSocketState: (state, action?: PayloadAction<SocketState['ripState']> ) => {
+    setSocketState: (state, action: PayloadAction<SocketState['ripState'] | undefined>) => {
       state.ripState = { ...initialState.ripState, ...(action?.payload ?? {}) }
     },
     appendToMessages: (state, action: PayloadAction<string>) => {
