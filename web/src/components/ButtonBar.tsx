@@ -47,6 +47,8 @@ export const ButtonBar = ({ }: Props) => {
     dispatch(tocActions.setTocLoading(true))
     dispatch(tocActions.setTocData(undefined))
 	dispatch(socketActions.setSocketState())
+	dispatch(ripActions.setMainIndexes([]))
+	dispatch(ripActions.setExtraIndexes([]))
     fetch(endpoints.toc_async(), { method: 'GET' })
   }
 
