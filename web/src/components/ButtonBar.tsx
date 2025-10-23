@@ -12,8 +12,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { StatusWrapper } from "./ButtonBar.styles";
 import { endpoints, type ApiModel } from "@/api/endpoints";
-import { ripActions } from "@/api/v1/rip/store";
-import type { Response as ResponseV1 } from "@/api/v1";
+import { ripActions, ripSelectors } from "@/api/v1/rip/store";
 
 type Props = {}
 
@@ -24,8 +23,8 @@ export const ButtonBar = ({ }: Props) => {
   const library = useAppSelector((state) => state.rip.destination?.library)
   const media = useAppSelector((state) => state.rip.destination?.media)
   const content = useAppSelector((state) => state.rip.destination?.content)
-  const ripAll = useAppSelector((state) => state.rip.rip_all)
   const ripState = useAppSelector((state) => state.socket.ripState)
+  const ripAll = useAppSelector((state) => ripSelectors.rip_all(state))
 
   const tocLoading = useAppSelector((state) => state.toc.loading)
 

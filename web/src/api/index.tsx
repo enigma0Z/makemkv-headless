@@ -3,15 +3,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { throttle } from "lodash";
 
 import rip, { ripStateIsValid, type RipState } from './v1/rip/store'
-import toc, { type TocState } from './v1/toc/store'
 import tmdb, { type TmdbState } from "./v1/tmdb/store";
 import socket, { type SocketState } from "./v1/socket/store";
 import { BACKEND, endpoints } from "./endpoints";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import type { Toc } from "./v1/toc/types";
+import toc from './v1/toc/store'
 
 export type RootState = {
   rip: RipState,
-  toc: TocState,
+  toc: Partial<Toc>,
   tmdb: TmdbState,
   socket: SocketState
 }
@@ -49,8 +50,8 @@ export const store = configureStore({
     .concat(updateApiMiddleware)
     .concat(api.middleware),
   reducer: {
-    rip, toc, tmdb, socket, api: api.reducer
-  }
+    rip: rip.reducer, toc, tmdb, socket, api: api.reducer
+  },
 })
 
 export type AppDispatch = typeof store.dispatch

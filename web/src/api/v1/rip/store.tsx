@@ -5,7 +5,6 @@ import type { TmdbSearchResult } from "../tmdb/types";
 
 export interface RipState {
   destination: RipStateDestination;
-  rip_all: boolean;
   sort_info: SortInfo & ShowInfo;
   toc_length: number
   tmdb_selection: TmdbSearchResult | null
@@ -33,7 +32,6 @@ const initialState: RipState = {
     split_segments: undefined,
     id_db: 'tmdbid'
   },
-  rip_all: false,
   toc_length: 0,
   tmdb_selection: null
 }
@@ -56,16 +54,12 @@ const ripSlice = createSlice({
         console.debug('applying')
         state.destination = action.payload.destination ?? initialState.destination
         state.sort_info = action.payload.sort_info ?? initialState.sort_info
-        state.rip_all = action.payload.rip_all ?? initialState.rip_all
         state.toc_length = action.payload.toc_length ?? initialState.toc_length
         state.tmdb_selection = action.payload.tmdb_selection ?? initialState.tmdb_selection
       }
     },
     updateSortInfo: (state, action: PayloadAction<RipState['sort_info']>) => {
       state.sort_info = {...state.sort_info, ...action.payload}
-    },
-    setRipAll: (state, action: PayloadAction<RipState['rip_all']>) => {
-      state.rip_all = action.payload
     },
     setLibrary: (state, action: PayloadAction<RipStateDestination['library']>) => {
       state.destination = {...state.destination, library: action.payload}
@@ -78,27 +72,22 @@ const ripSlice = createSlice({
     },
     setMainIndexes: (state, action: PayloadAction<number[]>) => {
       state.sort_info.main_indexes = action.payload
-      state.rip_all = [...state.sort_info.main_indexes, ...state.sort_info.extra_indexes].filter(uniqueFilter).length == state.toc_length
     },
     setExtraIndexes: (state, action: PayloadAction<number[]>) => {
       state.sort_info.extra_indexes = action.payload
-      state.rip_all = [...state.sort_info.main_indexes, ...state.sort_info.extra_indexes].filter(uniqueFilter).length == state.toc_length
     },
     addMainIndex: (state, action: PayloadAction<number>) => {
       state.sort_info.main_indexes.push(action.payload)
       state.sort_info.main_indexes.sort()
       state.sort_info.main_indexes = state.sort_info.main_indexes.filter(uniqueFilter)
-      state.rip_all = [...state.sort_info.main_indexes, ...state.sort_info.extra_indexes].filter(uniqueFilter).length == state.toc_length
     },
     addExtraIndex: (state, action: PayloadAction<number>) => {
       state.sort_info.extra_indexes.push(action.payload)
       state.sort_info.extra_indexes.sort()
       state.sort_info.extra_indexes = state.sort_info.extra_indexes.filter(uniqueFilter)
-      state.rip_all = [...state.sort_info.main_indexes, ...state.sort_info.extra_indexes].filter(uniqueFilter).length == state.toc_length
     },
     removeMainIndex: (state, action: PayloadAction<number>) => {
       state.sort_info.main_indexes = state.sort_info.main_indexes.filter((value) => value !== action.payload)
-      state.rip_all = [...state.sort_info.main_indexes, ...state.sort_info.extra_indexes].filter(uniqueFilter).length == state.toc_length
     },
     swapMainIndexForward: (state, action: PayloadAction<number>) => {
       const indexOfIndex = state.sort_info.main_indexes.indexOf(action.payload)
@@ -134,7 +123,7 @@ const ripSlice = createSlice({
     },
     removeExtraIndex: (state, action: PayloadAction<number>) => {
       state.sort_info.extra_indexes = state.sort_info.extra_indexes.filter((value) => value !== action.payload)
-      state.rip_all = [...state.sort_info.main_indexes, ...state.sort_info.extra_indexes].filter(uniqueFilter).length == state.toc_length
+    //   state.rip_all = [...state.sort_info.main_indexes, ...state.sort_info.extra_indexes].filter(uniqueFilter).length == state.toc_length
     },
     setTocLength: (state, action: PayloadAction<number | undefined>) => {
       state.toc_length = action.payload ?? 0
@@ -157,9 +146,15 @@ const ripSlice = createSlice({
     setTmdbSelection: (state, action: PayloadAction<TmdbSearchResult>) => {
       state.tmdb_selection = action.payload
     }
+  },
+  selectors: {
+	rip_all: (state) => (
+		[...state.sort_info.main_indexes, ...state.sort_info.extra_indexes].filter(uniqueFilter).length == state.toc_length
+	)
   }
 })
 
 export const ripActions = ripSlice.actions
+export const ripSelectors = ripSlice.selectors
 
-export default ripSlice.reducer
+export default ripSlice
