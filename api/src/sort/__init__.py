@@ -19,7 +19,8 @@ from src.toc import Toc
 from src.util import rsync, sanitize
 
 class SortInfo(SortInfoModel):
-  _index: int = PrivateAttr(default=-1) # Initialize to -1 to prevent oboe with next_file
+  # Initialize to -1 to prevent oboe with next_file()
+  _index: int = PrivateAttr(default=-1) 
 
   def path(self):
     return self.base_path()
