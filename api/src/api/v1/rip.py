@@ -15,18 +15,22 @@ from src.rip_titles.asyncio import rip_titles
 from src.sort import ShowInfo, SortInfo
 from src.toc import Toc
 
+class RequestModel(BaseModel):
+  destination: str
+  rip_all: bool
+  sort_info: SortInfo | ShowInfo
+
+class ResponseModel(BaseModel):
+  request: RequestModel
+
 interface = get_interface()
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix='/rip')
 
 rip_task: Task | None = None
+rip_request: RequestModel | None = None
 
 LOCK = Lock()
-
-class RequestModel(BaseModel):
-  destination: str
-  rip_all: bool
-  sort_info: SortInfo | ShowInfo
 
 async def rip_task_fn(data: RequestModel):
   async with LOCK:
@@ -49,13 +53,24 @@ async def rip_task_fn(data: RequestModel):
 @router.post('/')
 async def post_rip(data: RequestModel, background_tasks: BackgroundTasks):
   logger.debug(data)
+  global rip_request 
+  rip_request = data
 
   if not LOCK.locked():
     background_tasks.add_task(rip_task_fn, data)
-    return APIResponse("started")
+    return APIResponse("started", rip_request)
 
   else:
-    return APIResponse("in progress")
+    return APIResponse("in progress", rip_request)
+
+@router.get('')
+@router.get('/')
+async def get_rip():
+  if not LOCK.locked():
+    return APIResponse("stopped", rip_request)
+
+  else:
+    return APIResponse("in progress", rip_request)
     
 @router.get('.stop')
 async def get_rip_stop():
