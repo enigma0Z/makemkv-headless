@@ -1,5 +1,5 @@
 import { AppBar, Button, IconButton, LinearProgress, Toolbar, Tooltip, Typography } from "@mui/material";
-import { useAppDispatch, useAppSelector } from "@/api";
+import { store, useAppDispatch, useAppSelector } from "@/api";
 import { socketActions, type SocketProgress } from "@/api/v1/socket/store";
 import { tocActions } from "@/api/v1/toc/store";
 import { ConfirmationDialog } from "./ConfirmationModal";
@@ -25,6 +25,8 @@ export const ButtonBar = ({ }: Props) => {
   const content = useAppSelector((state) => state.rip.destination?.content)
   const ripState = useAppSelector((state) => state.socket.ripState)
 
+  const ripAll = () => ripSelectors.rip_all(store.getState())
+
   const tocLoading = useAppSelector((state) => state.toc.loading)
 
   const [cancelModalOpen, setCancelModalOpen] = useState<boolean>(false)
@@ -44,9 +46,9 @@ export const ButtonBar = ({ }: Props) => {
     console.info('Fetching Toc')
     dispatch(tocActions.setTocLoading(true))
     dispatch(tocActions.setTocData(undefined))
-	dispatch(socketActions.setSocketState())
-	dispatch(ripActions.setMainIndexes([]))
-	dispatch(ripActions.setExtraIndexes([]))
+    dispatch(socketActions.setSocketState())
+    dispatch(ripActions.setMainIndexes([]))
+    dispatch(ripActions.setExtraIndexes([]))
     fetch(endpoints.toc_async(), { method: 'GET' })
   }
 
@@ -68,7 +70,7 @@ export const ButtonBar = ({ }: Props) => {
       fetch(endpoints.rip.start(), {
         method: 'POST',
         body: JSON.stringify({
-          rip_all: useAppSelector((state) => ripSelectors.rip_all(state)),
+          rip_all: ripAll(),
           destination: `${library}/${content}s/${media}`,
           sort_info: sortInfo
         }),
