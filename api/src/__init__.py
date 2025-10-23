@@ -74,7 +74,7 @@ def parse_args():
   if opts.temp_prefix:
     CONFIG.update(temp_prefix=opts.temp_prefix)
 
-  logging.info('Starting makemkv-batch')
+  logging.info('Starting makemkv-headless')
 
   features.DO_SORT = not opts.skip_sort
   features.DO_RIP = not opts.skip_rip

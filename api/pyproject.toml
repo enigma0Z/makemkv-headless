@@ -41,18 +41,18 @@ description = "Python wrapper-server built around makemkvcli and with built-in o
 readme = "README.md"
 license = "MIT"
 license-files = ["LICEN[CS]E.*"]
-keywords = ["makemkv", "makemkv-batch", "makemkv-server", "jellyfin"]
+keywords = ["makemkv", "makemkv-headless", "makemkv-server", "jellyfin"]
 
 [project.urls]
-Homepage = "https://github.com/enigma0Z/makemkv-batch"
-Documentation = "https://github.com/enigma0Z/makemkv-batch/blob/main/README.md"
-Repository = "https://github.com/enigma0Z/makemkv-batch.git"
-"Bug Tracker" = "https://github.com/enigma0Z/makemkv-batch/issues"
-Changelog = "https://github.com/enigma0Z/makemkv-batch/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/enigma0Z/makemkv-headless"
+Documentation = "https://github.com/enigma0Z/makemkv-headless/blob/main/README.md"
+Repository = "https://github.com/enigma0Z/makemkv-headless.git"
+"Bug Tracker" = "https://github.com/enigma0Z/makemkv-headless/issues"
+Changelog = "https://github.com/enigma0Z/makemkv-headless/blob/main/CHANGELOG.md"
 
 [project.scripts]
 # import sys; from spam import main_cli; sys.exit(main_cli())
-makemkv-batch = "src:main_cli"
+makemkv-headless = "src:main_cli"
 makemkv-server = "src:main_api"
 
 # [project.entry-points."spam.magical"]

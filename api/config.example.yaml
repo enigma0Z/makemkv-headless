@@ -20,7 +20,7 @@ destination:
 # `makemkvcon` will drop its files (within a temporary directory therein).  This
 # is a **TRUE PREFIX** so if you do not include the trailing slash, it'll create
 # folders in that destination with the prefix name.
-temp_prefix: /tmp/makemkv-batch/
+temp_prefix: /tmp/makemkv-headless/
 
 # Log level.  ERROR WARNING INFO DEBUG
 log_level: DEBUG
