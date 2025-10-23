@@ -12,7 +12,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { StatusWrapper } from "./ButtonBar.styles";
 import { endpoints, type ApiModel } from "@/api/endpoints";
-import { ripActions, ripSelectors } from "@/api/v1/rip/store";
+import { ripActions } from "@/api/v1/rip/store";
+import { uniqueFilter } from "@/util/array";
 
 type Props = {}
 
@@ -24,8 +25,12 @@ export const ButtonBar = ({ }: Props) => {
   const media = useAppSelector((state) => state.rip.destination?.media)
   const content = useAppSelector((state) => state.rip.destination?.content)
   const ripState = useAppSelector((state) => state.socket.ripState)
-
-  const ripAll = () => ripSelectors.rip_all(store.getState())
+  const ripAll = useAppSelector((state) =>
+    state.toc.source?.titles.length == [
+      ...state.rip.sort_info.extra_indexes, 
+      ...state.rip.sort_info.main_indexes
+    ].filter(uniqueFilter).length
+  )
 
   const tocLoading = useAppSelector((state) => state.toc.loading)
 
@@ -54,12 +59,12 @@ export const ButtonBar = ({ }: Props) => {
 
   const handleCancelRip = () => {
     fetch(endpoints.rip.stop(), { method: 'GET' })
-    .then((response) => response.json() as Promise<ApiModel['v1']['rip.stop']>)
-    .then(({ status }) => {
-      if (status === 'stopped') {
-        dispatch(socketActions.updateSocketState({ rip_started: false }))
-      }
-    })
+      .then((response) => response.json() as Promise<ApiModel['v1']['rip.stop']>)
+      .then(({ status }) => {
+        if (status === 'stopped') {
+          dispatch(socketActions.updateSocketState({ rip_started: false }))
+        }
+      })
   };
 
   const handleStartRip = () => {
@@ -70,7 +75,7 @@ export const ButtonBar = ({ }: Props) => {
       fetch(endpoints.rip.start(), {
         method: 'POST',
         body: JSON.stringify({
-          rip_all: ripAll(),
+          rip_all: ripAll,
           destination: `${library}/${content}s/${media}`,
           sort_info: sortInfo
         }),
@@ -110,9 +115,9 @@ export const ButtonBar = ({ }: Props) => {
           sx={{ marginLeft: "auto", textWrap: "nowrap", minWidth: 'max-content' }}
           onClick={handleStartRip}
           variant="outlined"
-          startIcon={ ripState?.rip_started ? <CancelIcon /> : <CheckCircleIcon /> }
+          startIcon={ripState?.rip_started ? <CancelIcon /> : <CheckCircleIcon />}
         >
-          { ripState?.rip_started 
+          {ripState?.rip_started
             ? "Cancel Rip"
             : "Start Rip"
           }
@@ -125,7 +130,7 @@ export const ButtonBar = ({ }: Props) => {
           message={'This disc will not get uploaded if it is cancelled now'}
         />
       </Toolbar>
-      { ripState?.total_status && <StatusWrapper>
+      {ripState?.total_status && <StatusWrapper>
         <Typography variant="caption">
           {ripState?.total_status
             ? <>{ripState.total_status} ({Math.round((ripState.total_progress?.progress ?? 0) * 10000) / 100}%) </>
@@ -147,7 +152,7 @@ export const ButtonBar = ({ }: Props) => {
             value={(current_progress.progress ?? 0) * 100}
           />
         </>}
-      </StatusWrapper> }
+      </StatusWrapper>}
     </AppBar>
     <div style={{ height: ripState?.total_status ? "8rem" : "4rem" }} />
   </>

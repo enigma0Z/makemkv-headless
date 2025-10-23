@@ -123,7 +123,6 @@ const ripSlice = createSlice({
     },
     removeExtraIndex: (state, action: PayloadAction<number>) => {
       state.sort_info.extra_indexes = state.sort_info.extra_indexes.filter((value) => value !== action.payload)
-    //   state.rip_all = [...state.sort_info.main_indexes, ...state.sort_info.extra_indexes].filter(uniqueFilter).length == state.toc_length
     },
     setTocLength: (state, action: PayloadAction<number | undefined>) => {
       state.toc_length = action.payload ?? 0
@@ -146,15 +145,9 @@ const ripSlice = createSlice({
     setTmdbSelection: (state, action: PayloadAction<TmdbSearchResult>) => {
       state.tmdb_selection = action.payload
     }
-  },
-  selectors: {
-	rip_all: (state) => (
-		[...state.sort_info.main_indexes, ...state.sort_info.extra_indexes].filter(uniqueFilter).length == state.toc_length
-	)
   }
 })
 
 export const ripActions = ripSlice.actions
-export const ripSelectors = ripSlice.selectors
 
 export default ripSlice
