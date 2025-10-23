@@ -19,7 +19,7 @@ from src.toc import Toc
 from src.util import rsync, sanitize
 
 class SortInfo(SortInfoModel):
-  _index: int = PrivateAttr(default=0)
+  _index: int = PrivateAttr(default=-1) # Initialize to -1 to prevent oboe with next_file
 
   def path(self):
     return self.base_path()
@@ -31,9 +31,8 @@ class SortInfo(SortInfoModel):
     return f'{self.path()} - {self._index}.mkv'
 
   def next_file(self):
-    return_file = self.file()
     self._index += 1
-    return return_file
+    return self.file()
 
   def __str__(self):
     return self.path()
