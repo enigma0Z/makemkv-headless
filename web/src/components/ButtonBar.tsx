@@ -24,7 +24,6 @@ export const ButtonBar = ({ }: Props) => {
   const media = useAppSelector((state) => state.rip.destination?.media)
   const content = useAppSelector((state) => state.rip.destination?.content)
   const ripState = useAppSelector((state) => state.socket.ripState)
-  const ripAll = useAppSelector((state) => ripSelectors.rip_all(state))
 
   const tocLoading = useAppSelector((state) => state.toc.loading)
 
@@ -69,7 +68,7 @@ export const ButtonBar = ({ }: Props) => {
       fetch(endpoints.rip.start(), {
         method: 'POST',
         body: JSON.stringify({
-          rip_all: ripAll,
+          rip_all: useAppSelector((state) => ripSelectors.rip_all(state)),
           destination: `${library}/${content}s/${media}`,
           sort_info: sortInfo
         }),
