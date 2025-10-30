@@ -36,6 +36,7 @@ async def rip_task_fn(data: RequestModel):
   async with LOCK:
     logger.debug(f'rip_task_fn(), {rip_task}')
     STATE.reset_socket()
+    STATE.socket.rip_started = True
     toc = Toc()
     await toc.get_from_disc(CONFIG.source)
     await rip_titles(
