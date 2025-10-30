@@ -42,7 +42,7 @@ export const TocGrid = ({ }: Props) => {
   const content = useAppSelector((state) => state.rip.destination?.content)
   const ripState = useAppSelector((state) => state.socket.ripState)
 
-  // const [oldMainIndexes, setOldMainIndexes] = useState<number[]>([])
+  const [oldMainIndexes, setOldMainIndexes] = useState<number[]>([])
   const [oldExtraIndexes, setOldExtraIndexes] = useState<number[]>([])
 
   const getTitleGroups = () => {
@@ -157,19 +157,26 @@ export const TocGrid = ({ }: Props) => {
 
   const handleSelectAllOnClick = (_event: React.ChangeEvent, checked: boolean) => {
     if (checked) {
+      const { mainIndexes: newMainIndexes, extraIndexes: newExtraIndexes } = getIndexes()
       data?.source?.titles.forEach((_value, index) => {
         const isInMainIndexes = (mainIndexes.indexOf(index) > -1)
         const isInExtraIndexes = (extraIndexes.indexOf(index) > -1)
-        // const wasInMainIndexes = (oldMainIndexes.indexOf(index) > -1)
+        const wasInMainIndexes = (oldMainIndexes.indexOf(index) > -1)
         const wasInExtraIndexes = (oldExtraIndexes.indexOf(index) > -1)
+        const shouldBeInMainIndexes = (newMainIndexes.indexOf(index) > -1)
+        const shouldBeInExtraIndexes = (newExtraIndexes.indexOf(index) > -1)
         if (!isInMainIndexes && !isInExtraIndexes) {
-          if (wasInExtraIndexes) dispatch(ripActions.addExtraIndex(index))
+          if (wasInMainIndexes) dispatch(ripActions.addMainIndex(index))
+          else if (wasInExtraIndexes) dispatch(ripActions.addExtraIndex(index))
+          else if (shouldBeInMainIndexes) dispatch(ripActions.addMainIndex(index))
+          else if (shouldBeInExtraIndexes) dispatch(ripActions.addExtraIndex(index))
           else dispatch(ripActions.addMainIndex(index))
         }
       });
-      // setOldMainIndexes([])
+      setOldMainIndexes([])
       setOldExtraIndexes([])
     } else {
+      setOldMainIndexes(mainIndexes)
       setOldExtraIndexes(extraIndexes)
       dispatch(ripActions.setMainIndexes([]))
       dispatch(ripActions.setExtraIndexes([]))
