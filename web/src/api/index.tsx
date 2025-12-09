@@ -18,14 +18,14 @@ export type RootState = {
 }
 
 const updateRipStateOnApi = throttle(async (ripState: RipState) => {
-  if (ripStateIsValid(ripState)) {
+  // if (ripStateIsValid(ripState)) {
     console.info("Updating rip state on API")
     fetch(endpoints.state.get(), { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({
       redux: { rip: ripState }
     })})
-  } else {
-    console.info("Cannot update rip state, is not valid", ripState)
-  }
+  // } else {
+    // console.info("Cannot update rip state, is not valid", ripState)
+  // }
 }, 500, {leading: false, trailing: true})
 
 export const api = createApi({
