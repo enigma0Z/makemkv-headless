@@ -1,7 +1,11 @@
+import logging
+logger = logging.getLogger(__name__)
+
 from os import path, remove, rename, makedirs
 from shutil import rmtree
 
-import logging
+from random import sample
+from string import ascii_lowercase
 
 from pydantic import PrivateAttr
 
@@ -9,7 +13,6 @@ from src.interface.base_interface import BaseInterface
 from src.interface.target import Target
 from src.models.sort import ShowInfoModel, SortInfoModel
 
-logger = logging.getLogger(__name__)
 
 from src import features
 from src.interface import get_interface
@@ -55,6 +58,9 @@ async def sort_titles(
     sort_info: SortInfo,
     interface: BaseInterface = get_interface(),
 ):
+
+  unique_identifier = ''.join(sample(ascii_lowercase, 8))
+
   logger.debug(
     'sort_titles() called with args; ' 
     f'toc: {toc}, ' 
@@ -115,7 +121,7 @@ async def sort_titles(
           interface.print(f'Sorting Extra {toc.source.name} - {title.filename}', target=Target.SORT)
           rename(
             path.join(rip_path, title.filename), 
-            path.join(rip_path, 'extras', f'{sanitize(toc.source.name)}___{title.filename}')
+            path.join(rip_path, 'extras', f'{sanitize(toc.source.name)}___{unique_identifier}___{title.filename}')
           )
         except FileNotFoundError as ex:
           failed_titles.append(f'{index}: {title.filename}, {title.runtime}\n{ex}')
