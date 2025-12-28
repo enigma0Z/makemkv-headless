@@ -7,6 +7,8 @@ if [[ -z "$api_port" ]]; then
 	api_port=4000
 fi
 
+export VITE_BACKEND_PORT=$api_port
+
 if [[ -z "$web_port" ]]; then
 	web_port=3000
 fi
