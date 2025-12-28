@@ -11,5 +11,5 @@ if [[ -z "$web_port" ]]; then
 	web_port=3000
 fi
 
-screen -dmS makemkv-headless-api-$api_port ./api.sh --port $api_port "@$"
+screen -dmS makemkv-headless-api-$api_port ./api.sh --port $api_port "$@"
 screen -dmS makemkv-headless-web-$web_port ./web.sh --port $web_port
