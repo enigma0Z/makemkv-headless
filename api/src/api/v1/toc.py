@@ -33,6 +33,7 @@ async def get_toc_from_disc(source):
 @router.get('/')
 async def get_toc():
   try:
+    logger.debug(f"Getting TOC from {CONFIG.source}")
     toc = await get_toc_from_disc(CONFIG.source)
     failures = toc.get_failures()
 
