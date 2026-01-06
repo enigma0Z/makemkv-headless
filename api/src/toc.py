@@ -56,10 +56,13 @@ class Toc(TocModel):
 
     while process.returncode is None and not process.stdout.at_eof():
       try:
-        stdout = await asyncio.wait_for(process.stdout.readline(), 60)
+        stdout = await asyncio.wait_for(process.stdout.readline(), 0.25)
       except TimeoutError:
-        process.stdout.feed_eof()
-        pass
+        if (process.returncode is not None):
+          logger.debug('Process has not exited yet...')
+          process.stdout.feed_eof()
+        else:
+          pass
       else:
         if not stdout:
           process.stdout.feed_eof()
@@ -70,8 +73,6 @@ class Toc(TocModel):
           except Exception as ex:
             logger.error(f'Failed to send {self.lines[-1]} to FE with error {ex}, {format_exc()}')
             raise ex
-          if self.lines[-1].startswith('TCOUNT'):
-            process.stdout.feed_eof()
 
     self.load()
 
