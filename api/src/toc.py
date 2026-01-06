@@ -56,17 +56,20 @@ class Toc(TocModel):
 
     while not process.stdout.at_eof():
       try:
-        stdout = asyncio.wait_for(await process.stdout.readline(), 10)
+        stdout = await asyncio.wait_for(process.stdout.readline(), 10)
       except TimeoutError:
         process.stdout.feed_eof()
         pass
       else:
-        self.lines.append(stdout.decode().strip())
-        try:
-          interface.send(mkv_message_from_raw(self.lines[-1]))
-        except Exception as ex:
-          logger.error(f'Failed to send {self.lines[-1]} to FE with error {ex}, {format_exc()}')
-          raise ex
+        if not stdout:
+          process.stdout.feed_eof()
+        else:
+          self.lines.append(stdout.decode().strip())
+          try:
+            interface.send(mkv_message_from_raw(self.lines[-1]))
+          except Exception as ex:
+            logger.error(f'Failed to send {self.lines[-1]} to FE with error {ex}, {format_exc()}')
+            raise ex
 
     self.load()
 
