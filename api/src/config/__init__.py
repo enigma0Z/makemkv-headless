@@ -43,7 +43,7 @@ class Config(ConfigModel):
     with open(filename, 'r') as file:
       self.update(**yaml.safe_load(file)) 
 
-  def get_log_level(level: LogLevelStr) -> logging._Level:
+  def get_log_level(level: LogLevelStr) -> int:
     if level == 'ERROR':
       return logging.ERROR
 
