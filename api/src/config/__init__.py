@@ -1,7 +1,8 @@
 import json
+import logging
 import yaml
 
-from src.models.config import ConfigModel
+from src.models.config import ConfigModel, LogLevelStr
 
 class Config(ConfigModel):
   keys: list[str] = []
@@ -41,5 +42,20 @@ class Config(ConfigModel):
   def update_from_yaml(self, filename: str):
     with open(filename, 'r') as file:
       self.update(**yaml.safe_load(file)) 
+
+  def get_log_level(level: LogLevelStr) -> logging._Level:
+    if level == 'ERROR':
+      return logging.ERROR
+
+    if level == 'WARN' or level == 'WARNING':
+      return logging.WARNING
+
+    if level == 'INFO':
+      return logging.INFO
+
+    if level == 'DEBUG':
+      return logging.DEBUG
+
+    return logging.INFO
 
 CONFIG = Config()
