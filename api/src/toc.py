@@ -70,6 +70,8 @@ class Toc(TocModel):
           except Exception as ex:
             logger.error(f'Failed to send {self.lines[-1]} to FE with error {ex}, {format_exc()}')
             raise ex
+          if self.lines[-1].startswith('TCOUNT'):
+            process.stdout.feed_eof()
 
     self.load()
 
