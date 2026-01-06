@@ -54,9 +54,9 @@ class Toc(TocModel):
       stderr=PIPE
     )
 
-    while not process.stdout.at_eof():
+    while process.returncode is None and not process.stdout.at_eof():
       try:
-        stdout = await asyncio.wait_for(process.stdout.readline(), 10)
+        stdout = await asyncio.wait_for(process.stdout.readline(), 60)
       except TimeoutError:
         process.stdout.feed_eof()
         pass
