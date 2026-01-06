@@ -31,6 +31,9 @@ if opts.cors_origin is not None:
 if opts.log_file is not None:
   CONFIG.log_file = opts.log_file
 
+if opts.log_level is not None:
+  CONFIG.log_level = opts.log_level
+
 logging.basicConfig(
   style='{', 
   format='{asctime} [{levelname}] {filename}:{lineno} {threadName} - {message}', 
