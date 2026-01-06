@@ -35,7 +35,8 @@ logging.basicConfig(
   style='{', 
   format='{asctime} [{levelname}] {filename}:{lineno} {threadName} - {message}', 
   level=CONFIG.get_log_level(),
-  filename=CONFIG.log_file
+  filename=CONFIG.log_file,
+  filemode='w'
 )
 
 logger = logging.getLogger(__name__)
