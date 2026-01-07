@@ -47,14 +47,14 @@ async def rip_titles(
   rip_path_base = tempfile.mkdtemp(prefix=temp_prefix)
   logger.debug(f'tempfile created at {rip_path_base}')
   rip_path = os.path.join(rip_path_base, sort_info.path())
-  logger.debug(f'rip path created at {rip_path}')
-
-  logger.debug(f'rip_content() computed rip_path: {rip_path}')
 
   os.makedirs(os.path.join(
     rip_path,
     'extras'
   ), exist_ok=True)
+
+  logger.debug(f'rip path created at {rip_path}')
+  logger.debug(f'rip_content() computed rip_path: {rip_path}')
 
   if features.DO_RIP:
     interface.print(f"These titles will be copied to {sort_info.base_path()}", target=Target.SORT)
