@@ -34,12 +34,15 @@ if opts.log_file is not None:
 if opts.log_level is not None:
   CONFIG.log_level = opts.log_level
 
+# Erase log file
+open(CONFIG.log_file, 'w').close()
+
 logging.basicConfig(
   style='{', 
   format='{asctime} [{levelname}] {filename}:{lineno} {threadName} - {message}', 
   level=CONFIG.get_log_level(),
   filename=CONFIG.log_file,
-  filemode='w'
+  filemode='a'
 )
 
 logger = logging.getLogger(__name__)
