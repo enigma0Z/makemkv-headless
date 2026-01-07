@@ -121,6 +121,9 @@ async def sort_titles(
               path.join(rip_path, title.filename), 
               path.join(rip_path, sort_file)
             )
+          except IndexError as ex:
+            failed_titles.append(f'{index}: {title.filename}, {title.runtime}\n{ex}')
+            logger.error(f"Could not locate title with index {index} to sort as an extra. extra_indexes: {sort_info.extra_indexes}, len(toc.source.titles): {len(toc.source.titles)}\n{ex}")
           except FileNotFoundError as ex:
             failed_titles.append(f'{index}: {title.filename}, {title.runtime}\n{ex}')
 
