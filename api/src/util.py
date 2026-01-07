@@ -6,6 +6,8 @@ from asyncio.subprocess import PIPE
 from math import trunc
 from sys import platform
 
+from unicodedata import normalize, combining
+
 import os
 import re
 import shlex
@@ -70,7 +72,19 @@ async def rsync(source, dest, interface=PlaintextInterface()):
 
   await cmd('rsync', '-av', source, dest, callback=log_rsync_lines)
 
-def sanitize(value: str): # Strips out non alphanumeric characters and replaces with "_"
+def sanitize(value: str) -> str: 
+  '''
+  Make a filesystem-safe-ish string.
+
+  * Removes diacritics
+  * Converts string to lowercase
+  * Replaces non alphanumeric characters with "_"
+  
+  :param value: The value to sanitize
+  :type value: str
+  :rtype: str
+  '''
+  value = ''.join([c for c in normalize('NFKD', value) if not combining(c)])
   return re.sub(r'[^\w]', '_', value.lower())
 
 def string_to_list_int(_input):
