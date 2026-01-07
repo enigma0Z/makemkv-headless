@@ -13,6 +13,7 @@ import shutil
 import subprocess
 
 import logging
+from typing import Callable
 
 from src.interface.plaintext_interface import PlaintextInterface
 from src.interface.target import Target
@@ -143,7 +144,7 @@ def input_with_default(
       continue
 
 
-async def cmd(*args, callback: callable[[str]] | None = None, timeout=0.25):
+async def cmd(*args, callback: Callable[[str]] | None = None, timeout=0.25):
     process = await create_subprocess_shell(
       shlex.join(args),
       stdout=PIPE,
