@@ -48,7 +48,7 @@ def notify(message):
       stdout=subprocess.PIPE,
       stderr=subprocess.PIPE,
     )
-  if platform == 'linxu':
+  if platform == 'linux':
     logger.info('Notification not supported')
 
 def clearing_line(line=' '):
