@@ -156,8 +156,7 @@ async def cmd(*args, callback: Callable[[str], Any] | None = None, timeout=0.25)
         stdout = await asyncio.wait_for(process.stdout.readline(), 0.25)
       except TimeoutError:
         if (process.returncode is not None):
-          logger.debug('Process has not exited yet...')
-        else:
+          logger.debug('Process has exited')
           process.stdout.feed_eof()
         pass
       else:
