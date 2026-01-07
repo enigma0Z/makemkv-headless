@@ -30,7 +30,10 @@ class SortInfo(SortInfoModel):
 
   def base_path(self):
     sanitized_name = sanitize(self.name)
-    return f'{sanitized_name[0]}/{sanitized_name} [{self.id_db}-{self.id}]'
+    sort_letter = sanitized_name[0]
+    if sanitized_name.startswith('the_'):
+      sort_letter = sanitized_name[4]
+    return f'{sort_letter}/{sanitized_name} [{self.id_db}-{self.id}]'
 
   def file(self):
     return f'{self.path()} - {self._index}.mkv'
