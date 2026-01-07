@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from asyncio import create_subprocess_shell
+import asyncio
 from asyncio.subprocess import PIPE
 from math import trunc
 from sys import platform
@@ -140,3 +141,27 @@ def input_with_default(
     except AttributeError:
       print("Error validating input")
       continue
+
+
+async def cmd(*args, callback: callable[[str]] | None = None, timeout=0.25):
+    process = await create_subprocess_shell(
+      shlex.join(args),
+      stdout=PIPE,
+      stderr=PIPE
+    )
+
+    while process.returncode is None and not process.stdout.at_eof():
+      try:
+        stdout = await asyncio.wait_for(process.stdout.readline(), 0.25)
+      except TimeoutError:
+        if (process.returncode is not None):
+          logger.debug('Process has not exited yet...')
+        else:
+          process.stdout.feed_eof()
+        pass
+      else:
+        if not stdout:
+          process.stdout.feed_eof()
+        else:
+          if callback is not None:
+            callback(stdout.decode().strip())

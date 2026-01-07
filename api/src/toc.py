@@ -22,6 +22,7 @@ import logging
 from src.models.makemkv import from_raw
 from src.models.socket import mkv_message_from_raw
 from src.models.toc import BaseInfoModel, SourceInfoModel, TocModel, TitleInfoModel, TrackInfoModel
+from src.util import cmd
 logger = logging.getLogger(__name__)
 
 failure_statuses = [
@@ -47,33 +48,15 @@ class Toc(TocModel):
     interface = get_interface()
     interface.print('Loading disc Toc', target=Target.MKV)
 
-    # Load the disc Toc from makemkvcon output
-    process = await create_subprocess_shell(
-      shlex.join([CONFIG.makemkvcon_path, '--noscan', '--robot', 'info', source]),
-      stdout=PIPE,
-      stderr=PIPE
-    )
-
-    while process.returncode is None and not process.stdout.at_eof():
+    def load_line(line: str):
+      self.lines.append(line)
       try:
-        stdout = await asyncio.wait_for(process.stdout.readline(), 0.25)
-      except TimeoutError:
-        if (process.returncode is not None):
-          logger.debug('Process has not exited yet...')
-          process.stdout.feed_eof()
-        else:
-          pass
-      else:
-        if not stdout:
-          process.stdout.feed_eof()
-        else:
-          self.lines.append(stdout.decode().strip())
-          try:
-            interface.send(mkv_message_from_raw(self.lines[-1]))
-          except Exception as ex:
-            logger.error(f'Failed to send {self.lines[-1]} to FE with error {ex}, {format_exc()}')
-            raise ex
+        interface.send(mkv_message_from_raw(line))
+      except Exception as ex:
+        logger.error(f'Failed to send {line} to FE with error {ex}, {format_exc()}')
+        raise ex
 
+    await cmd(CONFIG.makemkvcon_path, '--noscan', '--robot', 'info', source, callback=load_line)
     self.load()
 
   def get_from_list(self, lines):
