@@ -2,6 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from os import path, remove, rename, makedirs
+from re import match
 from shutil import rmtree
 
 from random import sample
@@ -33,6 +34,10 @@ class SortInfo(SortInfoModel):
     sort_letter = sanitized_name[0]
     if sanitized_name.startswith('the_'):
       sort_letter = sanitized_name[4]
+    
+    if match(r'[0-9]', sort_letter):
+      sort_letter = '#'
+
     return f'{sort_letter}/{sanitized_name} [{self.id_db}-{self.id}]'
 
   def file(self):
