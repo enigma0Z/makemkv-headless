@@ -1,27 +1,16 @@
 #!/usr/bin/env python3
 
-from asyncio import create_subprocess_shell
-from asyncio.subprocess import PIPE
-import re
-import shlex
-from time import time
-
 import logging
 
 from src.interface import get_interface
-from src.interface.base_interface import BaseInterface
-from src.interface.plaintext_interface import PlaintextInterface
 from src.interface.target import Target
 from src.message.rip_start_stop_message_event import RipStartStopMessageEvent
-from src.models.makemkv import from_raw
 from src.models.socket import RipStartStopMessage, mkv_message_from_raw
-from src.threads import StoppableThread
 logger = logging.getLogger(__name__)
 
-from src.message.build_message import build_message
 from src.config import CONFIG
 from src.disc import wait_for_disc_inserted
-from src.util import seconds_to_hms
+from src.util import cmd
 
 async def rip_disc(
     source, 
@@ -44,15 +33,9 @@ async def rip_disc(
     else:
       interface.send(RipStartStopMessage(index=int(rip_title), state="start"))
 
-    with open('makemkv.log', 'w') as log:
-      process = await create_subprocess_shell(
-        shlex.join([CONFIG.makemkvcon_path, '--noscan', '--robot', '--progress=-same', 'mkv', source, rip_title, dest]),
-        stdout=PIPE,
-        stderr=PIPE
-      )
+    def send_mkv_message(line: str):
+      interface.send(mkv_message_from_raw(line))
 
-      while not process.stdout.at_eof():
-        line = (await process.stdout.readline()).decode().strip()
-        interface.send(mkv_message_from_raw(line))
+    await cmd(CONFIG.makemkvcon_path, '--noscan', '--robot', '--progress=-same', 'mkv', source, rip_title, dest, callback=send_mkv_message)
 
     interface.send(RipStartStopMessageEvent(index=rip_title, state="stop"))

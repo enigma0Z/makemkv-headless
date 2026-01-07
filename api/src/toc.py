@@ -1,15 +1,7 @@
 #!usr/bin/env python3
 
-from asyncio import create_subprocess_shell
-import asyncio
-from asyncio.subprocess import PIPE
-from functools import lru_cache
-from json import dumps
 import re
-import shlex
 from traceback import format_exc
-
-from pydantic import PrivateAttr
 
 from src.config import CONFIG
 from src.interface import get_interface

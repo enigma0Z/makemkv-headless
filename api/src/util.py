@@ -17,6 +17,7 @@ from typing import Any, Callable
 
 from src.interface.plaintext_interface import PlaintextInterface
 from src.interface.target import Target
+from src.models.socket import CurrentProgressMessage, LogMessage
 logger = logging.getLogger(__name__)
 
 def grep(term, lines):
@@ -62,25 +63,12 @@ async def rsync(source, dest, interface=PlaintextInterface()):
     ])
   ]))
   # Put output files into their final destinations if the rip was done locally
-  interface.print(f'Copying local rip from {source} to {dest}', target=Target.SORT)
-  notify(f'Copying local rip to {dest}')
-  process = await create_subprocess_shell(
-    shlex.join([ 'rsync', '-av', source, dest ]),
-    stdout=PIPE,
-    stderr=PIPE
-  )
+  interface.send(LogMessage(message=f'Starting copy of {source} to {dest}'))
 
-  while not process.stdout.at_eof():
-    line = (await process.stdout.readline()).decode('utf-8').strip()
-    interface.print(line, target=Target.SORT)
-    logger.info(line)
+  def log_rsync_lines(line: str):
+    interface.send(LogMessage(message=line))
 
-  if process.returncode == 0 or process.returncode == None:
-    line = f'rsync completed successfully for {os.path.split(source)[-1]}'
-    interface.print(line, target=Target.SORT)
-  else:
-    line = f'RSYNC FAILED FOR {dest} with return code {process.returncode}'
-    interface.print(line, target=Target.SORT)
+  await cmd('rsync', '-av', source, dest, callback=log_rsync_lines)
 
 def sanitize(value: str): # Strips out non alphanumeric characters and replaces with "_"
   return re.sub(r'[^\w]', '_', value.lower())
@@ -145,23 +133,23 @@ def input_with_default(
 
 
 async def cmd(*args, callback: Callable[[str], Any] | None = None, timeout=0.25):
-    process = await create_subprocess_shell(
-      shlex.join(args),
-      stdout=PIPE,
-      stderr=PIPE
-    )
+  process = await create_subprocess_shell(
+    shlex.join(args),
+    stdout=PIPE,
+    stderr=PIPE
+  )
 
-    while process.returncode is None and not process.stdout.at_eof():
-      try:
-        stdout = await asyncio.wait_for(process.stdout.readline(), 0.25)
-      except TimeoutError:
-        if (process.returncode is not None):
-          logger.debug('Process has exited')
-          process.stdout.feed_eof()
-        pass
+  while process.returncode is None and not process.stdout.at_eof():
+    try:
+      stdout = await asyncio.wait_for(process.stdout.readline(), 0.25)
+    except TimeoutError:
+      if (process.returncode is not None):
+        logger.debug('Process has exited')
+        process.stdout.feed_eof()
+      pass
+    else:
+      if not stdout:
+        process.stdout.feed_eof()
       else:
-        if not stdout:
-          process.stdout.feed_eof()
-        else:
-          if callback is not None:
-            callback(stdout.decode().strip())
+        if callback is not None:
+          callback(stdout.decode().strip())

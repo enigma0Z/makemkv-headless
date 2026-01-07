@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from asyncio import create_subprocess_shell, sleep
 import os
 import shlex
 import time
@@ -11,7 +10,7 @@ from src.config import CONFIG
 from src.interface import get_interface
 from src.interface.plaintext_interface import PlaintextInterface
 from src.interface.target import Target
-from src.util import grep, notify
+from src.util import cmd, grep, notify
 
 def disc_inserted(source):
   if source.startswith('dev'):
@@ -42,7 +41,7 @@ async def eject_disc(
     interface.print("Ejecting Disc", target=Target.INPUT)
     match platform:
         case 'darwin':
-          await create_subprocess_shell(shlex.join([ 'drutil', 'eject' ]))
-          await create_subprocess_shell(shlex.join([ 'diskutil', 'eject' ]))
+          await cmd('drutil', 'eject')
+          await cmd('diskutil', 'eject')
         case 'linux':
-          await create_subprocess_shell(shlex.join([ 'eject', CONFIG.source.split(':')[1]]))
+          await cmd('eject', CONFIG.source.split(':')[1])

@@ -37,10 +37,14 @@ class ProgressModel(MakeMKVDataModel):
   progress_type: Progress
 
   def __init__(self, raw: str, **kwargs):
-    code = int(raw.split(':')[1].split(',')[0])
-    index = int(raw.split(':')[1].split(',')[1])
-    name = str(raw.split(':')[1].split(',')[2]).strip('"')
-    super().__init__(raw=raw, code=code, index=index, name=name, **kwargs)
+    if 'code' not in kwargs:
+      kwargs['code'] = int(raw.split(':')[1].split(',')[0])
+    if 'index' not in kwargs:
+      kwargs['index'] = int(raw.split(':')[1].split(',')[1])
+    if 'name' not in kwargs:
+      kwargs['name'] = str(raw.split(':')[1].split(',')[2]).strip('"')
+
+    super().__init__(raw=raw, **kwargs)
 
 class CurrentProgressModel(ProgressModel):
   progress_type: Progress = 'current'
