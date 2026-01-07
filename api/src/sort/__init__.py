@@ -116,15 +116,19 @@ async def sort_titles(
             failed_titles.append(f'{index}: {title.filename}, {title.runtime}\n{ex}')
 
       for index in sort_info.extra_indexes:
-        title = toc.source.titles[int(index)]
         try:
+          title = toc.source.titles[int(index)]
           interface.print(f'Sorting Extra {toc.source.name} - {title.filename}', target=Target.SORT)
           rename(
             path.join(rip_path, title.filename), 
             path.join(rip_path, 'extras', f'{sanitize(toc.source.name)}___{unique_identifier}___{title.filename}')
           )
+        except IndexError as ex:
+          failed_titles.append(f'{index}: {title.filename}, {title.runtime}\n{ex}')
+          logger.error(f"Could not locate title with index {index} to sort as an extra. extra_indexes: {sort_info.extra_indexes}, len(toc.source.titles): {len(toc.source.titles)}\n{ex}")
         except FileNotFoundError as ex:
           failed_titles.append(f'{index}: {title.filename}, {title.runtime}\n{ex}')
+          logger.error(f"Could not locate title with filename {title.filename} to sort as an extra\n{ex}")
 
       if len(failed_titles) > 0:
         logger.error(f"Some titles failed to rip or copy, {failed_titles}")
