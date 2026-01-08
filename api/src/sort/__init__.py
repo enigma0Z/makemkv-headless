@@ -27,9 +27,21 @@ class SortInfo(SortInfoModel):
   _index: int = PrivateAttr(default=-1) 
 
   def path(self):
+    '''
+    The path to where the sorted files go
+    
+    :param self: Description
+    '''
     return self.base_path()
 
   def base_path(self):
+    '''
+    The base path to where the sorted files go.  This differs from `self.path`
+    in that if this class is subclassed, this is _just_ the base folder, i.e.
+    without tv show season or similar.
+    
+    :param self: Description
+    '''
     sanitized_name = sanitize(self.name)
     sort_letter = sanitized_name[0]
     if sanitized_name.startswith('the_'):
@@ -41,7 +53,7 @@ class SortInfo(SortInfoModel):
     return f'{sort_letter}/{sanitized_name} [{self.id_db}-{self.id}]'
 
   def file(self):
-    return f'{self.path()} - {self._index}.mkv'
+    return f'{sanitize(self.name)} - {self._index}.mkv'
 
   def next_file(self):
     self._index += 1
