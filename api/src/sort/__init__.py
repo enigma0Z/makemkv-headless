@@ -34,6 +34,17 @@ class SortInfo(SortInfoModel):
     '''
     return self.base_path()
 
+  def sort_letter(self):
+    sanitized_name = sanitize(self.name)
+    letter = sanitized_name[0]
+    if letter.startswith('the_'):
+      return sanitized_name[4]
+    
+    if match(r'[0-9]', letter):
+      return '#'
+
+    return letter
+
   def base_path(self):
     '''
     The base path to where the sorted files go.  This differs from `self.path`
@@ -42,15 +53,7 @@ class SortInfo(SortInfoModel):
     
     :param self: Description
     '''
-    sanitized_name = sanitize(self.name)
-    sort_letter = sanitized_name[0]
-    if sanitized_name.startswith('the_'):
-      sort_letter = sanitized_name[4]
-    
-    if match(r'[0-9]', sort_letter):
-      sort_letter = '#'
-
-    return f'{sort_letter}/{sanitized_name} [{self.id_db}-{self.id}]'
+    return f'{self.sort_letter()}/{sanitize(self.name)} [{self.id_db}-{self.id}]'
 
   def file(self):
     return f'{sanitize(self.name)} - {self._index}.mkv'
@@ -163,7 +166,7 @@ async def sort_titles(
     if features.DO_COPY:
       await rsync(
         path.join(rip_path_base, sort_info.base_path()), 
-        dest_path_base, 
+        path.join(dest_path_base, sort_info.sort_letter()), 
         interface=interface
       )
 
