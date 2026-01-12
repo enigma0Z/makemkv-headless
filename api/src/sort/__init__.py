@@ -38,7 +38,7 @@ class SortInfo(SortInfoModel):
     sanitized_name = sanitize(self.name)
     letter = sanitized_name[0]
     if sanitized_name.startswith('the_'):
-      return sanitized_name[4]
+      letter = sanitized_name[4]
     
     if match(r'[0-9]', letter):
       return '#'
