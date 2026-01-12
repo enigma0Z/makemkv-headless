@@ -130,7 +130,7 @@ async def sort_titles(
         else:
           try:
             sort_file = sort_info.next_file()
-            interface.print(f'Sorting Title {sort_file}', target=Target.SORT)
+            interface.print(f'Sorting - rip_path: {rip_path}, title.filename: {title.filename} sort_file: {sort_file},', target=Target.SORT)
             logger.info(f'Sorting Title {path.join(rip_path, title.filename)} to {path.join(rip_path, sort_file)}')
             rename(
               path.join(rip_path, title.filename), 
