@@ -56,7 +56,7 @@ class SortInfo(SortInfoModel):
     return f'{self.sort_letter()}/{sanitize(self.name)} [{self.id_db}-{self.id}]'
 
   def file(self):
-    return f'{sanitize(self.name)} - {self._index}.mkv'
+    return f'{sanitize(self.name)} [{self.id_db}-{self.id}] - {self._index}.mkv'
 
   def next_file(self):
     self._index += 1
