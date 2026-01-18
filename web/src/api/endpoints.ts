@@ -8,7 +8,8 @@ import type { Config } from "./v1/config/types"
 
 type Endpoint = (params?: any) => string
 
-export const BACKEND = `${window.location.protocol}//${window.location.hostname}:4000`
+export const BACKEND_PORT = import.meta.env.VITE_BACKEND_PORT ?? 4000
+export const BACKEND = `${window.location.protocol}//${window.location.hostname}:${BACKEND_PORT}`
 // export const BACKEND = "http://localhost:4000"
 
 export const endpoints = {

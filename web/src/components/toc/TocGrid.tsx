@@ -444,7 +444,7 @@ export const TocGridRow = ({ index, data, statusText, titleType, episodeNumber, 
             Segments: {data.segments}
           </Typography></span>
           <span><Typography variant="caption">
-            Segments Map: {data.segments_map.split(",").join(", ")}
+            Segments Map: {data.segments_map?.split(",").join(", ")}
           </Typography></span>
         </Box>
         {progress !== undefined && progress !== null && isRippingTitle && <>

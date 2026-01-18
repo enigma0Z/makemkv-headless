@@ -1,14 +1,7 @@
 #!usr/bin/env python3
 
-from asyncio import create_subprocess_shell
-from asyncio.subprocess import PIPE
-from functools import lru_cache
-from json import dumps
 import re
-import shlex
 from traceback import format_exc
-
-from pydantic import PrivateAttr
 
 from src.config import CONFIG
 from src.interface import get_interface
@@ -21,6 +14,7 @@ import logging
 from src.models.makemkv import from_raw
 from src.models.socket import mkv_message_from_raw
 from src.models.toc import BaseInfoModel, SourceInfoModel, TocModel, TitleInfoModel, TrackInfoModel
+from src.util import cmd
 logger = logging.getLogger(__name__)
 
 failure_statuses = [
@@ -46,22 +40,15 @@ class Toc(TocModel):
     interface = get_interface()
     interface.print('Loading disc Toc', target=Target.MKV)
 
-    # Load the disc Toc from makemkvcon output
-    process = await create_subprocess_shell(
-      shlex.join([CONFIG.makemkvcon_path, '--noscan', '--robot', 'info', source]),
-      stdout=PIPE,
-      stderr=PIPE
-    )
-
-    while not process.stdout.at_eof():
-      stdout = await process.stdout.readline()
-      self.lines.append(stdout.decode().strip())
+    def load_line(line: str):
+      self.lines.append(line)
       try:
-        interface.send(mkv_message_from_raw(self.lines[-1]))
+        interface.send(mkv_message_from_raw(line))
       except Exception as ex:
-        logger.error(f'Failed to send {self.lines[-1]} to FE with error {ex}, {format_exc()}')
+        logger.error(f'Failed to send {line} to FE with error {ex}, {format_exc()}')
         raise ex
 
+    await cmd(CONFIG.makemkvcon_path, '--noscan', '--robot', 'info', source, callback=load_line)
     self.load()
 
   def get_from_list(self, lines):

@@ -1,7 +1,12 @@
+import logging
+logger = logging.getLogger(__name__)
+
 from os import path, remove, rename, makedirs
+from re import match
 from shutil import rmtree
 
-import logging
+from random import sample
+from string import ascii_lowercase
 
 from pydantic import PrivateAttr
 
@@ -9,7 +14,6 @@ from src.interface.base_interface import BaseInterface
 from src.interface.target import Target
 from src.models.sort import ShowInfoModel, SortInfoModel
 
-logger = logging.getLogger(__name__)
 
 from src import features
 from src.interface import get_interface
@@ -23,13 +27,41 @@ class SortInfo(SortInfoModel):
   _index: int = PrivateAttr(default=-1) 
 
   def path(self):
+    '''
+    The path to where the sorted files go
+    
+    :param self: Description
+    '''
     return self.base_path()
 
+  def sort_letter(self):
+    sanitized_name = sanitize(self.name)
+    letter = sanitized_name[0]
+
+    if sanitized_name.startswith('a_'):
+      letter = sanitized_name[2]
+    elif sanitized_name.startswith('an_'):
+      letter = sanitized_name[3]
+    elif sanitized_name.startswith('the_'):
+      letter = sanitized_name[4]
+    
+    if match(r'[0-9]', letter):
+      return '#'
+
+    return letter
+
   def base_path(self):
-    return f'{sanitize(self.name)} [{self.id_db}-{self.id}]'
+    '''
+    The base path to where the sorted files go.  This differs from `self.path`
+    in that if this class is subclassed, this is _just_ the base folder, i.e.
+    without tv show season or similar.
+    
+    :param self: Description
+    '''
+    return f'{self.sort_letter()}/{sanitize(self.name)} [{self.id_db}-{self.id}]'
 
   def file(self):
-    return f'{self.path()} - {self._index}.mkv'
+    return f'{sanitize(self.name)} [{self.id_db}-{self.id}] - {self._index}.mkv'
 
   def next_file(self):
     self._index += 1
@@ -55,6 +87,9 @@ async def sort_titles(
     sort_info: SortInfo,
     interface: BaseInterface = get_interface(),
 ):
+
+  unique_identifier = ''.join(sample(ascii_lowercase, 8))
+
   logger.debug(
     'sort_titles() called with args; ' 
     f'toc: {toc}, ' 
@@ -100,25 +135,32 @@ async def sort_titles(
         else:
           try:
             sort_file = sort_info.next_file()
-            interface.print(f'Sorting Title {sort_file}', target=Target.SORT)
+            interface.print(f'Sorting - rip_path: {rip_path}, title.filename: {title.filename} sort_file: {sort_file},', target=Target.SORT)
             logger.info(f'Sorting Title {path.join(rip_path, title.filename)} to {path.join(rip_path, sort_file)}')
             rename(
               path.join(rip_path, title.filename), 
               path.join(rip_path, sort_file)
             )
+          except IndexError as ex:
+            failed_titles.append(f'{index}: {title.filename}, {title.runtime}\n{ex}')
+            logger.error(f"Could not locate title with index {index} to sort as an extra. extra_indexes: {sort_info.extra_indexes}, len(toc.source.titles): {len(toc.source.titles)}\n{ex}")
           except FileNotFoundError as ex:
             failed_titles.append(f'{index}: {title.filename}, {title.runtime}\n{ex}')
 
       for index in sort_info.extra_indexes:
-        title = toc.source.titles[int(index)]
         try:
+          title = toc.source.titles[int(index)]
           interface.print(f'Sorting Extra {toc.source.name} - {title.filename}', target=Target.SORT)
           rename(
             path.join(rip_path, title.filename), 
-            path.join(rip_path, 'extras', f'{sanitize(toc.source.name)}___{title.filename}')
+            path.join(rip_path, 'extras', f'{sanitize(toc.source.name)}___{unique_identifier}___{title.filename}')
           )
+        except IndexError as ex:
+          failed_titles.append(f'{index}: {title.filename}, {title.runtime}\n{ex}')
+          logger.error(f"Could not locate title with index {index} to sort as an extra. extra_indexes: {sort_info.extra_indexes}, len(toc.source.titles): {len(toc.source.titles)}\n{ex}")
         except FileNotFoundError as ex:
           failed_titles.append(f'{index}: {title.filename}, {title.runtime}\n{ex}')
+          logger.error(f"Could not locate title with filename {title.filename} to sort as an extra\n{ex}")
 
       if len(failed_titles) > 0:
         logger.error(f"Some titles failed to rip or copy, {failed_titles}")
@@ -129,7 +171,7 @@ async def sort_titles(
     if features.DO_COPY:
       await rsync(
         path.join(rip_path_base, sort_info.base_path()), 
-        dest_path_base, 
+        path.join(dest_path_base, sort_info.sort_letter()), 
         interface=interface
       )
 

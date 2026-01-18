@@ -2,4 +2,4 @@
 
 cd web
 npm install
-exec npm run dev $@
+exec npm run dev -- $@
