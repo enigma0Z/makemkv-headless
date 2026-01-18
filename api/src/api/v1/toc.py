@@ -25,6 +25,7 @@ async def get_toc_from_disc(source):
   with lock:
     toc = Toc()
     await toc.get_from_disc(source)
+    STATE.reset_socket()
     STATE.redux.toc = toc
     get_interface().send(TocStatusMessage(state="complete"))
     return toc
