@@ -9,6 +9,8 @@ from os import stat
 from sys import exit, argv
 from pathlib import Path
 
+from humanfriendly import format_size
+
 from heuristics.Match import Match
 from heuristics.MatchSet import MatchSet
 from heuristics.NamedHeuristic import NamedHeuristic
@@ -95,7 +97,11 @@ for opts_path in opts.paths:
             print()
 
     if deleted_matches:
-        print("\nThe following files are marked for deletion")
+        total_storage = 0
+        for match in deleted_matches:
+            total_storage += match.stat.st_size
+
+        print(f"\nThe following files are marked for deletion ({format_size(total_storage)})")
         print('\n'.join([f'{m.path}' for m in deleted_matches]))
         if input_yes_no("Are you sure you want to delete these files?"):
             for file in deleted_matches:
