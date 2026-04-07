@@ -45,7 +45,10 @@ class CloseSizeMatch(SizeMatch):
 
     @staticmethod
     def matcher(a: Match, b: Match, *matches: list[Match]) -> bool:
-        if 1 - abs(a.stat.st_size / b.stat.st_size) < CloseSizeMatch._THRESHOLD:
+        if (
+            a.stat.st_size > 1024*4 and
+            (a.stat.st_size - b.stat.st_size) / a.stat.st_size < CloseSizeMatch._THRESHOLD
+        ):
             return [a, b]
 
 class ExactSizeMatch(SizeMatch):
@@ -92,7 +95,8 @@ for opts_path in opts.paths:
         file_db.append(Match(path=path, stat=stat(path)))
 
     # Defined heuristics for identifying matches
-    heuristics: list[NamedHeuristic] = [ExactSizeMatch, CloseSizeMatch]
+    # heuristics: list[NamedHeuristic] = [ExactSizeMatch, CloseSizeMatch]
+    heuristics: list[NamedHeuristic] = [CloseSizeMatch]
 
     # Store matched files here
     matches: list[MatchSet] = []
@@ -137,8 +141,9 @@ for opts_path in opts.paths:
 
             print()
 
-    print("\nThe following files are marked for deletion")
-    print('\n'.join([f'{m.path}' for m in deleted_matches]))
-    if input_yes_no("Are you sure you want to delete these files?"):
-        for file in deleted_matches:
-            print(f'deleting {file.path}')
+    if deleted_matches:
+        print("\nThe following files are marked for deletion")
+        print('\n'.join([f'{m.path}' for m in deleted_matches]))
+        if input_yes_no("Are you sure you want to delete these files?"):
+            for file in deleted_matches:
+                print(f'deleting {file.path}')
