@@ -59,9 +59,7 @@ for opts_path in opts.paths:
         for inner_file in [ file for file in file_db if file.path != outer_file.path ]:
             # Check each inner/outer against each heuristic
             for heuristic in heuristics:
-                print(heuristic)
                 heuristic_matches = heuristic.matcher(outer_file, inner_file)
-                print(heuristic_matches)
                 if heuristic_matches:
                     
                     # This should be a list of either 1 or 0.  If it's more than one, something bad happened
