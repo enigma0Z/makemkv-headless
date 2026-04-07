@@ -47,7 +47,7 @@ class CloseSizeMatch(SizeMatch):
     def matcher(a: Match, b: Match, *matches: list[Match]) -> bool:
         if (
             a.stat.st_size > 1024*4 and
-            (a.stat.st_size - b.stat.st_size) / a.stat.st_size < CloseSizeMatch._THRESHOLD
+            abs(a.stat.st_size - b.stat.st_size) / a.stat.st_size < CloseSizeMatch._THRESHOLD
         ):
             return [a, b]
 
