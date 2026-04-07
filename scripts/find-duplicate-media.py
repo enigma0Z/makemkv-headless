@@ -147,3 +147,4 @@ for opts_path in opts.paths:
         if input_yes_no("Are you sure you want to delete these files?"):
             for file in deleted_matches:
                 print(f'deleting {file.path}')
+                Path.unlink(file.path, missing_ok=True)
