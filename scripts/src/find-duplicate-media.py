@@ -1,65 +1,19 @@
 #!/usr/bin/env python3
 
-from abc import ABC, abstractmethod
-from typing import Callable, Type
+import sys
 
-from pydantic import BaseModel, ConfigDict
+from typing import Callable
 
 from argparse import ArgumentParser
-from os import stat, sep, stat_result
+from os import stat
 from sys import exit, argv
 from pathlib import Path
-class Match(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    path: Path
-    stat: stat_result
 
-# Heuristics
-class NamedHeuristic:
-    @staticmethod
-    @abstractmethod
-    def name() -> str:
-        pass
-
-    @staticmethod
-    @abstractmethod
-    def matcher(a: Match, b: Match, *matches: list[Match]) -> list[Match]:
-        pass
-
-    @staticmethod
-    @abstractmethod
-    def match_info(m: Match) -> str:
-        pass
-
-class SizeMatch(NamedHeuristic):
-    @staticmethod
-    def match_info(m: Match):
-        return f'Size is {m.stat.st_size} bytes'
-
-class CloseSizeMatch(SizeMatch):
-    _THRESHOLD = 0.01 # 1%
-
-    @staticmethod
-    def name():
-        return f"Close Size Match (within {CloseSizeMatch._THRESHOLD})"
-
-    @staticmethod
-    def matcher(a: Match, b: Match, *matches: list[Match]) -> bool:
-        if (
-            a.stat.st_size > 1024*4 and
-            abs(a.stat.st_size - b.stat.st_size) / a.stat.st_size < CloseSizeMatch._THRESHOLD
-        ):
-            return [a, b]
-
-class ExactSizeMatch(SizeMatch):
-    @staticmethod
-    def name():
-        return f"Exact Size Match"
-
-    @staticmethod
-    def matcher(a: Match, b: Match, *matches: list[Match]) -> bool:
-        if a.stat.st_size == b.stat.st_size:
-            return [a, b]
+from heuristics.Match import Match
+from heuristics.MatchSet import MatchSet
+from heuristics.NamedHeuristic import NamedHeuristic
+from heuristics.SizeMatch import CloseSizeMatch, ExactSizeMatch
+from heuristics.HeuristicRegistry import get_heuristic
 
 def input_loop(prompt: str, validator: Callable[[any], bool]):
     while True:
@@ -74,16 +28,18 @@ def input_yes_no(prompt: str) -> bool:
         lambda x: x.casefold() in ['y', 'yes', 'n', 'no']
     ).casefold().startswith('y')
 
-class MatchSet(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    heuristic: Type[NamedHeuristic]
-    match_key: Path
-    matches: list[Match] = []
-
 parser = ArgumentParser()
 parser.add_argument('--globstr', '-g', default="**/*.mkv")
 parser.add_argument('paths', nargs='*')
+parser.add_argument('--heuristics', nargs='*', default=[ExactSizeMatch.__name__, CloseSizeMatch.__name__])
 opts = parser.parse_args(argv[1:])
+
+# Defined heuristics for identifying matches
+# heuristics: list[NamedHeuristic] = [ExactSizeMatch, CloseSizeMatch]
+heuristics: list[NamedHeuristic] = []
+
+for heuristic in opts.heuristics:
+    heuristics.append(get_heuristic(heuristic)())
 
 # Iterate over the paths specified on the CLI
 for opts_path in opts.paths:
@@ -94,10 +50,6 @@ for opts_path in opts.paths:
     for path in paths:
         file_db.append(Match(path=path, stat=stat(path)))
 
-    # Defined heuristics for identifying matches
-    # heuristics: list[NamedHeuristic] = [ExactSizeMatch, CloseSizeMatch]
-    heuristics: list[NamedHeuristic] = [CloseSizeMatch]
-
     # Store matched files here
     matches: list[MatchSet] = []
 
@@ -106,7 +58,9 @@ for opts_path in opts.paths:
         for inner_file in [ file for file in file_db if file.path != outer_file.path ]:
             # Check each inner/outer against each heuristic
             for heuristic in heuristics:
+                print(heuristic)
                 heuristic_matches = heuristic.matcher(outer_file, inner_file)
+                print(heuristic_matches)
                 if heuristic_matches:
                     
                     # This should be a list of either 1 or 0.  If it's more than one, something bad happened
