@@ -30,6 +30,7 @@ def input_yes_no(prompt: str) -> bool:
 
 parser = ArgumentParser()
 parser.add_argument('--globstr', '-g', default="**/*.mkv")
+parser.add_argument('--apply', help='Actually delete files')
 parser.add_argument('paths', nargs='*')
 parser.add_argument('--heuristics', nargs='*', default=[ExactSizeMatch.__name__, CloseSizeMatch.__name__])
 opts = parser.parse_args(argv[1:])
@@ -100,5 +101,8 @@ for opts_path in opts.paths:
         print('\n'.join([f'{m.path}' for m in deleted_matches]))
         if input_yes_no("Are you sure you want to delete these files?"):
             for file in deleted_matches:
-                print(f'deleting {file.path}')
-                Path.unlink(file.path, missing_ok=True)
+                if opts.apply:
+                    print(f'deleting {file.path}')
+                    Path.unlink(file.path, missing_ok=True)
+                else:
+                    print(f'(dry run) deleting {file.path}')
