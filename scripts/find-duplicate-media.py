@@ -9,6 +9,11 @@ from argparse import ArgumentParser
 from os import stat, sep, stat_result
 from sys import exit, argv
 from pathlib import Path
+class Match(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    path: Path
+    stat: stat_result
+
 # Heuristics
 class NamedHeuristic:
     @staticmethod
@@ -65,11 +70,6 @@ def input_yes_no(prompt: str) -> bool:
         f'{prompt} [Y]es / [N]o',
         lambda x: x.casefold() in ['y', 'yes', 'n', 'no']
     ).casefold().startswith('y')
-
-class Match(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    path: Path
-    stat: stat_result
 
 class MatchSet(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
