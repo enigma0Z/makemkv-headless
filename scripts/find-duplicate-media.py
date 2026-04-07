@@ -9,18 +9,6 @@ from argparse import ArgumentParser
 from os import stat, sep, stat_result
 from sys import exit, argv
 from pathlib import Path
-
-class Match(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    path: Path
-    stat: stat_result
-
-class MatchSet(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    heuristic: Type[NamedHeuristic]
-    match_key: Path
-    matches: list[Match] = []
-
 # Heuristics
 class NamedHeuristic:
     @staticmethod
@@ -55,8 +43,6 @@ class CloseSizeMatch(SizeMatch):
         if 1 - abs(a.stat.st_size / b.stat.st_size) < CloseSizeMatch._THRESHOLD:
             return [a, b]
 
-
-
 class ExactSizeMatch(SizeMatch):
     @staticmethod
     def name():
@@ -79,6 +65,17 @@ def input_yes_no(prompt: str) -> bool:
         f'{prompt} [Y]es / [N]o',
         lambda x: x.casefold() in ['y', 'yes', 'n', 'no']
     ).casefold().startswith('y')
+
+class Match(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    path: Path
+    stat: stat_result
+
+class MatchSet(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    heuristic: Type[NamedHeuristic]
+    match_key: Path
+    matches: list[Match] = []
 
 parser = ArgumentParser()
 parser.add_argument('--globstr', '-g', default="**/*.mkv")
