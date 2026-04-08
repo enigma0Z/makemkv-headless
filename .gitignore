@@ -20,7 +20,6 @@ notes.md
 dot-ssh.tgz
 /test*.py
 /test*.ts
-/tmp
 
 start-all.sh
-scripts/tmp
+**/tmp
