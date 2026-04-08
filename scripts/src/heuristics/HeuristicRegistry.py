@@ -10,5 +10,8 @@ HeuristicRegistry: dict[str, NamedHeuristic] = {}
 def register_heuristic(heuristic: Type[NamedHeuristic]):
 	HeuristicRegistry[heuristic.__name__] = heuristic
 
+def get_all_heuristics():
+	return HeuristicRegistry
+
 def get_heuristic(name):
 	return HeuristicRegistry[name]
