@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
-from cli import main
+from sys import argv
 
-main()
+from cli.parsers import top_level_parser
+from cli.subcommands import *
+
+opts = top_level_parser.parse_args(argv[1:])
+opts.func(opts)
