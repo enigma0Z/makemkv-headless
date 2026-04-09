@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from ..parsers import subparsers
 
 from typing import Callable
@@ -11,11 +9,11 @@ from pathlib import Path
 
 from humanfriendly import format_size
 
-from heuristics.Match import Match
-from heuristics.MatchSet import MatchSet
-from heuristics.NamedHeuristic import NamedHeuristic
-from heuristics.SizeMatch import CloseSizeMatch, ExactSizeMatch
-from heuristics.HeuristicRegistry import get_all_heuristics, get_heuristic
+from ...heuristics.Match import Match
+from ...heuristics.MatchSet import MatchSet
+from ...heuristics.NamedHeuristic import NamedHeuristic
+from ...heuristics.SizeMatch import CloseSizeMatch, ExactSizeMatch
+from ...heuristics.HeuristicRegistry import get_all_heuristics, get_heuristic
 
 def input_loop(prompt: str, validator: Callable[[any], bool]):
     while True:
