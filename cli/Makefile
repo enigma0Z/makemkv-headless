@@ -9,6 +9,8 @@ $(VENV):
 	$(PYTHON) -m venv $(VENV)
 	$(VENV)/bin/pip install -r requirements.txt
 
+.PHONY: build
+build: dist
 dist: $(VENV)
 	$(VENV)/bin/python3 -m build
 
