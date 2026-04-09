@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from src.interface.base_interface import BaseInterface
+from makemkv_headless_api.interface.base_interface import BaseInterface
 
 _interface: BaseInterface = None
 

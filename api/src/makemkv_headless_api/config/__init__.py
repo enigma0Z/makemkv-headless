@@ -2,7 +2,7 @@ import json
 import logging
 import yaml
 
-from src.models.config import ConfigModel, LogLevelStr
+from makemkv_headless_api.models.config import ConfigModel, LogLevelStr
 
 class Config(ConfigModel):
   keys: list[str] = []

@@ -4,7 +4,7 @@ import subprocess
 from unittest import TestCase
 from unittest.mock import DEFAULT, MagicMock, Mock, NonCallableMock, patch
 
-from src.makemkv import rip_disc
+from makemkv_headless_api.makemkv import rip_disc
 
 @patch.multiple('subprocess', Popen=DEFAULT)
 @patch.multiple('builtins', open=DEFAULT)

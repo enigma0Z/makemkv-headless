@@ -1,9 +1,9 @@
 
-from src.interface.base_interface import BaseInterface
-from src.interface.target import Target
-from src.message.base_message_event import BaseMessageEvent
-from src.message.message_event import MessageEvent
-from src.message.progress_message_event import ProgressMessageEvent
+from makemkv_headless_api.interface.base_interface import BaseInterface
+from makemkv_headless_api.interface.target import Target
+from makemkv_headless_api.message.base_message_event import BaseMessageEvent
+from makemkv_headless_api.message.message_event import MessageEvent
+from makemkv_headless_api.message.progress_message_event import ProgressMessageEvent
 
 
 class PlaintextInterface(BaseInterface):

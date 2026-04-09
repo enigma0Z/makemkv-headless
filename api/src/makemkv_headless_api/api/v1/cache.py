@@ -1,7 +1,7 @@
 from fastapi import Response
-from src.api import cached_api
-from src.api.fastapi import json_api
-from src.api.fastapi import API
+from makemkv_headless_api.api import cached_api
+from makemkv_headless_api.api.fastapi import json_api
+from makemkv_headless_api.api.fastapi import API
 
 @API.get('/api/v1/cache/clear')
 @json_api

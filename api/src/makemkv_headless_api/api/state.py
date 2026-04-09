@@ -1,8 +1,8 @@
 import logging
 from typing import TypedDict
 
-from src.models.socket import CurrentProgressMessage, ProgressValueMessage, TotalProgressMessage
-from src.models.state import ProgressStateModel, StateModel
+from makemkv_headless_api.models.socket import CurrentProgressMessage, ProgressValueMessage, TotalProgressMessage
+from makemkv_headless_api.models.state import ProgressStateModel, StateModel
 
 logger = logging.getLogger(__name__)
 

@@ -5,7 +5,7 @@ import logging
 from typing import Callable
 from fastapi import Response
 
-from src.json_serializable import JSONSerializable
+from makemkv_headless_api.json_serializable import JSONSerializable
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,7 @@
 from typing import Generic, Literal, TypeVar
 from pydantic import BaseModel
 
-from src.models.makemkv import CurrentProgressModel, MkvLogModel, ProgressModel, ProgressValueModel, SourceInfoModel, TitleInfoModel, TotalProgressModel, TrackInfoModel, mkv_model_from_raw
+from makemkv_headless_api.models.makemkv import CurrentProgressModel, MkvLogModel, ProgressModel, ProgressValueModel, SourceInfoModel, TitleInfoModel, TotalProgressModel, TrackInfoModel, mkv_model_from_raw
 
 T = TypeVar('T')
 

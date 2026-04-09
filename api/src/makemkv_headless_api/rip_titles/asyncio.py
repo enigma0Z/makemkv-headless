@@ -6,15 +6,15 @@ import tempfile
 
 import logging
 
-from src import features
-from src.interface import get_interface
-from src.interface.target import Target
-from src.makemkv.asyncio import rip_disc
+from makemkv_headless_api import features
+from makemkv_headless_api.interface import get_interface
+from makemkv_headless_api.interface.target import Target
+from makemkv_headless_api.makemkv.asyncio import rip_disc
 logger = logging.getLogger(__name__)
 
-from src.sort import SortInfo, sort_titles
+from makemkv_headless_api.sort import SortInfo, sort_titles
 
-from src.toc import Toc
+from makemkv_headless_api.toc import Toc
 
 
 EPISODE_LENGTH_TOLERANCE = 90

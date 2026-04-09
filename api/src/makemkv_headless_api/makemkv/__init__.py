@@ -6,15 +6,15 @@ from time import time
 
 import logging
 
-from src.interface.base_interface import BaseInterface
-from src.interface.plaintext_interface import PlaintextInterface
-from src.message.rip_start_stop_message_event import RipStartStopMessageEvent
+from makemkv_headless_api.interface.base_interface import BaseInterface
+from makemkv_headless_api.interface.plaintext_interface import PlaintextInterface
+from makemkv_headless_api.message.rip_start_stop_message_event import RipStartStopMessageEvent
 logger = logging.getLogger(__name__)
 
-from src.message.build_message import build_message
-from src.config import CONFIG
-from src.disc import wait_for_disc_inserted
-from src.util import seconds_to_hms
+from makemkv_headless_api.message.build_message import build_message
+from makemkv_headless_api.config import CONFIG
+from makemkv_headless_api.disc import wait_for_disc_inserted
+from makemkv_headless_api.util import seconds_to_hms
 
 def rip_disc(
     source, 

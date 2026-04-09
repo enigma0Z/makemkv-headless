@@ -1,6 +1,6 @@
 from typing import Literal, TypedDict
 
-from src.message.base_message_event import BaseMessageEvent
+from makemkv_headless_api.message.base_message_event import BaseMessageEvent
 
 
 type StatusMessage = Literal[

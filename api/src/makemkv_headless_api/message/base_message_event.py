@@ -1,4 +1,4 @@
-from src.json_serializable import JSONSerializable
+from makemkv_headless_api.json_serializable import JSONSerializable
 
 
 class BaseMessageEvent(JSONSerializable):

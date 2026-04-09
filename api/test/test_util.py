@@ -6,7 +6,7 @@ import os
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from src import util
+from makemkv_headless_api import util
 
 multi_response_index = {}
 

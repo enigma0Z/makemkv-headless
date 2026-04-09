@@ -5,12 +5,12 @@ from traceback import format_exc
 
 from fastapi import APIRouter, BackgroundTasks
 
-from src.api.api_response import GenericAPIError, APIException, APIResponse
-from src.api.state import STATE
-from src.config import CONFIG
-from src.interface import get_interface
-from src.models.socket import TocStatusMessage
-from src.toc import Toc
+from makemkv_headless_api.api.api_response import GenericAPIError, APIException, APIResponse
+from makemkv_headless_api.api.state import STATE
+from makemkv_headless_api.config import CONFIG
+from makemkv_headless_api.interface import get_interface
+from makemkv_headless_api.models.socket import TocStatusMessage
+from makemkv_headless_api.toc import Toc
 
 class TocError(Exception): ...
 

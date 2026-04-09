@@ -7,21 +7,21 @@ import threading
 import logging
 from typing import TypedDict
 
-from src.interface import get_interface
-from src.interface.base_interface import BaseInterface
-from src.interface.target import Target
-from src.makemkv.threaded import RipDiscThread
-from src.threads import StoppableThread
-from src.util import sanitize
+from makemkv_headless_api.interface import get_interface
+from makemkv_headless_api.interface.base_interface import BaseInterface
+from makemkv_headless_api.interface.target import Target
+from makemkv_headless_api.makemkv.threaded import RipDiscThread
+from makemkv_headless_api.threads import StoppableThread
+from makemkv_headless_api.util import sanitize
 logger = logging.getLogger(__name__)
 
-from src.sort import SortInfo, sort_titles
+from makemkv_headless_api.sort import SortInfo, sort_titles
 
-from src.disc import eject_disc
-from src.makemkv import rip_disc
-from src.toc import Toc
+from makemkv_headless_api.disc import eject_disc
+from makemkv_headless_api.makemkv import rip_disc
+from makemkv_headless_api.toc import Toc
 
-from src import features
+from makemkv_headless_api import features
 
 EPISODE_LENGTH_TOLERANCE = 90
 

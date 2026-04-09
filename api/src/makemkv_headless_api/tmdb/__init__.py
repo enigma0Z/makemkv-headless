@@ -4,9 +4,9 @@ import logging
 from typing import Any
 import requests
 
-from src.json_serializable import JSONSerializable
-from src.config import CONFIG
-from src.models.tmdb import TMDBConfigurationModel, TMDBMovieSearchResultModel, TMDBShowSearchResultModel
+from makemkv_headless_api.json_serializable import JSONSerializable
+from makemkv_headless_api.config import CONFIG
+from makemkv_headless_api.models.tmdb import TMDBConfigurationModel, TMDBMovieSearchResultModel, TMDBShowSearchResultModel
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,7 @@
-from src.message.base_message_event import BaseMessageEvent
-from src.message.message_event import MessageEvent
-from src.message.progress_message_event import ProgressMessageEvent
-from src.message.progress_value_message_event import ProgressValueMessageEvent
+from makemkv_headless_api.message.base_message_event import BaseMessageEvent
+from makemkv_headless_api.message.message_event import MessageEvent
+from makemkv_headless_api.message.progress_message_event import ProgressMessageEvent
+from makemkv_headless_api.message.progress_value_message_event import ProgressValueMessageEvent
 
 import logging
 logger = logging.getLogger(__name__)

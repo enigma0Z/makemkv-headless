@@ -3,11 +3,11 @@
 
 from unittest import TestCase
 from unittest.mock import patch
-from src.interface.plaintext_interface import PlaintextInterface
-from src.interface.target import Target
-from src.message.base_message_event import BaseMessageEvent
-from src.message.message_event import MessageEvent
-from src.message.progress_message_event import ProgressMessageEvent
+from makemkv_headless_api.interface.plaintext_interface import PlaintextInterface
+from makemkv_headless_api.interface.target import Target
+from makemkv_headless_api.message.base_message_event import BaseMessageEvent
+from makemkv_headless_api.message.message_event import MessageEvent
+from makemkv_headless_api.message.progress_message_event import ProgressMessageEvent
 
 class InterfaceTest(TestCase):
   def test_BaseMessageEvent(self):

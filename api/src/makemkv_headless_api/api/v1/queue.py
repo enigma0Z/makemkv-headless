@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from src.interface import get_interface
-from src.message.base_message_event import BaseMessageEvent
+from makemkv_headless_api.interface import get_interface
+from makemkv_headless_api.message.base_message_event import BaseMessageEvent
 
 router = APIRouter(prefix="/queue")
 

@@ -6,16 +6,16 @@ import sys
 
 import logging
 
-from src.interactive import interactive_rip
-from src.rip_titles.interactive import rip_movie_interactive, rip_show_interactive
+from makemkv_headless_api.interactive import interactive_rip
+from makemkv_headless_api.rip_titles.interactive import rip_movie_interactive, rip_show_interactive
 
 from argparse import ArgumentParser
 
-from src import features
+from makemkv_headless_api import features
 
-from src.config import CONFIG
-from src.interface.curses_interface import CursesInterface
-# from src.api.singletons.singletons import start_api
+from makemkv_headless_api.config import CONFIG
+from makemkv_headless_api.interface.curses_interface import CursesInterface
+# from makemkv_headless_api.api.singletons.singletons import start_api
 
 logger = logging.getLogger(__name__)
 

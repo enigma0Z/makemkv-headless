@@ -1,6 +1,6 @@
 from typing import TypedDict
 
-from src.message.base_message_event import BaseMessageEvent
+from makemkv_headless_api.message.base_message_event import BaseMessageEvent
 
 
 class ProgressValueMessageData(TypedDict):

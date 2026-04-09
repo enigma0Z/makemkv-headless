@@ -4,8 +4,8 @@ from typing import Callable
 
 import logging
 
-from src.interface.target import Target
-from src.message.base_message_event import BaseMessageEvent
+from makemkv_headless_api.interface.target import Target
+from makemkv_headless_api.message.base_message_event import BaseMessageEvent
 logger = logging.getLogger(__name__)
 
 class BaseInterface(ABC):

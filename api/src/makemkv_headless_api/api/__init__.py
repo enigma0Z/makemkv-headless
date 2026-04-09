@@ -6,12 +6,12 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.socket import socket
+from makemkv_headless_api.api.socket import socket
 
-from src.config import CONFIG
-from src.interface import get_interface, init_interface
+from makemkv_headless_api.config import CONFIG
+from makemkv_headless_api.interface import get_interface, init_interface
 
-from src.interface.async_queue_interface import AsyncQueueInterface
+from makemkv_headless_api.interface.async_queue_interface import AsyncQueueInterface
 
 from . import v1
 

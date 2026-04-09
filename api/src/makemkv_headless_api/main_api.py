@@ -3,7 +3,7 @@ import uvicorn
 
 from argparse import ArgumentParser
 from sys import exit, argv
-from src.config import CONFIG
+from makemkv_headless_api.config import CONFIG
 
 CONFIG.update_from_file('./config.yaml')
 
@@ -48,6 +48,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':
-  from src.api import app
+  from makemkv_headless_api.api import app
   logger.info(f'Starting app {app}')
   uvicorn.run(app, host="0.0.0.0", port=CONFIG.listen_port) 

@@ -6,14 +6,14 @@ import threading
 
 import logging
 
-from src.interface import get_interface
-from src.interface.base_interface import BaseInterface
-from src.rip_titles.threaded import RipTitlesThread
+from makemkv_headless_api.interface import get_interface
+from makemkv_headless_api.interface.base_interface import BaseInterface
+from makemkv_headless_api.rip_titles.threaded import RipTitlesThread
 logger = logging.getLogger(__name__)
 
-from src.sort import SortInfo
+from makemkv_headless_api.sort import SortInfo
 
-from src.toc import Toc
+from makemkv_headless_api.toc import Toc
 
 
 EPISODE_LENGTH_TOLERANCE = 90

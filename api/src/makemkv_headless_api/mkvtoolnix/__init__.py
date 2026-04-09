@@ -5,9 +5,9 @@ import subprocess
 
 import logging
 
-from src.interface.base_interface import BaseInterface
-from src.interface.plaintext_interface import PlaintextInterface
-from src.interface.target import Target
+from makemkv_headless_api.interface.base_interface import BaseInterface
+from makemkv_headless_api.interface.plaintext_interface import PlaintextInterface
+from makemkv_headless_api.interface.target import Target
 logger = logging.getLogger(__name__)
 
 MKVMERGE='/opt/homebrew/bin/mkvmerge'

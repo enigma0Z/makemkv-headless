@@ -1,8 +1,8 @@
 from functools import lru_cache
 from fastapi import APIRouter
 
-from src.api.api_response import APIResponse
-from src.tmdb import configuration, search
+from makemkv_headless_api.api.api_response import APIResponse
+from makemkv_headless_api.tmdb import configuration, search
 
 router = APIRouter(prefix="/tmdb")
 

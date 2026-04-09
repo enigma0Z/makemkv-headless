@@ -1,9 +1,9 @@
 
 from pydantic import BaseModel
 
-from src.message.progress_message_event import StatusMessage
-from src.models.tmdb import TMDBMovieSearchResultModel, TMDBShowSearchResultModel
-from src.models.toc import TocModel
+from makemkv_headless_api.message.progress_message_event import StatusMessage
+from makemkv_headless_api.models.tmdb import TMDBMovieSearchResultModel, TMDBShowSearchResultModel
+from makemkv_headless_api.models.toc import TocModel
 
 
 class RipDestinationModel(BaseModel):
