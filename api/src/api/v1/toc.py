@@ -24,6 +24,8 @@ router = APIRouter(prefix="/toc")
 async def get_toc_from_disc(source):
   with lock:
     toc = Toc()
+    # STATE.reset_rip_indexes() # Reset which indexes are selected
+    STATE.reset_socket() # Reset which indexes are complete
     await toc.get_from_disc(source)
     STATE.redux.toc = toc
     get_interface().send(TocStatusMessage(state="complete"))

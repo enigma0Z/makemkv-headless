@@ -30,6 +30,10 @@ class State(StateModel):
 
       setattr(self.socket, field, default_value)
 
+  def reset_rip_indexes(self):
+    self.redux.rip.sort_info.main_indexes = []
+    self.redux.rip.sort_info.extra_indexes = []
+
   def fill_progress_indexes(self, index):
     if len(self.socket.current_progress) <= index:
       # Create empty current_progress entries as needed
