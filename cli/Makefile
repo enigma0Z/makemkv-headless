@@ -1,17 +1,24 @@
-.venv312:
-	python3.12 -m venv .venv312
-	.venv312/bin/pip install -r requirements.txt
+PYTHON_VERSION := 3.12
 
-dist: .venv312
-	.venv312/bin/python3 -m build
+PYTHON := python$(PYTHON_VERSION)
+VENV := .venv$(PYTHON_VERSION)
+
+.PHONY: venv
+venv: $(VENV)
+$(VENV):
+	$(PYTHON) -m venv $(VENV)
+	$(VENV)/bin/pip install -r requirements.txt
+
+dist: $(VENV)
+	$(VENV)/bin/python3 -m build
 
 .PHONY: clean
 clean:
-	rm -rf .venv312 dist
+	rm -rf $(VENV) dist
 
 .PHONY: build
 build: dist
 
 .PHONY: install
 install:
-	.venv312/bin/pip install -e .
+	$(VENV)/bin/pip install -e .
