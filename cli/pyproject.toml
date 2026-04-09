@@ -45,7 +45,8 @@ Repository = "https://github.com/enigma0Z/makemkv-headless/"
 mmh = "makemkv_headless_cli.__main__:main"
 
 [tool.hatch.version]
-path = 'makemkv_headless_cli/__about__.py'
+path = 'VERSION'
+pattern = "^(?P<version>.+)$"
 
 [tool.hatch.build.targets.wheel]
 packages = ["makemkv_headless_cli"]
