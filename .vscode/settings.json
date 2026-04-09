@@ -38,7 +38,12 @@
   "vite.buildCommand": "cd web && npm run build",
   "python-envs.pythonProjects": [
     {
-      "path": "api/.venv",
+      "path": "api",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    },
+    {
+      "path": "cli",
       "envManager": "ms-python.python:venv",
       "packageManager": "ms-python.python:pip"
     }
