@@ -9,6 +9,9 @@ dist: .venv312
 clean:
 	rm -rf .venv312 dist
 
-.PHONY: self-install
-self-install:
+.PHONY: build
+build: dist
+
+.PHONY: install
+install:
 	.venv312/bin/pip install -e .
