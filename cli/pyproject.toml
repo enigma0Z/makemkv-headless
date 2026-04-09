@@ -14,19 +14,25 @@ dependencies = [
 	"typing_extensions==4.15.0",
 ]
 
-authors = [
-	{ name = 'enigma0Z', email = "enigma.0ZA@gmail.com" }
-]
-maintainers = [
-	{ name = 'enigma0Z', email = "enigma.0ZA@gmail.com" }
-]
+authors = [{ name = 'enigma0Z', email = "enigma.0ZA@gmail.com" }]
+maintainers = [{ name = 'enigma0Z', email = "enigma.0ZA@gmail.com" }]
 
 description = "CLI for MakeMKV Headless"
-readme = "README.md" # TODO: add this
+readme = "README.md"                     # TODO: add this
 license = "MIT"
 license-files = ["LICENSE.md"]
 
-keywords = ["makemkv", "bd", "bdrom", "libbluray", "dvd", "rip", "video", "ffmpeg", "mkv"]
+keywords = [
+	"makemkv",
+	"bd",
+	"bdrom",
+	"libbluray",
+	"dvd",
+	"rip",
+	"video",
+	"ffmpeg",
+	"mkv",
+]
 
 classifiers = [
 	"Development Status :: 3 - Alpha",
@@ -39,7 +45,11 @@ classifiers = [
 ]
 
 [project.urls]
-Repository = "https://github.com/enigma0Z/makemkv-headless/"
+Homepage = "https://github.com/enigma0Z/makemkv-headless"
+Documentation = "https://github.com/enigma0Z/makemkv-headless/blob/main/README.md"
+Repository = "https://github.com/enigma0Z/makemkv-headless.git"
+"Bug Tracker" = "https://github.com/enigma0Z/makemkv-headless/issues"
+Changelog = "https://github.com/enigma0Z/makemkv-headless/blob/main/CHANGELOG.md"
 
 [project.scripts]
 mmh = "makemkv_headless_cli.__main__:main"
