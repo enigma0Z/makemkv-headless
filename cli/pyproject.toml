@@ -1,0 +1,52 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+dynamic = ["version"]
+name = "makemkv-headless-cli"
+dependencies = [
+	"annotated-types==0.7.0",
+	"humanfriendly==10.0",
+	"pydantic==2.12.5",
+	"pydantic_core==2.41.5",
+	"typing-inspection==0.4.2",
+	"typing_extensions==4.15.0",
+]
+
+authors = [
+	{ name = 'enigma0Z', email = "enigma.0ZA@gmail.com" }
+]
+maintainers = [
+	{ name = 'enigma0Z', email = "enigma.0ZA@gmail.com" }
+]
+
+description = "CLI for MakeMKV Headless"
+readme = "README.md" # TODO: add this
+license = "MIT"
+license-files = ["LICENSE.md"]
+
+keywords = ["makemkv", "bd", "bdrom", "libbluray", "dvd", "rip", "video", "ffmpeg", "mkv"]
+
+classifiers = [
+	"Development Status :: 3 - Alpha",
+	"Intended Audience :: System Administrators",
+	"Topic :: Multimedia",
+	"Topic :: Multimedia :: Video",
+	"Topic :: Multimedia :: Video :: Conversion",
+	"Topic :: System :: Archiving",
+	"Topic :: System :: Archiving :: Backup",
+]
+
+[project.urls]
+Repository = "https://github.com/enigma0Z/makemkv-headless/"
+
+[project.scripts]
+mmh = "makemkv_headless_cli.__main__:main"
+
+[tool.hatch.version]
+path = 'VERSION'
+pattern = "^(?P<version>.+)$"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/makemkv_headless_cli"]

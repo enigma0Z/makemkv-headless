@@ -110,7 +110,6 @@ class AsyncQueueInterface(BaseInterface):
       case Target.STATUS:
         pass
 
-
   async def run(self):
     '''Start the queue processing thread'''
     logger.info(f'{hex(id(self))} run(): Starting queue loop')

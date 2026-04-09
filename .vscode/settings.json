@@ -1,9 +1,12 @@
 {
   "cSpell.words": [
+    "bdrom",
     "CINFO",
     "clazz",
+    "humanfriendly",
     "imdbid",
     "levelname",
+    "libbluray",
     "makemkv",
     "MAKEMKVCON",
     "mkvmerge",
@@ -13,11 +16,13 @@
     "PRGC",
     "PRGT",
     "PRGV",
+    "pydantic",
     "setpgrp",
     "SINFO",
     "TINFO",
     "tmdb",
-    "tmdbid"
+    "tmdbid",
+    "venv"
   ],
   "python.testing.unittestArgs": [
     "-v",
@@ -33,7 +38,12 @@
   "vite.buildCommand": "cd web && npm run build",
   "python-envs.pythonProjects": [
     {
-      "path": "api/.venv",
+      "path": "api",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    },
+    {
+      "path": "cli",
       "envManager": "ms-python.python:venv",
       "packageManager": "ms-python.python:pip"
     }
