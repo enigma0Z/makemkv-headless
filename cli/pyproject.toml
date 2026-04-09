@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 dynamic = ["version"]
-name = "makemkv-batch-cli"
+name = "makemkv-headless-cli"
 dependencies = [
 	"annotated-types==0.7.0",
 	"humanfriendly==10.0",
@@ -45,7 +45,7 @@ Repository = "https://github.com/enigma0Z/makemkv-headless/"
 mmh = "makemkv_headless_cli.__main__:main"
 
 [tool.hatch.version]
-path = 'src/__about__.py'
+path = 'makemkv_headless_cli/__about__.py'
 
 [tool.hatch.build.targets.wheel]
-packages = ["src"]
+packages = ["makemkv_headless_cli"]
