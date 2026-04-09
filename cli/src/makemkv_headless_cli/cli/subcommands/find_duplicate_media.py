@@ -1,19 +1,18 @@
-from ..parsers import subparsers
-
+from argparse import Namespace
+from os import stat
+from pathlib import Path
 from typing import Callable
 
-from argparse import ArgumentParser, Namespace
-from os import stat
-from sys import exit, argv
-from pathlib import Path
-
 from humanfriendly import format_size
+from makemkv_headless_cli.cli.parsers import subparsers
+from makemkv_headless_cli.heuristics.HeuristicRegistry import (
+    get_all_heuristics, get_heuristic)
+from makemkv_headless_cli.heuristics.Match import Match
+from makemkv_headless_cli.heuristics.MatchSet import MatchSet
+from makemkv_headless_cli.heuristics.NamedHeuristic import NamedHeuristic
+from makemkv_headless_cli.heuristics.SizeMatch import (CloseSizeMatch,
+                                                       ExactSizeMatch)
 
-from ...heuristics.Match import Match
-from ...heuristics.MatchSet import MatchSet
-from ...heuristics.NamedHeuristic import NamedHeuristic
-from ...heuristics.SizeMatch import CloseSizeMatch, ExactSizeMatch
-from ...heuristics.HeuristicRegistry import get_all_heuristics, get_heuristic
 
 def input_loop(prompt: str, validator: Callable[[any], bool]):
     while True:

@@ -49,4 +49,4 @@ path = 'VERSION'
 pattern = "^(?P<version>.+)$"
 
 [tool.hatch.build.targets.wheel]
-packages = ["makemkv_headless_cli"]
+packages = ["src/makemkv_headless_cli"]
