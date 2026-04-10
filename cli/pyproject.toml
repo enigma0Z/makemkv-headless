@@ -1,17 +1,10 @@
-[build-system]
-requires = ["hatchling >= 1.26"]
-build-backend = "hatchling.build"
-
 [project]
 dynamic = ["version"]
+requires-python = ">= 3.14"
 name = "makemkv-headless-cli"
 dependencies = [
-	"annotated-types==0.7.0",
-	"humanfriendly==10.0",
-	"pydantic==2.12.5",
-	"pydantic_core==2.41.5",
-	"typing-inspection==0.4.2",
-	"typing_extensions==4.15.0",
+    "humanfriendly>=10.0",
+    "pydantic>=2.12.5",
 ]
 
 authors = [{ name = 'enigma0Z', email = "enigma.0ZA@gmail.com" }]
@@ -53,6 +46,10 @@ Changelog = "https://github.com/enigma0Z/makemkv-headless/blob/main/CHANGELOG.md
 
 [project.scripts]
 mmh = "makemkv_headless_cli.__main__:main"
+
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
 
 [tool.hatch.version]
 path = 'VERSION'
