@@ -4,19 +4,8 @@ import uvicorn
 from argparse import ArgumentParser
 from sys import exit, argv
 from makemkv_headless_api.config import CONFIG
-from makemkv_headless_api.api import app
 
 def main():
-  logging.basicConfig(
-    style='{', 
-    format='{asctime} [{levelname}] {filename}:{lineno} {threadName} - {message}', 
-    level=CONFIG.get_log_level(),
-    filename=CONFIG.log_file,
-    filemode='a'
-  )
-
-  logger = logging.getLogger(__name__)
-
   CONFIG.update_from_file('./config.yaml')
 
   parser = ArgumentParser()
@@ -49,5 +38,16 @@ def main():
   # Erase log file
   open(CONFIG.log_file, 'w').close()
 
-  logger.info(f'Starting app {app}')
+  logging.basicConfig(
+    style='{', 
+    format='{asctime} [{levelname}] {filename}:{lineno} {threadName} - {message}', 
+    level=CONFIG.get_log_level(),
+    filename=CONFIG.log_file,
+    filemode='a'
+  )
+
+  logger = logging.getLogger(__name__)
+
+  from makemkv_headless_api.api import app
+  logger.info(f'Starting app {app} with config {CONFIG}')
   uvicorn.run(app, host="0.0.0.0", port=CONFIG.listen_port) 
