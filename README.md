@@ -15,58 +15,49 @@ A headless interface for [makemkv](https://makemkv.com).
 
 ## Installation
 
-### Install prerequisites
+### Prerequisites
 
-Install the following according to your own OS's needs/preferences.
+* [uv](https://docs.astral.sh/uv/getting-started/installation/)
+* [node](https://nodejs.org/en/download)
+* [makemkv](https://makemkv.com/download/)
 
-* Makemkv
-* git (duh?)
-* rsync
-* python3.13 or newer + python3.13-venv
-* Java? I think makemkv needs that sometimes
+### API
 
-### Install `makemkv-headless`
+```bash
+cd api && uv sync
+```
 
-Pick one of the following, either the easy way or the advanced way.  With the
-advanced way, you will be running straight from source.  I try to keep `main` as
-stable as possible, but it's possible that some bugs slip in.  If that is the
-case, you'll need to wait for a fix and update, or manually roll back to a
-previous commit.
+### CLI
 
-### The easy way
-	
-> _Sorry, this way doesn't exist yet.  When it does, it'll be something like
-> "install the deb etc then just run it 5head"_
+```bash
+cd cli && uv sync
+```
 
-### The "advanced" way
+### WEB
 
-1. `git clone` the repo
-2. `./web.sh`
-3. Install the dependencies you probably missed
-4. Install the dependencies **I** probably missed writing down
-5. Kill the web interface
-6. `./api.sh`
-7. Repeat #3 and #4 above
+```bash
+cd web && npm install
+```
 
-## Usage
+## Setup
 
-1. Configure it: copy `api/config.example.yaml` to `api/config.yaml`
-	* See the comments from the example on how to configure each field
-	* Note that you will need to get your own TMDB API key
-2. Run it: `./start.sh`
-	* This will create a screen session for each of web and api
-	* You can run `screen -R makemkv-headless-api` (for example) to attach to
-		the running session and see active output from the api server
-	* If you borked up any dependencies, you may not see both running when you
-		check via `screen -ls` or similar, review the installation steps in that
-		case
-3. Access and use the web interface
-	* Fill out the form fields
-	* Hit the load TOC button to load the table of contents from the disk
-	* Make sure mains/extras are set right and the tracks you want to rip are
-    	selected
-	* Click "Rip Disk" to start
+1. Copy `api/config.example.yaml` to `api/config.yaml`
+2. Get your own [TMDB API key](https://developer.themoviedb.org/docs/getting-started) and put it in here 
 
-### Configuration
+## Running everything
 
-## Caveats
+### From source / development mode
+
+```bash
+./start.sh <api port> <web port> <api options...>
+```
+
+### In production
+
+This part is not yet done.  The goal, however, is something like this from the
+CLI package.
+
+```bash
+# Run a package install command... then
+mmh start <api port> <web port> <api options...>
+```
