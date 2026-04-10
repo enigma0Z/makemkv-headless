@@ -1,0 +1,169 @@
+#!/usr/bin/env python3
+
+from asyncio import create_subprocess_shell
+import asyncio
+from asyncio.subprocess import PIPE
+from math import trunc
+from sys import platform
+
+from unicodedata import normalize, combining
+
+import os
+import re
+import shlex
+import shutil
+import subprocess
+
+import logging
+from typing import Any, Callable
+
+from makemkv_headless_api.interface.plaintext_interface import PlaintextInterface
+from makemkv_headless_api.interface.target import Target
+from makemkv_headless_api.models.socket import CurrentProgressMessage, LogMessage
+logger = logging.getLogger(__name__)
+
+def grep(term, lines):
+  return True in [ term.casefold() in line.casefold() for line in lines ]
+
+def hms_to_seconds(time):
+  [hours, minutes, seconds] = [int(v) for v in time.split(':')]
+  hours *= 60 * 60
+  minutes *= 60
+  return hours + minutes + seconds
+
+def seconds_to_hms(seconds):
+  seconds = round(seconds)
+  hours = trunc(seconds/60/60)
+  minutes = trunc(seconds/60) - hours * 60
+  seconds = seconds - hours * 60 * 60 - minutes * 60
+  return f'{hours}:{minutes:02d}:{seconds:02d}'
+
+def notify(message):
+  if platform == 'darwin':
+    subprocess.Popen(
+      [
+        'osascript', '-e',
+        f'display notification "{message}" with title "Disc Backup"'
+      ],
+      stdout=subprocess.PIPE,
+      stderr=subprocess.PIPE,
+    )
+  if platform == 'linux':
+    logger.info('Notification not supported')
+
+def clearing_line(line=' '):
+  if len(line) == 0: line = ' '
+  return line + ' ' * (-len(line) % shutil.get_terminal_size().columns)
+
+async def rsync(source, dest, interface=PlaintextInterface()):
+  logger.debug(' '.join([
+    'rsync() called with args:',
+    ', '.join([
+      f'source: {source}',
+      f'dest: {dest}',
+      f'interface: {interface}',
+    ])
+  ]))
+  # Put output files into their final destinations if the rip was done locally
+  interface.send(LogMessage(message=f'Starting copy of {source} to {dest}'))
+
+  def log_rsync_lines(line: str):
+    interface.send(LogMessage(message=line))
+
+  await cmd('rsync', '-av', source, dest, callback=log_rsync_lines)
+
+def sanitize(value: str) -> str: 
+  '''
+  Make a filesystem-safe-ish string.
+
+  * Removes diacritics
+  * Converts string to lowercase
+  * Replaces non alphanumeric characters with "_"
+  
+  :param value: The value to sanitize
+  :type value: str
+  :rtype: str
+  '''
+  value = ''.join([c for c in normalize('NFKD', value) if not combining(c)])
+  return re.sub(r'[^\w]', '_', value.lower())
+
+def string_to_list_int(_input):
+  if (type(_input) is list):
+    return _input
+
+  elif (type(_input) is None):
+    return []
+
+  token_list = [
+    v 
+    for v 
+    in re.sub(r'[^,\d-]', '', _input).split(',')
+    if v != ''
+  ]
+
+  output_list = []
+
+  for index, value in enumerate(token_list):
+    if type(value) is int:
+      pass
+
+    elif '-' in value:
+      start, end = [int(v) for v in value.split('-')]
+      new_list = []
+
+      if start <= end:
+        for value in range(start, end + 1):
+          new_list.append(int(value))
+      else:
+        for value in reversed(range(end, start + 1)):
+          new_list.append(int(value))
+
+      output_list.extend(new_list)
+    
+    else:
+      output_list.append(int(value))
+
+  return output_list
+
+def input_with_default(
+    prompt, 
+    value=None,
+    validation = lambda v: v != '' and v is not None
+  ):
+  while True:
+    _input = input(f'{prompt}\n({value})> ')
+    try:
+      if _input == '' and value is not None:
+        return value
+      elif _input.casefold() == 'none':
+        return ''
+      elif validation(_input):
+        return _input
+      elif validation(value):
+        return value
+    except AttributeError:
+      print("Error validating input")
+      continue
+
+
+async def cmd(*args, callback: Callable[[str], Any] | None = None, timeout=0.25):
+  process = await create_subprocess_shell(
+    shlex.join(args),
+    stdout=PIPE,
+    stderr=PIPE
+  )
+
+  while process.returncode is None and not process.stdout.at_eof():
+    try:
+      stdout = await asyncio.wait_for(process.stdout.readline(), 0.25)
+    except TimeoutError:
+      if (process.returncode is not None):
+        logger.debug('Process has exited')
+        process.stdout.feed_eof()
+      pass
+    else:
+      if not stdout:
+        process.stdout.feed_eof()
+      else:
+        if callback is not None:
+          callback(stdout.decode().strip())

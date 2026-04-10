@@ -4,9 +4,9 @@ from argparse import Namespace
 from unittest import TestCase
 from unittest.mock import DEFAULT, MagicMock, Mock, patch
 
-from src.rip_titles.rip_titles import rip_titles
-from src.sort import SortInfo
-from src.toc import Toc
+from makemkv_headless_api.rip_titles.rip_titles import rip_titles
+from makemkv_headless_api.sort import SortInfo
+from makemkv_headless_api.toc import Toc
 
 from test.data.toc_test_data import generate_CINFO, generate_SINFO, generate_TINFO
 

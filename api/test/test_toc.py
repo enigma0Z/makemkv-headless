@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from test.data.toc_test_data import generate_CINFO, generate_TINFO, generate_SINFO
-from src.toc import Toc, TrackInfo, format_records
+from makemkv_headless_api.toc import Toc, TrackInfo, format_records
 
 class TocTest(TestCase):
   def test_format_records(self):
