@@ -1,22 +1,20 @@
-PYTHON_VERSION := 3.12
-
+PYTHON_VERSION := $(shell cat pyproject.toml | grep 'requires-python' | cut -d\" -f2 | cut -d\  -f2)
 PYTHON := python$(PYTHON_VERSION)
 VENV := .venv$(PYTHON_VERSION)
 
 .PHONY: venv
 venv: $(VENV)
 $(VENV):
-	$(PYTHON) -m venv $(VENV)
-	$(VENV)/bin/pip install -r requirements.txt
+	uv venv
 
 .PHONY: build
 build: dist
 dist: $(VENV)
-	$(VENV)/bin/python3 -m build
+	uv build
 
 .PHONY: clean
 clean:
-	rm -rf $(VENV) dist
+	rm -rf .venv dist
 
 .PHONY: build
 build: dist
