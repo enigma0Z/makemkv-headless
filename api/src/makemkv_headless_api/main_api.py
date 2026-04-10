@@ -4,50 +4,50 @@ import uvicorn
 from argparse import ArgumentParser
 from sys import exit, argv
 from makemkv_headless_api.config import CONFIG
+from makemkv_headless_api.api import app
 
-CONFIG.update_from_file('./config.yaml')
+def main():
+  logging.basicConfig(
+    style='{', 
+    format='{asctime} [{levelname}] {filename}:{lineno} {threadName} - {message}', 
+    level=CONFIG.get_log_level(),
+    filename=CONFIG.log_file,
+    filemode='a'
+  )
 
-parser = ArgumentParser()
-parser.add_argument("--source")
-parser.add_argument("--log-level")
-parser.add_argument("--log-file")
-parser.add_argument("--port")
-parser.add_argument("--frontend")
-parser.add_argument("--cors-origin", action='append')
-opts = parser.parse_args(argv[1:])
+  logger = logging.getLogger(__name__)
 
-if opts.source is not None:
-  CONFIG.source = opts.source
+  CONFIG.update_from_file('./config.yaml')
 
-if opts.port is not None:
-  CONFIG.listen_port = int(opts.port)
+  parser = ArgumentParser()
+  parser.add_argument("--source")
+  parser.add_argument("--log-level")
+  parser.add_argument("--log-file")
+  parser.add_argument("--port")
+  parser.add_argument("--frontend")
+  parser.add_argument("--cors-origin", action='append')
+  opts = parser.parse_args(argv[1:])
 
-if opts.frontend is not None:
-  CONFIG.frontend = opts.frontend
+  if opts.source is not None:
+    CONFIG.source = opts.source
 
-if opts.cors_origin is not None:
-  CONFIG.cors_origins = opts.cors_origin
+  if opts.port is not None:
+    CONFIG.listen_port = int(opts.port)
 
-if opts.log_file is not None:
-  CONFIG.log_file = opts.log_file
+  if opts.frontend is not None:
+    CONFIG.frontend = opts.frontend
 
-if opts.log_level is not None:
-  CONFIG.log_level = opts.log_level
+  if opts.cors_origin is not None:
+    CONFIG.cors_origins = opts.cors_origin
 
-# Erase log file
-open(CONFIG.log_file, 'w').close()
+  if opts.log_file is not None:
+    CONFIG.log_file = opts.log_file
 
-logging.basicConfig(
-  style='{', 
-  format='{asctime} [{levelname}] {filename}:{lineno} {threadName} - {message}', 
-  level=CONFIG.get_log_level(),
-  filename=CONFIG.log_file,
-  filemode='a'
-)
+  if opts.log_level is not None:
+    CONFIG.log_level = opts.log_level
 
-logger = logging.getLogger(__name__)
+  # Erase log file
+  open(CONFIG.log_file, 'w').close()
 
-if __name__ == '__main__':
-  from makemkv_headless_api.api import app
   logger.info(f'Starting app {app}')
   uvicorn.run(app, host="0.0.0.0", port=CONFIG.listen_port) 
