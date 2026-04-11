@@ -1,0 +1,20 @@
+name: Build and test python
+description: Build and test Python
+
+inputs:
+  project:
+    description: The project (working dir) to build
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v6
+      with:
+        node-version: 24
+
+    - name: Build
+      id: build
+      working-directory: ${{ inputs.project }}
+      shell: bash
+      run: npm run build
