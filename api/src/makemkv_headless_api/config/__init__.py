@@ -2,6 +2,8 @@ import json
 import logging
 import yaml
 
+from os.path import abspath
+
 from makemkv_headless_api.models.config import ConfigModel, LogLevelStr
 
 class Config(ConfigModel):
@@ -43,19 +45,27 @@ class Config(ConfigModel):
     with open(filename, 'r') as file:
       self.update(**yaml.safe_load(file)) 
 
-  def get_log_level(level: LogLevelStr) -> int:
-    if level == 'ERROR':
+  def get_log_level(self) -> int:
+    if self.log_level == 'ERROR':
       return logging.ERROR
 
-    if level == 'WARN' or level == 'WARNING':
+    if self.log_level == 'WARN' or self.log_level == 'WARNING':
       return logging.WARNING
 
-    if level == 'INFO':
+    if self.log_level == 'INFO':
       return logging.INFO
 
-    if level == 'DEBUG':
+    if self.log_level == 'DEBUG':
       return logging.DEBUG
 
     return logging.INFO
+
+  def normalize_paths(self):
+    if self.temp_prefix.startswith('.'):
+      self.temp_prefix = abspath(self.temp_prefix)
+
+    if self.destination.startswith('.'):
+      self.destination = abspath(self.destination)
+
 
 CONFIG = Config()

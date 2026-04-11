@@ -48,6 +48,7 @@ def main():
 
   logger = logging.getLogger(__name__)
 
+  CONFIG.normalize_paths()
   from makemkv_headless_api.api import app
   logger.info(f'Starting app {app} with config {CONFIG}')
   uvicorn.run(app, host="0.0.0.0", port=CONFIG.listen_port) 
