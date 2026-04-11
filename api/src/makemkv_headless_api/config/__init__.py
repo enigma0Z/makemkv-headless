@@ -62,10 +62,10 @@ class Config(ConfigModel):
 
   def normalize_paths(self):
     if self.temp_prefix.startswith('.'):
-      self.temp_prefix = abspath(self.temp_prefix)
+      self.temp_prefix = abspath(self.temp_prefix) + "/"
 
     if self.destination.startswith('.'):
-      self.destination = abspath(self.destination)
+      self.destination = abspath(self.destination) + "/"
 
 
 CONFIG = Config()
