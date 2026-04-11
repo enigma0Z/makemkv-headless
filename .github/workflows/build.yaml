@@ -1,10 +1,25 @@
 name: Build and test
 on: 
-    - workflow_dispatch
-    - pull_request
+  - workflow_dispatch
+  - pull_request
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - run: echo hello world
+  build-python:
+    strategy:
+      matrix:
+        project:
+          - api
+          - web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install UV
+        id: install-uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Build
+        id: build
+        working-directory: ${{ matrix.project }}
+        run: uv sync && uv build
+      
