@@ -4,12 +4,12 @@ on:
   - pull_request
 
 jobs:
-  build-python:
+  build-and-test-python:
     strategy:
       matrix:
         project:
           - api
-          - web
+          - cli
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
