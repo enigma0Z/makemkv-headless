@@ -4,8 +4,9 @@ from typing import Callable
 
 import logging
 
+from pydantic import BaseModel
+
 from makemkv_headless_api.interface.target import Target
-from makemkv_headless_api.message.base_message_event import BaseMessageEvent
 logger = logging.getLogger(__name__)
 
 class BaseInterface(ABC):
@@ -44,7 +45,7 @@ class BaseInterface(ABC):
   @abstractmethod
   def send(
       self,
-      message: BaseMessageEvent
+      message: BaseModel
   ):
     # logger.debug('interface.send() message', message)
     pass

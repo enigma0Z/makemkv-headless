@@ -3,8 +3,8 @@ __pycache__
 _TOKEN.py
 config.json
 application.log
-app.log
-dvd.iso
+**/app.log
+**/*.iso
 config.yaml
 makemkv.log
 makemkv-bin*.tar.gz

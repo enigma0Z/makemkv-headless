@@ -9,7 +9,6 @@ from makemkv_headless_api.api.api_response import GenericAPIError, APIException,
 from makemkv_headless_api.api.state import STATE
 from makemkv_headless_api.config import CONFIG
 from makemkv_headless_api.interface import get_interface
-from makemkv_headless_api.message.rip_start_stop_message_event import RipStartStopMessageEvent
 from makemkv_headless_api.models.socket import RipStartStopMessage
 from makemkv_headless_api.rip_titles.asyncio import rip_titles
 from makemkv_headless_api.sort import ShowInfo, SortInfo
@@ -80,7 +79,7 @@ async def get_rip_stop():
     if rip_task != None:
       if not rip_task.done():
         rip_task.cancel()
-        interface.send(RipStartStopMessageEvent(state="stop"))
+        interface.send(RipStartStopMessage(state="stop"))
         return APIResponse(status="in progress")
 
     return APIResponse(status="stopped")
