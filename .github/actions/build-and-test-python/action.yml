@@ -1,0 +1,21 @@
+name: Build and test python
+description: Build and test Python
+
+inputs:
+  project:
+    description: The project (working dir) to build
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install UV
+      id: install-uv
+      shell: bash
+      run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+    - name: Build
+      id: build
+      working-directory: ${{ inputs.project }}
+      shell: bash
+      run: uv sync && uv build
