@@ -27,14 +27,12 @@ async def rip_disc(
   for rip_title in [str(v) for v in rip_titles]:
     logger.info(f'Ripping title {rip_title}')
     interface.print(f'Ripping title {rip_title}', target=Target.SORT)
-    if rip_title == "all":
-      interface.send(RipStartStopMessage(index=0, state="start"))
-    else:
-      interface.send(RipStartStopMessage(index=int(rip_title), state="start"))
+
+    interface.send(RipStartStopMessage(index=0 if rip_title == 'all' else int(rip_title), state="start"))
 
     def send_mkv_message(line: str):
       interface.send(mkv_message_from_raw(line))
 
     await cmd(CONFIG.makemkvcon_path, '--noscan', '--robot', '--progress=-same', 'mkv', source, rip_title, dest, callback=send_mkv_message)
 
-    interface.send(RipStartStopMessage(index=rip_title, state="stop"))
+    interface.send(RipStartStopMessage(index=0 if rip_title == 'all' else int(rip_title), state="stop"))
