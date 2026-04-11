@@ -67,5 +67,4 @@ class Config(ConfigModel):
     if self.destination.startswith('.'):
       self.destination = abspath(self.destination) + "/"
 
-
 CONFIG = Config()
