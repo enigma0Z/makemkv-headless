@@ -1,10 +1,22 @@
 
+from typing import Literal
+
 from pydantic import BaseModel
 
-from makemkv_headless_api.message.progress_message_event import StatusMessage
 from makemkv_headless_api.models.tmdb import TMDBMovieSearchResultModel, TMDBShowSearchResultModel
 from makemkv_headless_api.models.toc import TocModel
 
+type StatusMessage = Literal[
+  "Scanning CD-ROM devices",
+  "Opening DVD disc",
+  "Processing title sets",
+  "Scanning contents",
+  "Processing titles",
+  "Decrypting data",
+  "Saving all titles to MKV files",
+  "Analyzing seamless segments",
+  "Saving to MKV file"
+]
 
 class RipDestinationModel(BaseModel):
   library: str = None

@@ -17,7 +17,6 @@ from makemkv_headless_api.models.sort import ShowInfoModel, SortInfoModel
 
 from makemkv_headless_api import features
 from makemkv_headless_api.interface import get_interface
-from makemkv_headless_api.json_serializable import JSONSerializable
 from makemkv_headless_api.mkvtoolnix import split_mkv
 from makemkv_headless_api.toc import Toc
 from makemkv_headless_api.util import rsync, sanitize

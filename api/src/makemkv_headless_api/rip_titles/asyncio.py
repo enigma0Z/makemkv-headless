@@ -44,8 +44,8 @@ async def rip_titles(
 
   # Set rip dir to a temporary file location for extraction to enable more
   # stable rips when the destination is a network location
+  logger.debug(f'Creating temp file at {temp_prefix}')
   rip_path_base = tempfile.mkdtemp(prefix=temp_prefix)
-  logger.debug(f'tempfile created at {rip_path_base}')
   rip_path = os.path.join(rip_path_base, sort_info.path())
 
   os.makedirs(os.path.join(

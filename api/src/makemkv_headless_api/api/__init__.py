@@ -30,8 +30,9 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 cors_allow_origins = [CONFIG.frontend, *CONFIG.cors_origins]
-print(f'Loaded config: {CONFIG}')
-print(f'Allowed CORS Origins: {cors_allow_origins}')
+
+logger.info(f'Loaded config: {CONFIG}')
+logger.info(f'Allowed CORS Origins: {cors_allow_origins}')
 
 # try:
 #   logger.debug(f'')

@@ -4,7 +4,6 @@ import logging
 
 from makemkv_headless_api.interface import get_interface
 from makemkv_headless_api.interface.target import Target
-from makemkv_headless_api.message.rip_start_stop_message_event import RipStartStopMessageEvent
 from makemkv_headless_api.models.socket import RipStartStopMessage, mkv_message_from_raw
 logger = logging.getLogger(__name__)
 
@@ -38,4 +37,4 @@ async def rip_disc(
 
     await cmd(CONFIG.makemkvcon_path, '--noscan', '--robot', '--progress=-same', 'mkv', source, rip_title, dest, callback=send_mkv_message)
 
-    interface.send(RipStartStopMessageEvent(index=rip_title, state="stop"))
+    interface.send(RipStartStopMessage(index=rip_title, state="stop"))
