@@ -1,4 +1,4 @@
-name: Build and test API
+name: API - Build & Test
 on: 
   workflow_dispatch: {}
   pull_request: 
