@@ -17,7 +17,7 @@ import subprocess
 import logging
 from typing import Any, Callable
 
-from makemkv_headless_api.interface.plaintext_interface import PlaintextInterface
+from makemkv_headless_api.interface.base_interface import BaseInterface
 from makemkv_headless_api.interface.target import Target
 from makemkv_headless_api.models.socket import CurrentProgressMessage, LogMessage
 logger = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ def clearing_line(line=' '):
   if len(line) == 0: line = ' '
   return line + ' ' * (-len(line) % shutil.get_terminal_size().columns)
 
-async def rsync(source, dest, interface=PlaintextInterface()):
+async def rsync(source, dest, interface: BaseInterface):
   logger.debug(' '.join([
     'rsync() called with args:',
     ', '.join([

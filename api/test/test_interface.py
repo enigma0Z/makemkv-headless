@@ -3,7 +3,6 @@
 
 from unittest import TestCase
 from unittest.mock import patch
-from makemkv_headless_api.interface.plaintext_interface import PlaintextInterface
 from makemkv_headless_api.interface.target import Target
 from makemkv_headless_api.message.base_message_event import BaseMessageEvent
 from makemkv_headless_api.message.message_event import MessageEvent
@@ -38,21 +37,3 @@ class InterfaceTest(TestCase):
 
     with self.assertRaises(AssertionError):
       ProgressMessageEvent(current=10, target='foo')
-
-  def test_PlaintextInterface(self):
-    interface = PlaintextInterface()
-    with patch('builtins.print') as mock_print:
-      interface.send(MessageEvent('this'))
-      self.assertEqual('this\n', mock_print.mock_calls[0].args[0], 'Sending a message without an interface prints it out')
-
-      mock_print.reset_mock()
-      interface.send(MessageEvent('test', target=Target.MKV))
-      self.assertEqual('\x1b[F'*4, mock_print.mock_calls[0].args[0], 'Printing to MKV backs up four lines')
-      self.assertEqual('test\n', mock_print.mock_calls[1].args[0], 'Printing to MKV prints the output')
-      self.assertEqual('\n'*3, mock_print.mock_calls[1].kwargs['end'], 'Printing to MKV pads the output with three newlines')
-
-      mock_print.reset_mock()
-      interface.send(MessageEvent('test', target=Target.SORT))
-      self.assertEqual('\x1b[F'*3, mock_print.mock_calls[0].args[0], 'Printing to sort backs up three lines')
-      self.assertEqual('test\n', mock_print.mock_calls[1].args[0], 'Printing to sort prints the output')
-      self.assertEqual('\n'*2, mock_print.mock_calls[1].kwargs['end'], 'Printing to sort pads the output with two newlines')

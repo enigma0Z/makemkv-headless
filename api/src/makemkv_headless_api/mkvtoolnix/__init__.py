@@ -6,7 +6,6 @@ import subprocess
 import logging
 
 from makemkv_headless_api.interface.base_interface import BaseInterface
-from makemkv_headless_api.interface.plaintext_interface import PlaintextInterface
 from makemkv_headless_api.interface.target import Target
 logger = logging.getLogger(__name__)
 
@@ -16,7 +15,7 @@ def split_mkv(
     input: str, 
     output: str, 
     chapters: list[int], 
-    interface: BaseInterface = PlaintextInterface()
+    interface: BaseInterface
   ):
   with subprocess.Popen(
     [

@@ -7,7 +7,6 @@ from makemkv_headless_api.config import CONFIG
 from makemkv_headless_api.interface import get_interface
 from makemkv_headless_api.interface.base_interface import BaseInterface
 from makemkv_headless_api.interface.target import Target
-from makemkv_headless_api.interface.plaintext_interface import PlaintextInterface
 
 import logging
 

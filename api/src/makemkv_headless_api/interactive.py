@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 from makemkv_headless_api.interface.base_interface import BaseInterface
-from makemkv_headless_api.interface.plaintext_interface import PlaintextInterface
+from makemkv_headless_api.interface.target import Target
 from makemkv_headless_api.rip_titles.interactive import rip_movie_interactive, rip_show_interactive
 
 def interactive_rip(
     source, destination,
-    interface: BaseInterface = PlaintextInterface(),
+    interface: BaseInterface,
     **kwargs
   ):
   library_choices = ['kids', 'main']
