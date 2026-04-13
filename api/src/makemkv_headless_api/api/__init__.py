@@ -3,15 +3,21 @@ from socket import socket, AF_INET, SOCK_DGRAM
 from asyncio import create_task
 from contextlib import asynccontextmanager
 import logging
-from fastapi import FastAPI
+from traceback import format_exc
+from fastapi import FastAPI, Request
+from fastapi.exception_handlers import http_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
+
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from makemkv_headless_api.api.socket import socket
 
+from makemkv_headless_api.api.state import STATE
 from makemkv_headless_api.config import CONFIG
 from makemkv_headless_api.interface import get_interface, init_interface
 
 from makemkv_headless_api.interface.async_queue_interface import AsyncQueueInterface
+from makemkv_headless_api.models.state import ErrorStatusModel
 
 from . import v1
 
@@ -56,6 +62,19 @@ app.add_middleware(
 )
 
 app.include_router(prefix="/api", router=v1.router)
+
+@app.exception_handler(StarletteHTTPException)
+async def api_http_exception_handler(request: Request, ex: StarletteHTTPException):
+  if request.url.path.startswith('/api'):
+    # Store error state
+    STATE.error = ErrorStatusModel(
+      path=request.url.path,
+      message=ex.detail,
+      traceback=format_exc(),
+      http_status=request.http_status
+    )
+    logger.error("API Error", exc_info=True)
+  return await http_exception_handler(request, ex)
 
 @app.get('/')
 async def root():
