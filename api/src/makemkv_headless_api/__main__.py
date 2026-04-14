@@ -7,40 +7,37 @@ from makemkv_headless_api.config import CONFIG
 from makemkv_headless_api.models.config import ConfigModel
 
 def main():
-  CONFIG.update_from_file('./config.yaml')
+  # parser = ArgumentParser()
 
-  parser = ArgumentParser()
+  # for (_, value) in ConfigModel.model_fields.items():
+  #   args = value.json_schema_extra['cli_argument']['args']
+  #   kwargs = value.json_schema_extra['cli_argument']['kwargs']
+  #   parser.add_argument(*args, **kwargs)
 
-  for (_, value) in ConfigModel.model_fields.items():
-    args = value.json_schema_extra['cli_argument']['args']
-    kwargs = value.json_schema_extra['cli_argument']['kwargs']
-    parser.add_argument(*args, **kwargs)
+  # opts = parser.parse_args(argv[1:])
 
-  # parser.add_argument("--source")
-  # parser.add_argument("--log-level")
-  # parser.add_argument("--log-file")
-  # parser.add_argument("--port")
-  # parser.add_argument("--frontend")
-  # parser.add_argument("--cors-origin", action='append')
-  opts = parser.parse_args(argv[1:])
+  # # Load config file into opts
+  # if ('config_file' in opts and opts.config_file is not None):
+  #   CONFIG.config_file = opts.config_file
 
-  if opts.source is not None:
-    CONFIG.source = opts.source
+  # CONFIG.update_from_file(CONFIG.config_file)
 
-  if opts.port is not None:
-    CONFIG.listen_port = int(opts.port)
+  # print(opts)
 
-  if opts.frontend is not None:
-    CONFIG.frontend = opts.frontend
+  # for key in ConfigModel.model_fields:
+  #   try:
+  #     opt = getattr(opts, key)
+  #   except AttributeError:
+  #     print(f"Could not retrieve option for config {key}")
+  #     continue
 
-  if opts.cors_origin is not None:
-    CONFIG.cors_origins = opts.cors_origin
+  #   if opt is not None:
+  #     print(f'setting config {key} to {opt}')
+  #     setattr(CONFIG, key, opt)
+  #   else:
+  #     print(f'Leaving config {key} at value {getattr(CONFIG, key)}')
 
-  if opts.log_file is not None:
-    CONFIG.log_file = opts.log_file
-
-  if opts.log_level is not None:
-    CONFIG.log_level = opts.log_level
+  CONFIG.load()
 
   # Erase log file
   open(CONFIG.log_file, 'w').close()

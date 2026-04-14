@@ -3,6 +3,7 @@
 import logging
 from typing import Literal, Optional, Type
 from pydantic import BaseModel, Field
+from pydantic.fields import FieldInfo
 
 type LogLevelStr = Literal['INFO'] | Literal['WARN'] | Literal['WARNING'] | Literal['ERROR'] | Literal['DEBUG']
 
@@ -11,6 +12,7 @@ ENV_VAR_PREIFX="MMH_API"
 class ParserKwargs(BaseModel):
   help: str
   action: Optional[str] = None
+  dest: Optional[str] = None
 
 class CliArgument(BaseModel):
   args: list[str]
@@ -19,6 +21,9 @@ class CliArgument(BaseModel):
 class JsonSchemaExtra(BaseModel):
   cli_argument: CliArgument
   environment_var: Optional[str] = None
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
 
 class ConfigModel(BaseModel):
   config_file: str | None = Field(
@@ -111,7 +116,8 @@ class ConfigModel(BaseModel):
       args=['--cors-origin'],
       kwargs=ParserKwargs(
         help='Additional CORS origins to trust (for instance if the frontend is accessible via different IPs or hostnames)',
-        action='append'
+        action='append',
+        dest='cors_origins'
       )
     )
   ).model_dump())
