@@ -26,23 +26,23 @@ class Config(ConfigModel):
     for key in kwargs:
       self.__dict__[key] = kwargs[key]
 
-  def update_from_file(self, filename: str = None):
-    if (filename == None):
-      filename = self.filename
+  def update_from_file(self, config_file: str = None):
+    if (config_file == None):
+      config_file = self.config_file
     else:
-      self.filename = filename
+      self.config_file = config_file
 
-    if filename.endswith('.json'):
-      self.update_from_json(filename)
-    elif filename.endswith('.yaml'):
-      self.update_from_yaml(filename)
+    if config_file.endswith('.json'):
+      self.update_from_json(config_file)
+    elif config_file.endswith('.yaml'):
+      self.update_from_yaml(config_file)
 
-  def update_from_json(self, filename: str):
-    with open(filename, 'r') as file:
+  def update_from_json(self, config_file: str):
+    with open(config_file, 'r') as file:
       self.update(**json.loads(file.read()))
 
-  def update_from_yaml(self, filename: str):
-    with open(filename, 'r') as file:
+  def update_from_yaml(self, config_file: str):
+    with open(config_file, 'r') as file:
       self.update(**yaml.safe_load(file)) 
 
   def get_log_level(self) -> int:
