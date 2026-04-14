@@ -1,6 +1,6 @@
 import os
 
-from socket import socket, AF_INET, SOCK_DGRAM
+from socket import socket
 
 from asyncio import create_task
 from contextlib import asynccontextmanager
