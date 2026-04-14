@@ -40,14 +40,10 @@ class Config(ConfigModel):
       try:
         opt = getattr(opts, key)
       except AttributeError:
-        print(f"Could not retrieve option for config {key}")
         continue
 
       if opt is not None:
-        print(f'setting config {key} to {opt}')
         setattr(CONFIG, key, opt)
-      else:
-        print(f'Leaving config {key} at value {getattr(self, key)}')
 
   def overwrite(
       self, **kwargs
@@ -69,10 +65,14 @@ class Config(ConfigModel):
     else:
       self.config_file = config_file
 
-    if config_file.endswith('.json'):
-      self.update_from_json(config_file)
-    elif config_file.endswith('.yaml'):
-      self.update_from_yaml(config_file)
+    try:
+      if self.config_file is not None:
+        if config_file.endswith('.json'):
+          self.update_from_json(self.config_file)
+        elif config_file.endswith('.yaml'):
+          self.update_from_yaml(self.config_file)
+    except FileNotFoundError:
+      print(f'Could not load config file {self.config_file}, continuing...')
 
   def update_from_json(self, config_file: str):
     with open(config_file, 'r') as file:
@@ -98,10 +98,10 @@ class Config(ConfigModel):
     return logging.INFO
 
   def normalize_paths(self):
-    if self.temp_prefix.startswith('.'):
+    if self.temp_prefix is not None and self.temp_prefix.startswith('.'):
       self.temp_prefix = abspath(self.temp_prefix) + "/"
 
-    if self.destination.startswith('.'):
+    if self.destination is not None and self.destination.startswith('.'):
       self.destination = abspath(self.destination) + "/"
 
 CONFIG = Config()

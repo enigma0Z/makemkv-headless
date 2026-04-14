@@ -21,13 +21,19 @@ A headless interface for [makemkv](https://makemkv.com).
 * [node](https://nodejs.org/en/download)
 * [makemkv](https://makemkv.com/download/)
 
-### API
+### Building everything
+
+```bash
+make clean && make
+```
+
+### API only
 
 ```bash
 cd api && uv sync
 ```
 
-### CLI
+### CLI (deprecated)
 
 ```bash
 cd cli && uv sync
@@ -41,7 +47,7 @@ cd web && npm install
 
 ## Setup
 
-1. Copy `api/config.example.yaml` to `api/config.yaml`
+1. Copy `config.example.yaml` to `config.yaml`
 2. Get your own [TMDB API key](https://developer.themoviedb.org/docs/getting-started) and put it in here 
 
 ## Running everything
@@ -49,15 +55,18 @@ cd web && npm install
 ### From source / development mode
 
 ```bash
-./start.sh <api port> <web port> <api options...>
+make
+./start.sh --ui-path web/dist # api options; use --help to see what there is
 ```
 
-### In production
+### In production-ish
 
-This part is not yet done.  The goal, however, is something like this from the
-CLI package.
+This part is not yet done, but we can do it from built source
 
 ```bash
-# Run a package install command... then
-mmh start <api port> <web port> <api options...>
+make
+./start.sh screen <listen port> # api options ...
 ```
+
+If you give `start.sh` `screen` and a port it will run in a screen session and
+give you back your terminal.

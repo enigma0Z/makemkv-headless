@@ -6,7 +6,7 @@ from asyncio import create_task
 from contextlib import asynccontextmanager
 import logging
 from traceback import format_exc
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.exception_handlers import http_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -88,4 +88,8 @@ async def index():
 
 @app.get('/{path:path}')
 async def arbitrary_file(path: str):
-  return FileResponse(os.path.join(CONFIG.ui_path, path))
+  served_file = os.path.join(CONFIG.ui_path, path)
+  if os.path.exists(served_file):
+    return FileResponse(served_file)
+  else:
+    return HTTPException(404)

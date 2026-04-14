@@ -1,17 +1,15 @@
 #!/bin/bash
 
-api_port="$1"; shift
-web_port="$1"; shift
+SCREEN="false"
+LISTEN_PORT=""
 
-if [[ -z "$api_port" ]]; then
-	api_port=4000
+if [[ "$1" == "screen" ]]; then
+  SCREEN="true"; shift
+  LISTEN_PORT="$1"; shift
 fi
 
-export VITE_BACKEND_PORT=$api_port
-
-if [[ -z "$web_port" ]]; then
-	web_port=3000
+if [[ "$SCREEN" == "true" ]]; then
+  screen -dmS mmh-api-$LISTEN_PORT uv --project api --listen-port $LISTEN_PORT "$@"
+else
+  uv --project api run mmh_api "$@"
 fi
-
-screen -dmS makemkv-headless-api-$api_port ./api.sh --port $api_port "$@"
-screen -dmS makemkv-headless-web-$web_port ./web.sh --port $web_port
