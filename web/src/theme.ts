@@ -10,7 +10,7 @@ export const theme = createTheme({
   }
 })
 
-export const AutocompleteWrapper = styled.div(({ theme }) => ({
+export const AutocompleteWrapper = styled.div(({ }) => ({
   ".MuiAutocomplete-endAdornment": { // Fix for weird spacing on buttons
     justifyContent: "right"
   }

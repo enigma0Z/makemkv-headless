@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 
-export const StatusScrollerWrapper = styled.div(({ theme }) => ({
+export const StatusScrollerWrapper = styled.div(({ }) => ({
   lineHeight: "1.5em",
   height: "calc(27em + 20px)",
   overflowY: "scroll",
@@ -9,7 +9,7 @@ export const StatusScrollerWrapper = styled.div(({ theme }) => ({
   fontFamily: "monospace"
 }));
 
-export const StatusScrollerWrapperMinimized = styled.div(({ theme }) => ({
+export const StatusScrollerWrapperMinimized = styled.div(({ }) => ({
   lineHeight: "1.5em",
   height: "calc(4.5em + 20px)",
   overflowY: "scroll",

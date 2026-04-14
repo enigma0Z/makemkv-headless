@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, TextField, Typography } from "@mui/material"
+import { Button, Dialog, IconButton, TextField, Typography } from "@mui/material"
 import { ConfigDialogActions, ConfigDialogContent, ConfigDialogTitle } from "./ConfigDialog.styles"
 
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -13,7 +13,7 @@ type Props = {
 }
 
 export const ConfigDialog = ({ open, onClose = () => {} }: Props) => {
-  const { data, refetch: refetchConfig, isLoading, isSuccess } = useGetConfigQuery()
+  const { data, refetch: _, isLoading, isSuccess } = useGetConfigQuery()
   const { refetch: reloadConfig } = useReloadConfigQuery()
 
   const [ tmdbToken, setTmdbToken ] = useState<Config['tmdb_token'] | null>(null)

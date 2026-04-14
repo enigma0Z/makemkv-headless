@@ -1,6 +1,6 @@
 import { createContext, useState } from "react";
 
-import { initialApiState, type ApiState } from "@/api/v1/state/types";
+import { initialApiState, type State as ApiState, type State } from "@/api/v1/state/types";
 
 export type BaseMessageEventData = { // message.py BaseMessage
   type: string;
@@ -86,7 +86,7 @@ const SocketContext = ({ children }: SocketContextProps) => {
   const [ripState, setRipState] = useState<ApiState['socket']>()
 
   const resetRipState = () => {
-    setRipState((prev) => ({ ...prev, ...initialApiState.socket }))
+    setRipState((prev?: State['socket']) => ({ ...prev, ...initialApiState.socket }))
   }
 
   return <Context value={{

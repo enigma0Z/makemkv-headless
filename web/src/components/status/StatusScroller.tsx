@@ -13,7 +13,7 @@ export const StatusScroller = () => {
 
   const [isMinimized, setIsMinimized] = useState<boolean>(false)
 
-  const handleOnScroll = () => { };
+  // const handleOnScroll = () => { };
 
   useEffect(() => {
     const scroller = document.getElementById('status-scroller')

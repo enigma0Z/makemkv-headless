@@ -19,7 +19,7 @@ export const StatusScroller = ({ minimized = false, showMinimizeButton = true, i
 
   const [isMinimized, setIsMinimized] = useState<boolean>(minimized)
 
-  const handleOnScroll = () => { };
+  // const handleOnScroll = () => { };
 
   useEffect(() => {
     const scroller = document.getElementById(`status-scroller-${id}`)

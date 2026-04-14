@@ -1,5 +1,5 @@
 import { AppBar, Button, IconButton, LinearProgress, Toolbar, Tooltip, Typography } from "@mui/material";
-import { store, useAppDispatch, useAppSelector } from "@/api";
+import { useAppDispatch, useAppSelector } from "@/api";
 import { socketActions, type SocketProgress } from "@/api/v1/socket/store";
 import { tocActions } from "@/api/v1/toc/store";
 import { ConfirmationDialog } from "./ConfirmationModal";

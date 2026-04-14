@@ -1,9 +1,9 @@
-import styled from "@emotion/styled";
-import { Collapse, RadioGroup } from "@mui/material";
+// import styled from "@emotion/styled";
+import { Collapse, RadioGroup, styled } from "@mui/material";
 
 const GridWidth = 24
 
-export const TocGridContainer = styled.div(({ theme }) => ({
+export const TocGridContainer = styled('div')(({ }) => ({
   display: "grid",
   gridTemplateColumns: `repeat(${GridWidth}, 1fr)`,
   "> div": {
@@ -13,11 +13,11 @@ export const TocGridContainer = styled.div(({ theme }) => ({
   }
 }));
 
-export const CheckboxCell = styled.div(({ theme }) => ({
+export const CheckboxCell = styled('div')(({ }) => ({
   gridColumn: "span 1",
 }))
 
-export const MainExtraCell = styled.div(({ theme }) => ({
+export const MainExtraCell = styled('div')(({ theme }) => ({
   gridColumn: "span 3",
   [theme.breakpoints.down("md")]: {
     gridColumn: `span ${5}`
@@ -27,7 +27,7 @@ export const MainExtraCell = styled.div(({ theme }) => ({
   },
 }))
 
-export const EpisodeCell = styled.div(({ theme }) => ({
+export const EpisodeCell = styled('div')(({ theme }) => ({
   gridColumn: "span 3",
   "> .MuiIconButton-root": {
     padding: 0
@@ -47,7 +47,7 @@ export const EpisodeCell = styled.div(({ theme }) => ({
   },
 }))
 
-export const RuntimeCell = styled.div(({ theme }) => ({
+export const RuntimeCell = styled('div')(({ theme }) => ({
   gridColumn: "span 3",
   [theme.breakpoints.down("md")]: {
     gridColumn: `span ${3}`
@@ -58,7 +58,7 @@ export const RuntimeCell = styled.div(({ theme }) => ({
   },
 }))
 
-export const FilenameCell = styled.div(({ theme }) => ({
+export const FilenameCell = styled('div')(({ theme }) => ({
   gridColumn: "span 12",
   [theme.breakpoints.down("md")]: {
     gridColumn: `span ${8}`,
@@ -69,7 +69,7 @@ export const FilenameCell = styled.div(({ theme }) => ({
   },
 }))
 
-export const FilenameContent = styled.div(({ theme }) => ({
+export const FilenameContent = styled('div')(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "flex-start",
@@ -78,36 +78,36 @@ export const FilenameContent = styled.div(({ theme }) => ({
   },
 }));
 
-export const FilenameHead = styled.div(({ theme }) => ({
+export const FilenameHead = styled('div')(({ theme }) => ({
   [theme.breakpoints.down("sm")]: {
     display: "none"
   }
 }));
 
-export const BorderCell = styled.div(({ theme }) => ({
+export const BorderCell = styled('div')(({ }) => ({
   gridColumn: `span ${GridWidth}`,
   margin: 0,
   marginTop: 8,
   padding: 0,
 }))
 
-export const DividerCell = styled(BorderCell)(({ theme }) => ({
+export const DividerCell = styled(BorderCell)(({ }) => ({
   borderTop: ".5px solid grey",
   marginBottom: 8,
 }));
 
-export const CollapseRow = styled(Collapse)(({ theme }) => ({
+export const CollapseRow = styled(Collapse)(({ }) => ({
   gridColumn: `span ${GridWidth}`,
   div: {
     // alignItems: "normal"
   }
 }));
 
-export const FullWidthRow = styled.div(({ theme }) => ({
+export const FullWidthRow = styled('div')(({ }) => ({
   gridColumn: `span ${GridWidth}`,
 }));
 
-export const DetailsWrapper = styled.div(({ theme }) => ({
+export const DetailsWrapper = styled('div')(({ }) => ({
   display: "flex",
   flexDirection: "column",
   div: {
@@ -134,7 +134,7 @@ export const DetailsWrapper = styled.div(({ theme }) => ({
   },
 }));
 
-export const StatusWrapper = styled.div(({ theme }) => ({
+export const StatusWrapper = styled('div')(({ }) => ({
   padding: 16,
   display: "flex",
   flexDirection: "column",
@@ -145,7 +145,7 @@ export const StatusWrapper = styled.div(({ theme }) => ({
   },
 }));
 
-export const StatusWrapperCell = styled(StatusWrapper)(({ theme }) => ({
+export const StatusWrapperCell = styled(StatusWrapper)(({ }) => ({
   paddingTop: 0
 }));
 

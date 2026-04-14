@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 
-export const StatusWrapper = styled.div(({ theme }) => ({
+export const StatusWrapper = styled.div(({ }) => ({
   padding: 16,
   display: "flex",
   flexDirection: "column",

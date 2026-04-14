@@ -1,14 +1,14 @@
 import styled from "@emotion/styled"
-import { Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material"
+import { DialogActions, DialogContent, DialogTitle } from "@mui/material"
 
-export const ConfigDialogTitle = styled(DialogTitle)(({ theme }) => ({
+export const ConfigDialogTitle = styled(DialogTitle)(({ }) => ({
   display: "flex",
   justifyContent: "space-between"
 }));
-export const ConfigDialogContent = styled(DialogContent)(({ theme }) => ({
+export const ConfigDialogContent = styled(DialogContent)(({ }) => ({
   paddingTop: 0,
   paddingBottom: 0
 }));
-export const ConfigDialogActions = styled(DialogActions)(({ theme }) => ({
+export const ConfigDialogActions = styled(DialogActions)(({ }) => ({
   padding: "20px 24px"
 }));

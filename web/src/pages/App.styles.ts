@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 
-export const AppContainer = styled.div(({ theme }) => ({
+export const AppContainer = styled.div(({ }) => ({
   padding: "10px",
   display: "flex",
   flexDirection: "column",
