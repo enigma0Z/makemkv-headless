@@ -61,7 +61,6 @@ class ErrorStatusModel(BaseModel):
   path: str
   message: str | BaseModel | None = None
   traceback: list[str] | None = None
-  http_status: int | None = None
 
 class StateModel(BaseModel):
   redux: ReduxStateModel = ReduxStateModel()

@@ -63,18 +63,20 @@ app.add_middleware(
 
 app.include_router(prefix="/api", router=v1.router)
 
-@app.exception_handler(StarletteHTTPException)
-async def api_http_exception_handler(request: Request, ex: StarletteHTTPException):
+@app.exception_handler(Exception)
+async def api_http_exception_handler(request: Request, ex: Exception):
   if request.url.path.startswith('/api'):
     # Store error state
     STATE.error = ErrorStatusModel(
       path=request.url.path,
-      message=ex.detail,
-      traceback=format_exc(),
-      http_status=request.http_status
+      message=str(ex),
+      traceback=format_exc(-3).split('\n'),
     )
     logger.error("API Error", exc_info=True)
-  return await http_exception_handler(request, ex)
+  if isinstance(ex, StarletteHTTPException):
+    return await http_exception_handler(request, ex)
+  else:
+    return await http_exception_handler(request, StarletteHTTPException(500, STATE.error.model_dump(mode='json')))
 
 @app.get('/')
 async def root():
