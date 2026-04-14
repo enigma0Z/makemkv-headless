@@ -6,8 +6,7 @@ import type { TmdbSearchResultMovie, TmdbSearchResultShow } from "./v1/tmdb/type
 import type { Config } from "./v1/config/types"
 import type { ApiError } from "./v1/error/types"
 
-export const BACKEND_PORT = import.meta.env.VITE_BACKEND_PORT ?? 4000
-export const BACKEND = `${window.location.protocol}//${window.location.hostname}:${BACKEND_PORT}`
+export const BACKEND = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`
 
 export const endpoints = {
   disc: {
