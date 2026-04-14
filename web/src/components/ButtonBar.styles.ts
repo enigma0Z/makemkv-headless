@@ -1,6 +1,6 @@
-import styled from "@emotion/styled";
+import { styled } from "@mui/material";
 
-export const StatusWrapper = styled.div(({ }) => ({
+export const StatusWrapper = styled('div')(({ }) => ({
   padding: 16,
   display: "flex",
   flexDirection: "column",

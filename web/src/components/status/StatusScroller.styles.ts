@@ -1,6 +1,6 @@
-import styled from "@emotion/styled";
+import { styled } from "@mui/material";
 
-export const StatusScrollerWrapper = styled.div(({ }) => ({
+export const StatusScrollerWrapper = styled('div')(({ }) => ({
   lineHeight: "1.5em",
   height: "calc(27em + 20px)",
   overflowY: "scroll",
@@ -9,7 +9,7 @@ export const StatusScrollerWrapper = styled.div(({ }) => ({
   fontFamily: "monospace"
 }));
 
-export const StatusScrollerWrapperMinimized = styled.div(({ }) => ({
+export const StatusScrollerWrapperMinimized = styled('div')(({ }) => ({
   lineHeight: "1.5em",
   height: "calc(4.5em + 20px)",
   overflowY: "scroll",

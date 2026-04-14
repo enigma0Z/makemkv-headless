@@ -1,5 +1,4 @@
-import styled from "@emotion/styled"
-import { DialogActions, DialogContent, DialogTitle } from "@mui/material"
+import { DialogActions, DialogContent, DialogTitle, styled } from "@mui/material"
 
 export const ConfigDialogTitle = styled(DialogTitle)(({ }) => ({
   display: "flex",

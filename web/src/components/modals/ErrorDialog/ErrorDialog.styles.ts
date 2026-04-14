@@ -1,5 +1,4 @@
-import styled from "@emotion/styled"
-import { DialogActions, DialogContent, DialogTitle } from "@mui/material"
+import { DialogActions, DialogContent, DialogTitle, styled } from "@mui/material"
 import { red } from "@mui/material/colors";
 
 export const ErrorDialogTitle = styled(DialogTitle)(({ }) => ({

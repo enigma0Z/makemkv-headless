@@ -1,6 +1,6 @@
-import styled from "@emotion/styled";
+import { styled } from "@mui/material";
 
-export const AppContainer = styled.div(({ }) => ({
+export const AppContainer = styled('div')(({ }) => ({
   padding: "10px",
   display: "flex",
   flexDirection: "column",
