@@ -1,7 +1,7 @@
 
 
 import logging
-from typing import Literal, Optional, Type
+from typing import Any, Callable, Literal, Optional, Type
 from pydantic import BaseModel, Field
 from pydantic.fields import FieldInfo
 
@@ -13,6 +13,7 @@ class ParserKwargs(BaseModel):
   help: str
   action: Optional[str] = None
   dest: Optional[str] = None
+  type: Optional[Callable[..., Any]] = None
 
 class CliArgument(BaseModel):
   args: list[str]
@@ -107,7 +108,8 @@ class ConfigModel(BaseModel):
     cli_argument=CliArgument(
       args=['--listen-port'],
       kwargs=ParserKwargs(
-        help='The port to listen on for requests'
+        help='The port to listen on for requests',
+        type=int
       )
     )
   ).model_dump())
