@@ -2,20 +2,15 @@
 __pycache__
 _TOKEN.py
 config.json
-application.log
 **/*.log
 **/*.iso
 config.yaml
-makemkv.log
 makemkv-bin*.tar.gz
 makemkv-oss*.tar.gz
 node_modules
 api/dist
 test.py
 
-api.log
-api/api.log
-api/mkvtoolnix.log
 notes.md
 dot-ssh.tgz
 /test*.py
