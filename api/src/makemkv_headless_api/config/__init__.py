@@ -1,6 +1,9 @@
+from argparse import ArgumentParser
 import json
 import logging
+from pydantic import ConfigDict
 import yaml
+from sys import argv
 
 from os.path import abspath
 
@@ -8,9 +11,43 @@ from makemkv_headless_api.models.config import ConfigModel, LogLevelStr
 
 class Config(ConfigModel):
   keys: list[str] = []
+  _parser: ArgumentParser
 
   def __str__(self):
-    return json.dumps(self.__dict__)
+    return f'{super().model_dump(mode='json')}'
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+    self._parser = ArgumentParser()
+
+    for (_, value) in ConfigModel.model_fields.items():
+      args = value.json_schema_extra['cli_argument']['args']
+      kwargs = value.json_schema_extra['cli_argument']['kwargs']
+      self._parser.add_argument(*args, **kwargs)
+
+  def load(self):
+
+    opts = self._parser.parse_args(argv[1:])
+
+    # Load config file into opts
+    if ('config_file' in opts and opts.config_file is not None):
+      self.config_file = opts.config_file
+
+    self.update_from_file(self.config_file)
+
+    for key in self.__class__.model_fields:
+      try:
+        opt = getattr(opts, key)
+      except AttributeError:
+        print(f"Could not retrieve option for config {key}")
+        continue
+
+      if opt is not None:
+        print(f'setting config {key} to {opt}')
+        setattr(CONFIG, key, opt)
+      else:
+        print(f'Leaving config {key} at value {getattr(self, key)}')
 
   def overwrite(
       self, **kwargs
@@ -26,23 +63,23 @@ class Config(ConfigModel):
     for key in kwargs:
       self.__dict__[key] = kwargs[key]
 
-  def update_from_file(self, filename: str = None):
-    if (filename == None):
-      filename = self.filename
+  def update_from_file(self, config_file: str = None):
+    if (config_file == None):
+      config_file = self.config_file
     else:
-      self.filename = filename
+      self.config_file = config_file
 
-    if filename.endswith('.json'):
-      self.update_from_json(filename)
-    elif filename.endswith('.yaml'):
-      self.update_from_yaml(filename)
+    if config_file.endswith('.json'):
+      self.update_from_json(config_file)
+    elif config_file.endswith('.yaml'):
+      self.update_from_yaml(config_file)
 
-  def update_from_json(self, filename: str):
-    with open(filename, 'r') as file:
+  def update_from_json(self, config_file: str):
+    with open(config_file, 'r') as file:
       self.update(**json.loads(file.read()))
 
-  def update_from_yaml(self, filename: str):
-    with open(filename, 'r') as file:
+  def update_from_yaml(self, config_file: str):
+    with open(config_file, 'r') as file:
       self.update(**yaml.safe_load(file)) 
 
   def get_log_level(self) -> int:

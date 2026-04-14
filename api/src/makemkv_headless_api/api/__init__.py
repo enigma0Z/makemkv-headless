@@ -1,4 +1,6 @@
-from socket import socket, AF_INET, SOCK_DGRAM
+import os
+
+from socket import socket
 
 from asyncio import create_task
 from contextlib import asynccontextmanager
@@ -8,6 +10,7 @@ from fastapi import FastAPI, Request
 from fastapi.exception_handlers import http_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 
+from fastapi.responses import FileResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from makemkv_headless_api.api.socket import socket
@@ -64,7 +67,7 @@ app.add_middleware(
 app.include_router(prefix="/api", router=v1.router)
 
 @app.exception_handler(Exception)
-async def api_http_exception_handler(request: Request, ex: Exception):
+async def exception_handler(request: Request, ex: Exception):
   if request.url.path.startswith('/api'):
     # Store error state
     STATE.error = ErrorStatusModel(
@@ -73,11 +76,16 @@ async def api_http_exception_handler(request: Request, ex: Exception):
       traceback=format_exc(-3).split('\n'),
     )
     logger.error("API Error", exc_info=True)
-  if isinstance(ex, StarletteHTTPException):
+    return await http_exception_handler(request, StarletteHTTPException(500, STATE.error.model_dump(mode='json')))
+  elif isinstance(ex, StarletteHTTPException):
     return await http_exception_handler(request, ex)
   else:
-    return await http_exception_handler(request, StarletteHTTPException(500, STATE.error.model_dump(mode='json')))
+    raise ex
 
 @app.get('/')
-async def root():
-  return "OK"
+async def index():
+  return FileResponse(os.path.join(CONFIG.ui_path, 'index.html'))
+
+@app.get('/{path:path}')
+async def arbitrary_file(path: str):
+  return FileResponse(os.path.join(CONFIG.ui_path, path))
