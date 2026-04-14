@@ -25,6 +25,9 @@ export const MainExtraCell = styled('div')(({ theme }) => ({
   [theme.breakpoints.down("sm")]: {
     gridColumn: `span ${9}`
   },
+  "> .MuiFormGroup-root": {
+    display: "flex"
+  },
 }))
 
 export const EpisodeCell = styled('div')(({ theme }) => ({
