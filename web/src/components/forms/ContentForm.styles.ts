@@ -1,7 +1,6 @@
-import styled from "@emotion/styled";
-import { FormControl, FormGroup } from "@mui/material";
+import { FormControl, FormGroup, styled } from "@mui/material";
 
-export const StyledFormGroup = styled(FormGroup)(({ theme }) => ({
+export const StyledFormGroup = styled(FormGroup)(({ }) => ({
   display: "grid",
   gridTemplateColumns: "repeat(6, 1fr)",
   gap: "10px",
@@ -63,7 +62,7 @@ export const SplitSegmentsFormControl = styled(FormControl)(({ theme }) => ({
   }
 }));
 
-export const NameOptionWrapper = styled.div(({ }) => ({
+export const NameOptionWrapper = styled('div')(({ }) => ({
   display: "flex",
   flexDirection: "row",
   width: "100%",

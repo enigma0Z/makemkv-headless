@@ -42,13 +42,11 @@ export const initialApiState: State = {
         split_segments: undefined,
         id_db: 'tmdbid'
       },
-      rip_all: false,
       toc_length: 0,
       tmdb_selection: null
     },
     toc: {
       lines: [],
-      source: undefined
     },
     socket: {
       ripState: {

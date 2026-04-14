@@ -11,7 +11,13 @@ runs:
   steps:
     - uses: actions/setup-node@v6
       with:
-        node-version: 24
+        node-version: 23
+
+    - name: Install
+      id: install
+      working-directory: ${{ inputs.project }}
+      shell: bash
+      run: npm ci
 
     - name: Build
       id: build

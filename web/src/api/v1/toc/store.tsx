@@ -1,7 +1,13 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Toc } from "./types";
 
-const initialState: Partial<Toc> = {
+export interface TocState {
+  lines: Toc['lines'];
+  source?: Toc['source'];
+  loading?: Toc['loading']
+}
+
+const initialState: TocState = {
   lines: [],
   source: undefined,
   loading: false
@@ -10,8 +16,8 @@ const initialState: Partial<Toc> = {
 const tocSlice = createSlice({
   name: "toc",
   initialState,
-  reducers: {
-    setTocData: (state, action: PayloadAction<Toc | undefined>) => {
+  reducers: { 
+    setTocData: (state, action: PayloadAction<TocState | undefined>) => {
       if (action.payload) {
         state.lines = action.payload.lines
         state.source = action.payload.source

@@ -9,14 +9,16 @@ import { tmdbActions } from '@/api/v1/tmdb/store'
 import { ripActions } from '@/api/v1/rip/store'
 import { StatusScroller } from '@/components/status/StatusScroller'
 import { TocGrid } from '@/components/toc/TocGrid'
-import { useGetStateByPathQuery, useGetStateQuery } from '@/api/v1/state/api'
+import { useGetStateByPathQuery } from '@/api/v1/state/api'
+import { useGetErrorQuery } from '@/api/v1/error/api'
+import { ErrorDialog } from '@/components/modals/ErrorDialog/ErrorDialog'
 
 function App() {
   const dispatch = useAppDispatch()
 
   const tmdbConfiguration = useAppSelector((state) => state.tmdb.configuration)
-
   const ripStateData = useGetStateByPathQuery('redux/rip').data?.redux.rip
+  const errorData = useGetErrorQuery()
 
   dispatch(ripActions.setRipData(ripStateData))
 
@@ -44,6 +46,10 @@ function App() {
       <CombinedShowMovieForm />
       <TocGrid />
       <StatusScroller /> 
+      <ErrorDialog 
+        open={!errorData.isLoading && errorData.currentData !== null} 
+        errorData={errorData.data} 
+      />
     </AppContainer>
   )
 }

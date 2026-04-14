@@ -20,7 +20,7 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
   const content = useAppSelector((state) => state.rip.destination?.content)
   const seasonNumber = useAppSelector((state) => state.rip.sort_info?.season_number)
   const firstEpisode = useAppSelector((state) => state.rip.sort_info?.first_episode)
-  const splitSegments = useAppSelector((state) => state.rip.sort_info?.split_segments)
+  // const splitSegments = useAppSelector((state) => state.rip.sort_info?.split_segments)
   const tmdbConfiguration = useAppSelector((state) => state.tmdb.configuration)
   const tmdbSelection = useAppSelector((state) => state.rip.tmdb_selection)
 
@@ -164,7 +164,7 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
                 })
                 return filteredOptions.length > 0 ? filteredOptions : options
               }}
-              renderOption={({key, ...props}, option: TmdbSearchResult | undefined, _state, ownerState) => {
+              renderOption={({key, ...props}, option: TmdbSearchResult | null, _state, ownerState) => {
                 return (
                   option && <li
                     key={key}

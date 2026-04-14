@@ -57,6 +57,12 @@ class SocketStatusModel(BaseModel):
   total_status: StatusMessage | None = None
   rip_started: bool = False
 
+class ErrorStatusModel(BaseModel):
+  path: str
+  message: str | BaseModel | None = None
+  traceback: list[str] | None = None
+
 class StateModel(BaseModel):
   redux: ReduxStateModel = ReduxStateModel()
   socket: SocketStatusModel = SocketStatusModel()
+  error: ErrorStatusModel | None = None

@@ -1,16 +1,13 @@
 import type { TmdbConfiguration } from "./v1/tmdb/store"
-import type { Toc as TocV1 } from "./v1/toc/store"
+import type { Toc as TocV1 } from "./v1/toc/types"
 import type { Response as ResponseV1 } from "./v1"
 import type { State as StateV1 } from "./v1/state/types"
 import type { TmdbSearchResultMovie, TmdbSearchResultShow } from "./v1/tmdb/types"
-import { fetchBaseQuery } from "@reduxjs/toolkit/query"
 import type { Config } from "./v1/config/types"
-
-type Endpoint = (params?: any) => string
+import type { ApiError } from "./v1/error/types"
 
 export const BACKEND_PORT = import.meta.env.VITE_BACKEND_PORT ?? 4000
 export const BACKEND = `${window.location.protocol}//${window.location.hostname}:${BACKEND_PORT}`
-// export const BACKEND = "http://localhost:4000"
 
 export const endpoints = {
   disc: {
@@ -55,6 +52,10 @@ export const endpointsV1 = {
     get: () => `/api/v1/config`,
     put: () => `/api/v1/config`,
     reload: () => `/api/v1/config.reload`
+  },
+  error: {
+    get: () => `/api/v1/error`,
+    clear: () => `/api/v1/error.clear`
   }
 }
 
@@ -69,5 +70,6 @@ export type ApiModel = {
     'tmdb/configuration': ResponseV1<TmdbConfiguration>;
     'config': ResponseV1<Config>;
     'config.reload': ResponseV1<Config>;
+    'error': ResponseV1<ApiError>;
   }
 }
