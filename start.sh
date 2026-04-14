@@ -9,7 +9,7 @@ if [[ "$1" == "screen" ]]; then
 fi
 
 if [[ "$SCREEN" == "true" ]]; then
-  screen -dmS mmh-api-$LISTEN_PORT uv --project api --listen-port $LISTEN_PORT "$@"
+  screen -dmS mmh-api-$LISTEN_PORT uv --project api run mmh_api --listen-port $LISTEN_PORT "$@"
 else
   uv --project api run mmh_api "$@"
 fi
