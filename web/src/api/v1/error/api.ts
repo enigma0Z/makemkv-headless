@@ -8,14 +8,14 @@ const errorApi = api.injectEndpoints({
     getError: build.query<ApiError, void, ApiModel['v1']['error']>({
       providesTags: ['error'],
       query: () => endpointsV1.error.get(),
-      transformResponse: (response) => response.data
+      transformResponse: (response) => response.data,
     }),
     clearError: build.mutation<ApiError, void, ApiModel['v1']['error']>({
       invalidatesTags: ['error'],
       query: () => endpointsV1.error.clear(),
-      transformResponse: (response) => response.data
+      transformResponse: (response) => response.data,
     })
   }),
 })
 
-export const { useGetErrorQuery, useClearErrorMutation } = errorApi
+export const { useGetErrorQuery, useClearErrorMutation, util: errorApiUtil } = errorApi
