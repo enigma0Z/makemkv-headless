@@ -1,6 +1,5 @@
-import type { ProgressMessageEvent } from "@/components/socket/Context";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { initialApiState } from "../state/types";
+import { initialApiState, type CurrentStatus } from "../state/types";
 
 export type SocketProgress = {
   buffer?: number | null;
@@ -14,7 +13,7 @@ export interface SocketState {
     current_progress?: SocketProgress[]
     total_progress?: SocketProgress
 
-    current_status?: ProgressMessageEvent["name"];
+    current_status?: CurrentStatus;
     total_status?: string | null;
 
     rip_started?: boolean;

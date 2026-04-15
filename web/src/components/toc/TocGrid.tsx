@@ -11,7 +11,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
-import { isRippingStatus } from "@/models/socket"
+import { isRippingStatus } from "@/api/v1/socket/model"
 import type { TitleInfo, Toc } from "@/api/v1/toc/types"
 
 

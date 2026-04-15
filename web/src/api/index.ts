@@ -9,6 +9,7 @@ import { BACKEND, endpoints } from "./endpoints";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Toc } from "./v1/toc/types";
 import toc from './v1/toc/store'
+import { SOCKET_URI, SocketConnection } from "./v1/socket/api";
 
 export type RootState = {
   rip: RipState,
@@ -20,13 +21,15 @@ export type RootState = {
 const updateRipStateOnApi = throttle(async (ripState: RipState) => {
   if (ripStateIsValid(ripState)) {
     console.info("Updating rip state on API")
-    fetch(endpoints.state.get(), { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({
-      redux: { rip: ripState }
-    })})
+    fetch(endpoints.state.get(), {
+      method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({
+        redux: { rip: ripState }
+      })
+    })
   } else {
     console.info("Cannot update rip state, is not valid", ripState)
   }
-}, 500, {leading: false, trailing: true})
+}, 500, { leading: false, trailing: true })
 
 export const api = createApi({
   tagTypes: ['error'],
@@ -39,17 +42,29 @@ const updateApiMiddleware: Middleware<{}, RootState> = store => next => action =
     const result = next(action)
     const nextRipState = store.getState().rip
     updateRipStateOnApi(nextRipState)
-    
+
     return result
   } else {
     return next(action)
   }
 }
 
+export type ThunkExtraArgument = {
+  socketConnection: SocketConnection
+}
+
 export const store = configureStore({
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware()
-    .concat(updateApiMiddleware)
-    .concat(api.middleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    thunk: {
+      extraArgument: {
+        socketConnection: new SocketConnection(SOCKET_URI)
+      }
+    }
+  }).concat(
+    updateApiMiddleware
+  ).concat(
+    api.middleware
+  ),
   reducer: {
     rip: rip.reducer, toc, tmdb, socket, api: api.reducer
   },
