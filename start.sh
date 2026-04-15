@@ -29,6 +29,7 @@ elif [[ "$DEV" == "true" ]]; then
     set +x
   }
 
+  uv --project api sync
   uv --project api run mmh_api \
     --listen-port $API_PORT "$@" \
     --cors-origin http://127.0.0.1:3000 \
@@ -37,6 +38,7 @@ elif [[ "$DEV" == "true" ]]; then
 
   export VITE_BACKEND_PORT=$API_PORT
   cd web
+  npm ci
   npm run dev -- --port 3000
   WEB_PID=$!
 

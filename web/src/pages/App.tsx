@@ -50,7 +50,7 @@ function App() {
       <StatusScroller /> 
       <ErrorDialog 
         open={!errorData.isLoading && errorData.currentData !== null} 
-        errorData={errorData.data} 
+        errorData={errorData.currentData} 
       />
     </AppContainer>
   )

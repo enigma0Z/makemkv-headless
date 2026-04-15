@@ -1,3 +1,5 @@
+import type { ApiError } from "../error/types";
+
 export interface EventsMap {
     [index: string]: any;
 }
@@ -55,12 +57,19 @@ export type RipStartStopMessage = BaseMessageType & {
   state: "start" | "stop";
 }
 
-export interface ServerToClientEvents {
-  ProgressMessage: (value: ProgressMessage) => void;
-  ProgressValueMessage: (value: ProgressValueMessage) => void;
-  LogMessage: (value: LogMessage) => void;
-  RipStartStopMessage: (value: RipStartStopMessage) => void;
+export type ErrorMessage = BaseMessageType & {
+  error: ApiError
 }
+
+export type ServerToClientMessages = 
+  "LogMessage" | 
+  "MkvLogMessage" |
+  "TocStatusMessage" |
+  "CurrentProgressMessage" |
+  "TotalProgressMessage" |
+  "ProgressValueMessage" |
+  "RipStartStopMessage" |
+  "ErrorMessage"
 
 export function isRippingStatus(status: string | undefined) {
   return (

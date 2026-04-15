@@ -1,5 +1,5 @@
-export type ApiError = {
-  path: string
+export interface ApiError {
+  path?: string
   message?: string
   traceback?: string[]
 }
