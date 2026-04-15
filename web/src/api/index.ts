@@ -23,7 +23,7 @@ const updateRipStateOnApi = throttle(async (ripState: RipState) => {
     console.info("Updating rip state on API")
     fetch(endpoints.state.get(), {
       method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({
-        redux: { rip: ripState }
+        rip: ripState
       })
     })
   } else {

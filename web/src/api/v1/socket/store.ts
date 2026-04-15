@@ -24,7 +24,7 @@ export interface SocketState {
 }
 
 const initialState: SocketState = {
-  ...initialApiState.redux.socket
+  ...initialApiState.socket
 }
 
 const socketSlice = createSlice({

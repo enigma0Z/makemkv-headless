@@ -48,7 +48,7 @@ export class SocketConnection {
         fetch(endpoints.state.get("socket"), { method: 'GET' })
           .then(response => response.json() as Promise<ApiModel['v1']['state']>)
           .then(({ data: { socket } }) => {
-            store.dispatch(socketActions.updateSocketRipState(socket));
+            store.dispatch(socketActions.updateSocketRipState(socket.rip));
           });
 
         store.dispatch(socketActions.setConnected(true));
