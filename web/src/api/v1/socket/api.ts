@@ -1,6 +1,6 @@
 import { store } from "@/api"
 import { BACKEND_HOST_PORT, endpoints, type ApiModel } from "@/api/endpoints"
-import { type BaseMessageType, ClientPingMessage } from "./model"
+import { type BaseMessageType, ClientPingMessage, type ServerToClientMessages } from "./model"
 import { socketActions } from "./store"
 
 export const SOCKET_URI = `ws://${BACKEND_HOST_PORT}/api/v1/socket`
@@ -121,7 +121,7 @@ export class SocketConnection {
     this.socket && this.socket.send(JSON.stringify(data));
   }
 
-  on(event: string, callback: (event: any) => void) {
+  on(event: ServerToClientMessages, callback: (event: any) => void) {
     this.messageHandlers[event] = callback;
   }
 }
