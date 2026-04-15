@@ -2,10 +2,11 @@ import { type RootState, type ThunkExtraArgument } from "@/api";
 import type { UnknownAction } from "@reduxjs/toolkit";
 import type { ThunkAction } from "redux-thunk";
 import { socketActions, type SocketState } from "./store";
-import { isRippingStatus, type LogMessage, type MkvLogMessage, type ProgressMessage, type ProgressValueMessage, type RipStartStopMessage, type TocStatusMessage } from "@/api/v1/socket/model";
+import { isRippingStatus, type ErrorMessage, type LogMessage, type MkvLogMessage, type ProgressMessage, type ProgressValueMessage, type RipStartStopMessage, type TocStatusMessage } from "@/api/v1/socket/model";
 import { endpoints, type ApiModel } from "@/api/endpoints";
 import { tocActions } from "../toc/store";
 import { throttle } from "lodash";
+import { errorApiUtil } from '@/api/v1/error/api'
 
 type SocketThunkAction<T> = ThunkAction<T, RootState, ThunkExtraArgument, UnknownAction>
 
@@ -174,6 +175,11 @@ export const socketConnect = (): SocketThunkAction<void> => (
     }
 
     dispatch(socketActions.updateSocketRipState(nextSocketState))
+  })
+
+  socketConnection.on("ErrorMessage", (value: ErrorMessage) => {
+    console.debug('socketConnection.on("ErrorMessage")', value)
+    dispatch(errorApiUtil.invalidateTags(['error']))
   })
 
   socketConnection.connect()
