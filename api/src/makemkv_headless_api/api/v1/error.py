@@ -19,4 +19,3 @@ def clear_error_state():
 def test_error_state():
   STATE.error = None
   raise Exception("There was an error")
-  return APIResponse(status="success")
