@@ -69,19 +69,16 @@ export function isRippingStatus(status: string | undefined) {
   )
 }
 
-export class ClientMessage {
+export interface ClientMessage {
   type: string
-
-  constructor() {
-    this.type = this.constructor.name
-  }
 }
 
-export class ClientPingMessage extends ClientMessage {
+export class ClientPingMessage implements ClientMessage {
+  type: string
   message: PingPongMessage
 
   constructor(message: PingPongMessage) {
-    super()
+    this.type = 'ClientPingMessage'
     this.message = message
   }
 }
