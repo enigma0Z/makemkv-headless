@@ -3,10 +3,10 @@ import { socketActions, type SocketState } from "@/api/v1/socket/store";
 import { isRippingStatus, type LogMessage, type MkvLogMessage, type ProgressMessage, type ProgressValueMessage, type RipStartStopMessage, type TocStatusMessage } from "@/models/socket";
 import { throttle } from "lodash";
 import { SocketConnection } from "./Connection";
-import { endpoints, type ApiModel } from "@/api/endpoints";
+import { BACKEND_HOST_PORT, endpoints, type ApiModel } from "@/api/endpoints";
 import { tocActions } from "@/api/v1/toc/store";
 
-export const socket = new SocketConnection(`ws://${window.location.hostname}:${window.location.port}/api/v1/socket`)
+export const socket = new SocketConnection(`ws://${BACKEND_HOST_PORT}/api/v1/socket`)
 
 const throttledUpdateSocketState = throttle(
   (newState: SocketState['ripState']) => {

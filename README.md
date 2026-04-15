@@ -52,10 +52,10 @@ cd web && npm install
 
 ## Running everything
 
-### From source / development mode
+### From source
 
 ```bash
-make
+make clean all
 ./start.sh --ui-path web/dist # api options; use --help to see what there is
 ```
 
@@ -64,9 +64,22 @@ make
 This part is not yet done, but we can do it from built source
 
 ```bash
-make
+make clean all
 ./start.sh screen <listen port> # api options ...
 ```
 
 If you give `start.sh` `screen` and a port it will run in a screen session and
 give you back your terminal.
+
+### In development
+
+This starts the frontend server in development mode, and in the future will also
+start the backend in development mode too (watch files mode), but we're not
+there yet.  The two numbers after `dev` are the API and WEB ports, which are
+separated so that we can run the frontend dynamically.  You'll still get a UI on
+the API port as well, so be wary about that.
+
+```bash
+make clean all
+./start.sh dev 4000 3000 # API options
+```

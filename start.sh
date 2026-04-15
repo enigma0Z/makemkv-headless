@@ -29,7 +29,10 @@ elif [[ "$DEV" == "true" ]]; then
     set +x
   }
 
-  uv --project api run mmh_api --listen-port $API_PORT "$@" &
+  uv --project api run mmh_api \
+    --listen-port $API_PORT "$@" \
+    --cors-origin http://127.0.0.1:3000 \
+    --cors-origin http://localhost:3000 &
   API_PID=$!
 
   export VITE_BACKEND_PORT=$API_PORT
@@ -38,7 +41,8 @@ elif [[ "$DEV" == "true" ]]; then
   WEB_PID=$!
 
   trap 'cleanup' SIGINT
-  wait $API_PID $WEB_PID
+  wait $API_PID 
+  wait $WEB_PID
 else
   uv --project api run mmh_api "$@"
 fi
