@@ -4,7 +4,7 @@ from typing import Literal
 from pydantic import BaseModel
 
 from makemkv_headless_api.models.tmdb import TMDBMovieSearchResultModel, TMDBShowSearchResultModel
-from makemkv_headless_api.models.toc import TocModel
+from makemkv_headless_api.models.toc import TocStateModel
 
 type StatusMessage = Literal[
   "Scanning CD-ROM devices",
@@ -35,34 +35,36 @@ class RipShowInfoModel(RipSortInfoModel):
   first_episode: int = None
   season_number: int = None
 
-class ReduxRipStateModel(BaseModel):
+class RipStateModel(BaseModel):
   destination: RipDestinationModel = None
   sort_info: RipSortInfoModel | RipShowInfoModel = None
   rip_all: bool = None
   tmdb_selection: TMDBShowSearchResultModel | TMDBMovieSearchResultModel | None = None
 
-class ReduxStateModel(BaseModel):
-  rip: ReduxRipStateModel = ReduxRipStateModel()
-  toc: TocModel = TocModel()
-
 class ProgressStateModel(BaseModel):
   buffer: float | None = None
   progress: float = 0
 
-class SocketStatusModel(BaseModel):
+class SocketStateRipModel(BaseModel):
   current_title: int | None = None
   current_progress: list[ProgressStateModel] = []
   total_progress: ProgressStateModel = ProgressStateModel()
   current_status: StatusMessage | None = None
   total_status: StatusMessage | None = None
-  rip_started: bool = False
+  started: bool = False
 
-class ErrorStatusModel(BaseModel):
+class SocketStateModel(BaseModel):
+  rip: SocketStateRipModel = SocketStateRipModel()
+  connected: bool = False
+  message: list[str] = []
+
+class ErrorStateModel(BaseModel):
   path: str
   message: str | BaseModel | None = None
   traceback: list[str] | None = None
 
 class StateModel(BaseModel):
-  redux: ReduxStateModel = ReduxStateModel()
-  socket: SocketStatusModel = SocketStatusModel()
-  error: ErrorStatusModel | None = None
+  rip: RipStateModel = RipStateModel()
+  toc: TocStateModel = TocStateModel()
+  socket: SocketStateModel = SocketStateModel()
+  error: ErrorStateModel | None = None

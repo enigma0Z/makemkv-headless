@@ -45,11 +45,11 @@ export const socketConnect = (): SocketThunkAction<void> => (
 
   socketConnection.on("TocStatusMessage", (value: TocStatusMessage) => {
     if (value.state === "complete") {
-      fetch(endpoints.state.get("redux/toc"), { method: 'GET' })
+      fetch(endpoints.state.get("toc"), { method: 'GET' })
         .then(response => response.json() as Promise<ApiModel['v1']['state']>)
         .then(({ data }) => {
-          if (data.redux?.toc) {
-            dispatch(tocActions.setTocData(data.redux.toc))
+          if (data.toc) {
+            dispatch(tocActions.setTocData(data.toc))
             dispatch(tocActions.setTocLoading(false))
           }
         })

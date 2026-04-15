@@ -12,7 +12,7 @@ import logging
 
 from makemkv_headless_api.models.makemkv import from_raw
 from makemkv_headless_api.models.socket import mkv_message_from_raw
-from makemkv_headless_api.models.toc import BaseInfoModel, SourceInfoModel, TocModel, TitleInfoModel, TrackInfoModel
+from makemkv_headless_api.models.toc import BaseInfoModel, SourceInfoModel, TocStateModel, TitleInfoModel, TrackInfoModel
 from makemkv_headless_api.util import cmd
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ def format_records(lines):
     ]
   ]
 
-class Toc(TocModel):
+class Toc(TocStateModel):
   async def get_from_disc(self, source):
     interface = get_interface()
     interface.print('Loading disc Toc', target=Target.MKV)

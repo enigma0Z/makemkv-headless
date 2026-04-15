@@ -93,7 +93,7 @@ def get_state_select(state_path: str):
 @router.put('/')
 def put_state(data: StateModel):
   try:
-    STATE.redux.rip = data.redux.rip
+    STATE.rip = data.rip
     return data
   except Exception as ex:
     return GenericAPIError(400)

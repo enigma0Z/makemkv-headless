@@ -20,7 +20,7 @@ from makemkv_headless_api.config import CONFIG
 from makemkv_headless_api.interface import get_interface, init_interface
 
 from makemkv_headless_api.interface.async_queue_interface import AsyncQueueInterface
-from makemkv_headless_api.models.state import ErrorStatusModel
+from makemkv_headless_api.models.state import ErrorStateModel
 
 from . import v1
 
@@ -70,7 +70,7 @@ app.include_router(prefix="/api", router=v1.router)
 async def exception_handler(request: Request, ex: Exception):
   if request.url.path.startswith('/api'):
     # Store error state
-    STATE.error = ErrorStatusModel(
+    STATE.error = ErrorStateModel(
       path=request.url.path,
       message=str(ex),
       traceback=format_exc(-3).split('\n'),

@@ -18,7 +18,7 @@ function App() {
   const dispatch = useAppDispatch()
 
   const tmdbConfiguration = useAppSelector((state) => state.tmdb.configuration)
-  const ripStateData = useGetStateByPathQuery('redux/rip').data?.redux.rip
+  const ripStateData = useGetStateByPathQuery('rip').data?.rip
   const errorData = useGetErrorQuery()
 
   dispatch(ripActions.setRipData(ripStateData))
@@ -33,11 +33,11 @@ function App() {
   }
 
   useEffect(() => {
-    fetch(endpoints.state.get("redux/toc"), { method: 'GET' })
+    fetch(endpoints.state.get("toc"), { method: 'GET' })
       .then(response => response.json() as Promise<ApiModel['v1']['state']>)
       .then(({ data }) => {
-        if (data.redux?.toc) {
-          dispatch(tocActions.setTocData(data.redux.toc))
+        if (data.toc) {
+          dispatch(tocActions.setTocData(data.toc))
         }
       })
   }, []);

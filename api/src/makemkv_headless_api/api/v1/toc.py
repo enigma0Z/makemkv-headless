@@ -27,7 +27,7 @@ async def get_toc_from_disc(source):
     # STATE.reset_rip_indexes() # Reset which indexes are selected
     STATE.reset_socket() # Reset which indexes are complete
     await toc.get_from_disc(source)
-    STATE.redux.toc = toc
+    STATE.toc = toc
     get_interface().send(TocStatusMessage(state="complete"))
     return toc
 
@@ -42,7 +42,7 @@ async def get_toc():
     if len(failures) > 0: 
       raise TocError(failures)
 
-    STATE.redux.toc = toc
+    STATE.toc = toc
     return APIResponse("success", toc)
   except TocError as ex:
     logger.error(ex.args[0])
