@@ -43,18 +43,6 @@ cors_allow_origins = [CONFIG.frontend, *CONFIG.cors_origins]
 logger.info(f'Loaded config: {CONFIG}')
 logger.info(f'Allowed CORS Origins: {cors_allow_origins}')
 
-# try:
-#   logger.debug(f'')
-#   s = socket(AF_INET, SOCK_DGRAM) 
-#   s.connect(("169.254.255.255", 80))
-#   ip = s.getsockname()[0]
-#   s.close()
-#   logger.debug(f'adding {ip} to allowed origins')
-#   cors_allow_origins.append(f'http://{ip}:3000')
-# except:
-#   logger.error(f'Failed to determine origin ip for cors')
-#   pass
-
 app.add_middleware(
   CORSMiddleware,
   # TODO: Add routable IPs
