@@ -24,7 +24,7 @@ export const ButtonBar = ({ }: Props) => {
   const library = useAppSelector((state) => state.rip.destination?.library)
   const media = useAppSelector((state) => state.rip.destination?.media)
   const content = useAppSelector((state) => state.rip.destination?.content)
-  const ripState = useAppSelector((state) => state.socket.ripState)
+  const socketRipState = useAppSelector((state) => state.socket.rip)
   const ripAll = useAppSelector((state) =>
     state.toc.source?.titles.length == [
       ...state.rip.sort_info.extra_indexes, 
@@ -37,8 +37,8 @@ export const ButtonBar = ({ }: Props) => {
   const [cancelModalOpen, setCancelModalOpen] = useState<boolean>(false)
 
   let current_progress: SocketProgress | undefined
-  if (ripState.current_title !== null && ripState.current_title !== undefined) {
-    current_progress = ripState.current_progress?.[ripState.current_title]
+  if (socketRipState.current_title !== null && socketRipState.current_title !== undefined) {
+    current_progress = socketRipState.current_progress?.[socketRipState.current_title]
   }
 
   const handleEject = () => {
@@ -68,7 +68,7 @@ export const ButtonBar = ({ }: Props) => {
   };
 
   const handleStartRip = () => {
-    if (ripState?.rip_started) {
+    if (socketRipState?.rip_started) {
       setCancelModalOpen(true)
     } else {
       dispatch(socketActions.setSocketState({ rip_started: true }))
@@ -97,7 +97,7 @@ export const ButtonBar = ({ }: Props) => {
         <Tooltip title="Eject Disc">
           <IconButton
             onClick={handleEject}
-            disabled={ripState?.rip_started}
+            disabled={socketRipState?.rip_started}
           >
             <EjectIcon />
           </IconButton>
@@ -105,7 +105,7 @@ export const ButtonBar = ({ }: Props) => {
         <Tooltip title="Load ToC (Table of Contents)">
           <IconButton
             onClick={handleLoadToc}
-            disabled={ripState?.rip_started}
+            disabled={socketRipState?.rip_started}
             loading={tocLoading}
           >
             <SaveAltIcon />
@@ -115,9 +115,9 @@ export const ButtonBar = ({ }: Props) => {
           sx={{ marginLeft: "auto", textWrap: "nowrap", minWidth: 'max-content' }}
           onClick={handleStartRip}
           variant="outlined"
-          startIcon={ripState?.rip_started ? <CancelIcon /> : <CheckCircleIcon />}
+          startIcon={socketRipState?.rip_started ? <CancelIcon /> : <CheckCircleIcon />}
         >
-          {ripState?.rip_started
+          {socketRipState?.rip_started
             ? "Cancel Rip"
             : "Start Rip"
           }
@@ -130,22 +130,22 @@ export const ButtonBar = ({ }: Props) => {
           message={'This disc will not get uploaded if it is cancelled now'}
         />
       </Toolbar>
-      {ripState?.total_status && <StatusWrapper>
+      {socketRipState?.total_status && <StatusWrapper>
         <Typography variant="caption">
-          {ripState?.total_status
-            ? <>{ripState.total_status} ({Math.round((ripState.total_progress?.progress ?? 0) * 10000) / 100}%) </>
+          {socketRipState?.total_status
+            ? <>{socketRipState.total_status} ({Math.round((socketRipState.total_progress?.progress ?? 0) * 10000) / 100}%) </>
             : "Status"
-          } {ripState?.current_status && current_progress && <>
-            / {ripState.current_status} ({Math.round((current_progress.progress ?? 0) * 10000) / 100}%)
+          } {socketRipState?.current_status && current_progress && <>
+            / {socketRipState.current_status} ({Math.round((current_progress.progress ?? 0) * 10000) / 100}%)
           </>
           }
         </Typography>
         <LinearProgress
           variant="buffer"
-          value={ripState?.total_progress?.progress ? ripState.total_progress.progress * 100 : 0}
-          valueBuffer={ripState?.total_progress?.buffer ? ripState.total_progress.buffer * 100 : 0}
+          value={socketRipState?.total_progress?.progress ? socketRipState.total_progress.progress * 100 : 0}
+          valueBuffer={socketRipState?.total_progress?.buffer ? socketRipState.total_progress.buffer * 100 : 0}
         />
-        {ripState?.current_status && current_progress && <>
+        {socketRipState?.current_status && current_progress && <>
           <LinearProgress
             variant="buffer"
             valueBuffer={(current_progress.buffer ?? 1) * 100}
@@ -154,6 +154,6 @@ export const ButtonBar = ({ }: Props) => {
         </>}
       </StatusWrapper>}
     </AppBar>
-    <div style={{ height: ripState?.total_status ? "8rem" : "4rem" }} />
+    <div style={{ height: socketRipState?.total_status ? "8rem" : "4rem" }} />
   </>
 }

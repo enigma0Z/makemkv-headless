@@ -14,7 +14,7 @@ export type Props = {
 
 export const StatusScroller = ({ minimized = false, showMinimizeButton = true, id = "default" }: Props) => {
 
-  const connected = useAppSelector((state) => state.socket.ripState.connected )
+  const socketConnected = useAppSelector((state) => state.socket.rip.connected )
   const messages = useAppSelector((state) => state.socket.messages)
 
   const [isMinimized, setIsMinimized] = useState<boolean>(minimized)
@@ -54,7 +54,7 @@ export const StatusScroller = ({ minimized = false, showMinimizeButton = true, i
         <div key={index}>{message}</div>
       ))}
     </WrapperComponent>
-    { connected
+    { socketConnected
       ? <LinearProgress variant="determinate" value={0} /> 
       : <LinearProgress variant="determinate" color="error" value={0} />
     }

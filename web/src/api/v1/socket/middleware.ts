@@ -12,8 +12,8 @@ type SocketThunkAction<T> = ThunkAction<T, RootState, ThunkExtraArgument, Unknow
 export const socketConnect = (): SocketThunkAction<void> => (
   dispatch, getState, { socketConnection }
 ) => {
-  const throttledUpdateSocketState = throttle(
-    (newState: SocketState['ripState']) => {
+  const throttledUpdateSocketRipState = throttle(
+    (newState: SocketState['rip']) => {
       console.info('Throttled update socket state')
       dispatch(socketActions.updateSocketState(newState))
     },
@@ -59,8 +59,8 @@ export const socketConnect = (): SocketThunkAction<void> => (
   const progressMessageHandler = (value: ProgressMessage) => {
     // Set index if current index is undefined
     console.debug('ProgressMessage', value)
-    const socketState = getState().socket.ripState
-    const nextSocketState: SocketState['ripState'] = {
+    const socketState = getState().socket.rip
+    const nextSocketState: SocketState['rip'] = {
       ...socketState,
       current_progress: [...(socketState.current_progress ?? [])]
     }
@@ -106,8 +106,8 @@ export const socketConnect = (): SocketThunkAction<void> => (
 
   socketConnection.on("ProgressValueMessage", (value: ProgressValueMessage) => {
     // console.debug('ProgressValueMessage', value)
-    const socketState = getState().socket.ripState
-    const nextSocketState: SocketState['ripState'] = {
+    const socketState = getState().socket.rip
+    const nextSocketState: SocketState['rip'] = {
       current_progress: socketState.current_progress?.slice(),
       total_progress: { ...socketState.total_progress }
     }
@@ -149,12 +149,12 @@ export const socketConnect = (): SocketThunkAction<void> => (
       }
     }
 
-    throttledUpdateSocketState(nextSocketState)
+    throttledUpdateSocketRipState(nextSocketState)
   })
 
   socketConnection.on("RipStartStopMessage", (value: RipStartStopMessage) => {
-    const socketState = getState().socket.ripState
-    const nextSocketState: SocketState['ripState'] = {}
+    const socketState = getState().socket.rip
+    const nextSocketState: SocketState['rip'] = {}
 
     nextSocketState.rip_started = value.state === "start"
 

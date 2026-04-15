@@ -57,7 +57,7 @@ export const initialApiState: State = {
       lines: [],
     },
     socket: {
-      ripState: {
+      rip: {
         current_title: undefined,
         current_progress: [],
         total_progress: {

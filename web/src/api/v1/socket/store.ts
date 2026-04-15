@@ -7,7 +7,7 @@ export type SocketProgress = {
 }
 
 export interface SocketState {
-  ripState: {
+  rip: {
     current_title?: number | null;
 
     current_progress?: SocketProgress[]
@@ -31,13 +31,13 @@ const socketSlice = createSlice({
   name: "socket",
   initialState,
   reducers: {
-    updateSocketState: (state, action: PayloadAction<SocketState['ripState'] | undefined>) => {
+    updateSocketState: (state, action: PayloadAction<SocketState['rip'] | undefined>) => {
       if (action.payload) {
-        state.ripState = { ...state.ripState, ...action.payload }
+        state.rip = { ...state.rip, ...action.payload }
       }
     },
-    setSocketState: (state, action: PayloadAction<SocketState['ripState'] | undefined>) => {
-      state.ripState = { ...initialState.ripState, ...(action?.payload ?? {}) }
+    setSocketState: (state, action: PayloadAction<SocketState['rip'] | undefined>) => {
+      state.rip = { ...initialState.rip, ...(action?.payload ?? {}) }
     },
     appendToMessages: (state, action: PayloadAction<string>) => {
       if (!state.messages) state.messages = []

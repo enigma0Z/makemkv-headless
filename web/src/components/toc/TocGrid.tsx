@@ -40,7 +40,7 @@ export const TocGrid = ({ }: Props) => {
   const mainIndexes = useAppSelector((state) => state.rip.sort_info?.main_indexes)
   const extraIndexes = useAppSelector((state) => state.rip.sort_info?.extra_indexes)
   const content = useAppSelector((state) => state.rip.destination?.content)
-  const ripState = useAppSelector((state) => state.socket.ripState)
+  const socketRipState = useAppSelector((state) => state.socket.rip)
 
   const [oldMainIndexes, setOldMainIndexes] = useState<number[]>([])
   const [oldExtraIndexes, setOldExtraIndexes] = useState<number[]>([])
@@ -146,7 +146,7 @@ export const TocGrid = ({ }: Props) => {
 
   useEffect(() => {
     const makeItAsync = async () => {
-      if (data && !ripState?.rip_started) {
+      if (data && !socketRipState?.rip_started) {
         dispatch(ripActions.setTocLength(data?.source?.titles.length));
         setIndexes();
       }
@@ -240,9 +240,9 @@ export const TocGrid = ({ }: Props) => {
                   key={index}
                   index={index}
                   data={title}
-                  progress={ripState?.current_progress?.[index]?.progress ?? undefined}
-                  buffer={ripState?.current_progress?.[index]?.buffer ?? undefined}
-                  statusText={index === ripState?.current_title ? ripState?.current_status : ''}
+                  progress={socketRipState?.current_progress?.[index]?.progress ?? undefined}
+                  buffer={socketRipState?.current_progress?.[index]?.buffer ?? undefined}
+                  statusText={index === socketRipState?.current_title ? socketRipState?.current_status : ''}
                   titleType={
                     mainIndexes.indexOf(index) > -1
                       ? "main"
@@ -288,8 +288,8 @@ export const TocGridRow = ({ index, data, statusText, titleType, episodeNumber, 
   const firstEpisode = useAppSelector((state) => state.rip.sort_info.first_episode)
   const splitSegments = useAppSelector((state) => state.rip.sort_info.split_segments)
   const content = useAppSelector((state) => state.rip.destination.content)
-  const ripStarted = useAppSelector((state) => state.socket.ripState.rip_started)
-  const currentProgress = useAppSelector((state) => state.socket.ripState.current_progress?.[index])
+  const ripStarted = useAppSelector((state) => state.socket.rip.rip_started)
+  const currentProgress = useAppSelector((state) => state.socket.rip.current_progress?.[index])
 
   const progress = currentProgress?.progress
   const buffer = currentProgress?.buffer
