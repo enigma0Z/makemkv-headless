@@ -7,7 +7,7 @@ WEB_PORT=""
 
 if [[ "$1" == "screen" ]]; then
   SCREEN="true"; shift
-  WEB_PORT="$1"; shift
+  API_PORT="$1"; shift
 fi
 
 if [[ "$1" == "dev" ]]; then
@@ -17,7 +17,9 @@ if [[ "$1" == "dev" ]]; then
 fi
 
 if [[ "$SCREEN" == "true" ]]; then
+  set -x
   screen -dmS mmh-api-$API_PORT uv --project api run mmh_api --listen-port $API_PORT "$@"
+  set +x
 elif [[ "$DEV" == "true" ]]; then
   WEB_PID=""
   API_PID=""
