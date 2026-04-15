@@ -6,7 +6,17 @@ import type { TmdbSearchResultMovie, TmdbSearchResultShow } from "./v1/tmdb/type
 import type { Config } from "./v1/config/types"
 import type { ApiError } from "./v1/error/types"
 
-export const BACKEND = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`
+let backend_port = window.location.port;
+
+if (import.meta.env.DEV) {
+  backend_port = import.meta.env.BACKEND_PORT ?? 4000
+  console.info(`Setting backend port to ${backend_port}`)
+}
+
+export const BACKEND_HOST_PORT = `${window.location.hostname}:${backend_port}`
+export const BACKEND = `${window.location.protocol}//${BACKEND_HOST_PORT}`
+
+// export const BACKEND = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`
 
 export const endpoints = {
   disc: {
