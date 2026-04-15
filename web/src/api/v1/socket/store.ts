@@ -16,10 +16,10 @@ export interface SocketState {
     current_status?: CurrentStatus;
     total_status?: string | null;
 
-    rip_started?: boolean;
-
-    connected?: boolean;
+    started?: boolean;
   }
+
+  connected?: boolean;
   messages: string[]
 }
 
@@ -31,13 +31,16 @@ const socketSlice = createSlice({
   name: "socket",
   initialState,
   reducers: {
-    updateSocketState: (state, action: PayloadAction<SocketState['rip'] | undefined>) => {
+    updateSocketRipState: (state, action: PayloadAction<SocketState['rip'] | undefined>) => {
       if (action.payload) {
         state.rip = { ...state.rip, ...action.payload }
       }
     },
-    setSocketState: (state, action: PayloadAction<SocketState['rip'] | undefined>) => {
+    setSocketRipState: (state, action: PayloadAction<SocketState['rip'] | undefined>) => {
       state.rip = { ...initialState.rip, ...(action?.payload ?? {}) }
+    },
+    setConnected: (state, action: PayloadAction<boolean>) => {
+      state.connected = action.payload
     },
     appendToMessages: (state, action: PayloadAction<string>) => {
       if (!state.messages) state.messages = []

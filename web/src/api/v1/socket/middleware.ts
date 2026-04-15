@@ -15,7 +15,7 @@ export const socketConnect = (): SocketThunkAction<void> => (
   const throttledUpdateSocketRipState = throttle(
     (newState: SocketState['rip']) => {
       console.info('Throttled update socket state')
-      dispatch(socketActions.updateSocketState(newState))
+      dispatch(socketActions.updateSocketRipState(newState))
     },
     500
     // { trailing: true, leading: true }
@@ -23,8 +23,8 @@ export const socketConnect = (): SocketThunkAction<void> => (
 
   socketConnection.on("LogMessage", (value: LogMessage) => {
     if (value.message.startsWith("Copy complete")) {
-      dispatch(socketActions.updateSocketState({
-        rip_started: false,
+      dispatch(socketActions.updateSocketRipState({
+        started: false,
         current_status: undefined
       }))
     }
@@ -34,8 +34,8 @@ export const socketConnect = (): SocketThunkAction<void> => (
 
   socketConnection.on("MkvLogMessage", (value: MkvLogMessage) => {
     if (value.text.startsWith("Copy complete")) {
-      dispatch(socketActions.updateSocketState({
-        rip_started: false,
+      dispatch(socketActions.updateSocketRipState({
+        started: false,
         current_status: undefined
       }))
     }
@@ -67,7 +67,7 @@ export const socketConnect = (): SocketThunkAction<void> => (
 
     if (value.progress_type === "current" && socketState.current_title !== null && socketState.current_title !== undefined) {
       if (
-        socketState.rip_started
+        socketState.started
         && isRippingStatus(socketState.current_status)
         && (
           socketState.current_title === undefined
@@ -94,11 +94,11 @@ export const socketConnect = (): SocketThunkAction<void> => (
       nextSocketState.total_status = value.name
 
       if (value.name === "Saving all titles to MKV files") {
-        nextSocketState.rip_started = true
+        nextSocketState.started = true
       }
     }
 
-    dispatch(socketActions.updateSocketState(nextSocketState))
+    dispatch(socketActions.updateSocketRipState(nextSocketState))
   }
 
   socketConnection.on("CurrentProgressMessage", progressMessageHandler)
@@ -138,7 +138,7 @@ export const socketConnect = (): SocketThunkAction<void> => (
       nextSocketState.total_progress = { progress: 0, buffer: 0 }
     }
 
-    if (socketState.rip_started) {
+    if (socketState.started) {
       nextSocketState.total_progress = {
         buffer: 1,
         progress: value.total / value.max
@@ -156,7 +156,7 @@ export const socketConnect = (): SocketThunkAction<void> => (
     const socketState = getState().socket.rip
     const nextSocketState: SocketState['rip'] = {}
 
-    nextSocketState.rip_started = value.state === "start"
+    nextSocketState.started = value.state === "start"
 
     if (value.index !== null) {
       nextSocketState.current_title = value.index
@@ -173,7 +173,7 @@ export const socketConnect = (): SocketThunkAction<void> => (
       nextSocketState.current_progress[socketState.current_title] = { buffer: 1, progress: 1 }
     }
 
-    dispatch(socketActions.updateSocketState(nextSocketState))
+    dispatch(socketActions.updateSocketRipState(nextSocketState))
   })
 
   socketConnection.connect()

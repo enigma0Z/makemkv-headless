@@ -8,7 +8,7 @@ import { useAppSelector } from "@/api";
 
 export const StatusScroller = () => {
 
-  const socketConnected = useAppSelector((state) => state.socket.rip.connected )
+  const socketConnected = useAppSelector((state) => state.socket.connected )
   const messages = useAppSelector((state) => state.socket.messages)
 
   const [isMinimized, setIsMinimized] = useState<boolean>(false)

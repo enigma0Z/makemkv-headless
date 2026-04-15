@@ -146,7 +146,7 @@ export const TocGrid = ({ }: Props) => {
 
   useEffect(() => {
     const makeItAsync = async () => {
-      if (data && !socketRipState?.rip_started) {
+      if (data && !socketRipState?.started) {
         dispatch(ripActions.setTocLength(data?.source?.titles.length));
         setIndexes();
       }
@@ -288,7 +288,7 @@ export const TocGridRow = ({ index, data, statusText, titleType, episodeNumber, 
   const firstEpisode = useAppSelector((state) => state.rip.sort_info.first_episode)
   const splitSegments = useAppSelector((state) => state.rip.sort_info.split_segments)
   const content = useAppSelector((state) => state.rip.destination.content)
-  const ripStarted = useAppSelector((state) => state.socket.rip.rip_started)
+  const ripStarted = useAppSelector((state) => state.socket.rip.started)
   const currentProgress = useAppSelector((state) => state.socket.rip.current_progress?.[index])
 
   const progress = currentProgress?.progress

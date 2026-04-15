@@ -28,7 +28,6 @@ export type State = {
     total_status?: string;
 
     rip_started?: boolean;
-    
   }
 }
 
@@ -66,8 +65,9 @@ export const initialApiState: State = {
         },
         current_status: undefined,
         total_status: undefined,
-        rip_started: false
+        started: false
       },
+      connected: false,
       messages: []
     }
   },

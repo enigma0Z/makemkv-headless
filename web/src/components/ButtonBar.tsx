@@ -43,7 +43,7 @@ export const ButtonBar = ({ }: Props) => {
 
   const handleEject = () => {
     console.info('Ejecting disc')
-    dispatch(socketActions.setSocketState())
+    dispatch(socketActions.setSocketRipState())
     fetch(endpoints.disc.eject(), { method: 'GET' })
   }
 
@@ -51,7 +51,7 @@ export const ButtonBar = ({ }: Props) => {
     console.info('Fetching Toc')
     dispatch(tocActions.setTocLoading(true))
     dispatch(tocActions.setTocData(undefined))
-    dispatch(socketActions.setSocketState())
+    dispatch(socketActions.setSocketRipState())
     dispatch(ripActions.setMainIndexes([]))
     dispatch(ripActions.setExtraIndexes([]))
     fetch(endpoints.toc_async(), { method: 'GET' })
@@ -62,16 +62,16 @@ export const ButtonBar = ({ }: Props) => {
       .then((response) => response.json() as Promise<ApiModel['v1']['rip.stop']>)
       .then(({ status }) => {
         if (status === 'stopped') {
-          dispatch(socketActions.updateSocketState({ rip_started: false }))
+          dispatch(socketActions.updateSocketRipState({ started: false }))
         }
       })
   };
 
   const handleStartRip = () => {
-    if (socketRipState?.rip_started) {
+    if (socketRipState?.started) {
       setCancelModalOpen(true)
     } else {
-      dispatch(socketActions.setSocketState({ rip_started: true }))
+      dispatch(socketActions.setSocketRipState({ started: true }))
       fetch(endpoints.rip.start(), {
         method: 'POST',
         body: JSON.stringify({
@@ -97,7 +97,7 @@ export const ButtonBar = ({ }: Props) => {
         <Tooltip title="Eject Disc">
           <IconButton
             onClick={handleEject}
-            disabled={socketRipState?.rip_started}
+            disabled={socketRipState?.started}
           >
             <EjectIcon />
           </IconButton>
@@ -105,7 +105,7 @@ export const ButtonBar = ({ }: Props) => {
         <Tooltip title="Load ToC (Table of Contents)">
           <IconButton
             onClick={handleLoadToc}
-            disabled={socketRipState?.rip_started}
+            disabled={socketRipState?.started}
             loading={tocLoading}
           >
             <SaveAltIcon />
@@ -115,9 +115,9 @@ export const ButtonBar = ({ }: Props) => {
           sx={{ marginLeft: "auto", textWrap: "nowrap", minWidth: 'max-content' }}
           onClick={handleStartRip}
           variant="outlined"
-          startIcon={socketRipState?.rip_started ? <CancelIcon /> : <CheckCircleIcon />}
+          startIcon={socketRipState?.started ? <CancelIcon /> : <CheckCircleIcon />}
         >
-          {socketRipState?.rip_started
+          {socketRipState?.started
             ? "Cancel Rip"
             : "Start Rip"
           }
