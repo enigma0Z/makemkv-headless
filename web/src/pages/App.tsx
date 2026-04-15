@@ -12,6 +12,7 @@ import { TocGrid } from '@/components/toc/TocGrid'
 import { useGetStateByPathQuery } from '@/api/v1/state/api'
 import { useGetErrorQuery } from '@/api/v1/error/api'
 import { ErrorDialog } from '@/components/modals/ErrorDialog/ErrorDialog'
+import { socketConnect } from '@/api/v1/socket/middleware'
 
 function App() {
   const dispatch = useAppDispatch()
@@ -21,6 +22,7 @@ function App() {
   const errorData = useGetErrorQuery()
 
   dispatch(ripActions.setRipData(ripStateData))
+  dispatch(socketConnect())
 
   if (!tmdbConfiguration) {
     fetch(endpoints.tmdb.configuration())

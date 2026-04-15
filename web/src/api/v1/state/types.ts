@@ -2,7 +2,15 @@ import type { RipState } from "@/api/v1/rip/store";
 import type { TocState } from "@/api/v1/toc/store";
 import type { SocketProgress, SocketState } from "@/api/v1/socket/store";
 
-import type { ProgressMessageEvent } from "@/components/socket/Context";
+export type CurrentStatus = "Scanning CD-ROM devices"
+      | "Opening DVD disc"
+      | "Processing title sets"
+      | "Scanning contents"
+      | "Processing titles"
+      | "Decrypting data"
+      | "Saving all titles to MKV files"
+      | "Analyzing seamless segments"
+      | "Saving to MKV file";
 
 export type State = {
   redux: {
@@ -16,11 +24,10 @@ export type State = {
     current_progress?: SocketProgress[];
     total_progress?: SocketProgress;
 
-    current_status?: ProgressMessageEvent["name"];
+    current_status?: CurrentStatus;
     total_status?: string;
 
     rip_started?: boolean;
-    
   }
 }
 
@@ -49,7 +56,7 @@ export const initialApiState: State = {
       lines: [],
     },
     socket: {
-      ripState: {
+      rip: {
         current_title: undefined,
         current_progress: [],
         total_progress: {
@@ -58,8 +65,9 @@ export const initialApiState: State = {
         },
         current_status: undefined,
         total_status: undefined,
-        rip_started: false
+        started: false
       },
+      connected: false,
       messages: []
     }
   },

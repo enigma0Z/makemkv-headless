@@ -8,7 +8,7 @@ import { useAppSelector } from "@/api";
 
 export const StatusScroller = () => {
 
-  const connected = useAppSelector((state) => state.socket.ripState.connected )
+  const socketConnected = useAppSelector((state) => state.socket.connected )
   const messages = useAppSelector((state) => state.socket.messages)
 
   const [isMinimized, setIsMinimized] = useState<boolean>(false)
@@ -47,7 +47,7 @@ export const StatusScroller = () => {
         <div key={index}>{message}</div>
       ))}
     </WrapperComponent>
-    { connected
+    { socketConnected
       ? <LinearProgress variant="determinate" value={0} /> 
       : <LinearProgress variant="determinate" color="error" value={0} />
     }

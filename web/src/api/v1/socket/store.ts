@@ -1,6 +1,5 @@
-import type { ProgressMessageEvent } from "@/components/socket/Context";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { initialApiState } from "../state/types";
+import { initialApiState, type CurrentStatus } from "../state/types";
 
 export type SocketProgress = {
   buffer?: number | null;
@@ -8,19 +7,19 @@ export type SocketProgress = {
 }
 
 export interface SocketState {
-  ripState: {
+  rip: {
     current_title?: number | null;
 
     current_progress?: SocketProgress[]
     total_progress?: SocketProgress
 
-    current_status?: ProgressMessageEvent["name"];
+    current_status?: CurrentStatus;
     total_status?: string | null;
 
-    rip_started?: boolean;
-
-    connected?: boolean;
+    started?: boolean;
   }
+
+  connected?: boolean;
   messages: string[]
 }
 
@@ -32,13 +31,16 @@ const socketSlice = createSlice({
   name: "socket",
   initialState,
   reducers: {
-    updateSocketState: (state, action: PayloadAction<SocketState['ripState'] | undefined>) => {
+    updateSocketRipState: (state, action: PayloadAction<SocketState['rip'] | undefined>) => {
       if (action.payload) {
-        state.ripState = { ...state.ripState, ...action.payload }
+        state.rip = { ...state.rip, ...action.payload }
       }
     },
-    setSocketState: (state, action: PayloadAction<SocketState['ripState'] | undefined>) => {
-      state.ripState = { ...initialState.ripState, ...(action?.payload ?? {}) }
+    setSocketRipState: (state, action: PayloadAction<SocketState['rip'] | undefined>) => {
+      state.rip = { ...initialState.rip, ...(action?.payload ?? {}) }
+    },
+    setConnected: (state, action: PayloadAction<boolean>) => {
+      state.connected = action.payload
     },
     appendToMessages: (state, action: PayloadAction<string>) => {
       if (!state.messages) state.messages = []
