@@ -20,6 +20,7 @@ from makemkv_headless_api.config import CONFIG
 from makemkv_headless_api.interface import get_interface, init_interface
 
 from makemkv_headless_api.interface.async_queue_interface import AsyncQueueInterface
+from makemkv_headless_api.models.socket import ErrorMessage
 from makemkv_headless_api.models.state import ErrorStateModel
 
 from . import v1
@@ -64,6 +65,7 @@ async def exception_handler(request: Request, ex: Exception):
       traceback=format_exc(-3).split('\n'),
     )
     logger.error("API Error", exc_info=True)
+    get_interface().send(ErrorMessage(error=STATE.error))
     return await http_exception_handler(request, StarletteHTTPException(500, STATE.error.model_dump(mode='json')))
   elif isinstance(ex, StarletteHTTPException):
     return await http_exception_handler(request, ex)
