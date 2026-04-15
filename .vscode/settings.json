@@ -56,4 +56,5 @@
   "editor.tabSize": 2,
   "editor.indentSize": "tabSize",
   "editor.detectIndentation": false,
+  "makefile.configureOnOpen": false,
 }
