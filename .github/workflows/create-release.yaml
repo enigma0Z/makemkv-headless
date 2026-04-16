@@ -35,4 +35,8 @@ jobs:
             new_version=$(uv --project api version --short)
 
             gh release create "$new_version" --generate-notes
+
+            # Update latest tag
+            git tag latest
+            git push -f --tags
           fi
