@@ -1,4 +1,4 @@
-name: CLI - Build & Test
+name: Build & Test - CLI
 on: 
   workflow_dispatch: {}
   pull_request: 
