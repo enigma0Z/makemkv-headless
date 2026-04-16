@@ -9,6 +9,7 @@ fi
 
 UV_OPTS="--project api"
 
+git fetch --tags
 release_version=$(git tag | egrep "\d+\.\d+\.\d+" | sort --version-sort | tail -n1)
 release_major=$(cut -d. -f1 <<< "$release_version")
 release_minor=$(cut -d. -f2 <<< "$release_version")
