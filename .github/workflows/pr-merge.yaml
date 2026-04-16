@@ -9,12 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
       - run: |
           commit_log=$(mktemp)
           update_level=$(mktemp)
-          git log --quiet main..${{ github.event.pull_request.head.ref }} > $commit_log
+          git log --quiet HEAD^..HEAD > $commit_log
           update_level=$(grep -q '[major]' $commit_log && echo 'major' || \
             grep -q '[minor]' $commit_log && echo 'minor' || \
             grep -q '[patch]' $commit_log && echo 'patch' || \
