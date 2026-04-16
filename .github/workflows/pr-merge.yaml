@@ -16,7 +16,7 @@ jobs:
           fetch-tags: true
       - name: Bump version
         run: |
-          run: make install-uv
+          make install-uv
           commit_log=$(mktemp)
           git log --quiet HEAD^..HEAD > $commit_log
           update_level=$(grep -Fq '[major]' $commit_log && echo 'major' || \
