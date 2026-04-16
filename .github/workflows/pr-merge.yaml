@@ -13,4 +13,7 @@ jobs:
           git remote get-url origin
           git status
           git branch --show-current
-          git diff 
+          git log --quiet
+          git log --quiet | grep -q '[major]' && echo 'major update'
+          git log --quiet | grep -q '[minor]' && echo 'minor update'
+          git log --quiet | grep -q '[patch]' && echo 'patch update'
