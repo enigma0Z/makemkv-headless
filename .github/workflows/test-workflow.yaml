@@ -9,5 +9,5 @@ jobs:
     permissions:
       contents: write # To push the version bump back to the repo
     steps:
-      - name: Bump version
+      - name: Test
         run: gh --help

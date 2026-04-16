@@ -1,0 +1,38 @@
+name: PR Merge Handler
+
+on:
+  workflow_dispatch:
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # To create a release
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Create release
+        run: |
+          make install-uv
+
+          update_log=$(mktemp)
+          uv --project api version --bump stable | tee $update_log
+
+          # Create the release if we indeed did bump the version
+          if ! git diff-files --quiet; then
+            # Push release commit
+            git add -A .
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git config user.name "github-actions[bot]"
+            git commit -am "Version bump $(tail -n1 $update_log)"
+            git push
+
+            # Get new version
+            new_version=$(uv --project api version --short)
+
+            echo gh release create "$new_version" --generate-notes
+          fi
