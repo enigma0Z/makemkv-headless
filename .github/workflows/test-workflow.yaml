@@ -5,7 +5,6 @@ on:
 
 jobs:
   version:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: write # To push the version bump back to the repo
