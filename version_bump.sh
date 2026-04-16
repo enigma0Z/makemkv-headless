@@ -24,6 +24,7 @@ echo release: $release_version $release_major $release_minor $release_patch
 echo current: $current_version $current_major $current_minor $current_patch
 
 do_bump=0
+set -x
 if [[ $current_major -eq $release_major ]]; then
   if [[ "$BUMP" == "major" ]]; then
     do_bump=1
