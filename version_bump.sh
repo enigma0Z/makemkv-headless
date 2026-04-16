@@ -2,7 +2,7 @@
 
 BUMP="$1"
 
-if [[ "$BUMP" != "major" ]] || [[ "$BUMP" != "minor" ]] || [[ "$BUMP" != "patch" ]]; then
+if [[ "$BUMP" != "major" ]] && [[ "$BUMP" != "minor" ]] && [[ "$BUMP" != "patch" ]]; then
   echo "No version bump selected"
   exit 1
 fi
