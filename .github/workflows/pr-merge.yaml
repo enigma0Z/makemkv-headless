@@ -14,9 +14,9 @@ jobs:
       - run: |
           commit_log=$(mktemp)
           git log --quiet HEAD^..HEAD > $commit_log
-          update_level=$(grep -q '[major]' $commit_log && echo 'major' || \
-            grep -fq '[minor]' $commit_log && echo 'minor' || \
-            grep -fq '[patch]' $commit_log && echo 'patch' || \
+          update_level=$(grep -Fq '[major]' $commit_log && echo 'major' || \
+            grep -Fq '[minor]' $commit_log && echo 'minor' || \
+            grep -Fq '[patch]' $commit_log && echo 'patch' || \
             echo "none")
 
           echo "Update level is $(cat $update_level)"
