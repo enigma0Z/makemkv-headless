@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  version:
+  create-release:
     runs-on: ubuntu-latest
     permissions:
       contents: write # To create a release
