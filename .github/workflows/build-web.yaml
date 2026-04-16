@@ -1,4 +1,4 @@
-name: Web - Build & Test
+name: Build & Test - Web
 on: 
   workflow_dispatch: {}
   pull_request: 
