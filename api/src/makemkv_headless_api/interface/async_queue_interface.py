@@ -93,7 +93,7 @@ class AsyncQueueInterface(BaseInterface):
     elif isinstance(message, RipStartStopMessage):
       await self.queue.put(message)
       STATE.socket.current_title = message.index
-      STATE.socket.rip_started = message.state == 'start'
+      STATE.socket.rip.started = message.state == 'start'
     
     else:
       await self.queue.put(message)
