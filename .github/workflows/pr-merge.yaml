@@ -32,6 +32,8 @@ jobs:
 
           if ! git diff-files --quiet; then
             git add -A .
+            git config user.name "${{ github.actor }}"
+            git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
             git commit -am "Version bump $(tail -n1 $update_log)"
             git push
           fi
