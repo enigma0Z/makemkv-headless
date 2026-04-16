@@ -56,3 +56,6 @@ def main():
   from makemkv_headless_api.api import app
   logger.info(f'Starting app {app} with config {CONFIG}')
   uvicorn.run(app, host="0.0.0.0", port=CONFIG.listen_port) 
+
+if __name__ == '__main__':
+  main()
