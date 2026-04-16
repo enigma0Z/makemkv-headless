@@ -4,6 +4,7 @@ import logging
 from typing import Any
 import requests
 
+from makemkv_headless_api.api.api_response import APIException, GenericAPIError
 from makemkv_headless_api.config import CONFIG
 from makemkv_headless_api.models.tmdb import TMDBConfigurationModel, TMDBMovieSearchResultModel, TMDBShowSearchResultModel
 
@@ -39,4 +40,7 @@ def configuration():
     headers = { 'Authorization': f'Bearer {CONFIG.tmdb_token}' },
   )
 
-  return TMDBConfigurationModel(**response.json())
+  try:
+    return TMDBConfigurationModel(**response.json())
+  except Exception as ex: 
+    raise APIException(500, GenericAPIError("error", ex))
