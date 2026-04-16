@@ -1,5 +1,8 @@
 import os
 
+from importlib import resources
+
+from pathlib import Path
 from socket import socket
 
 from asyncio import create_task
@@ -10,9 +13,11 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.exception_handlers import http_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette import status 
 
+from makemkv_headless_api import ui
 from makemkv_headless_api.api.socket import socket
 
 from makemkv_headless_api.api.state import STATE
@@ -57,6 +62,7 @@ app.include_router(prefix="/api", router=v1.router)
 
 @app.exception_handler(Exception)
 async def exception_handler(request: Request, ex: Exception):
+  print('exception handler', request, ex, ex.__class__)
   if request.url.path.startswith('/api'):
     # Store error state
     STATE.error = ErrorStateModel(
@@ -67,19 +73,33 @@ async def exception_handler(request: Request, ex: Exception):
     logger.error("API Error", exc_info=True)
     get_interface().send(ErrorMessage(error=STATE.error))
     return await http_exception_handler(request, StarletteHTTPException(500, STATE.error.model_dump(mode='json')))
+  elif isinstance(ex, FileNotFoundError):
+    return await http_exception_handler(request, StarletteHTTPException(404, f'{ex}'))
+  elif isinstance(ex, RuntimeError):
+    return await http_exception_handler(request, StarletteHTTPException(500, f'{ex}'))
   elif isinstance(ex, StarletteHTTPException):
     return await http_exception_handler(request, ex)
-  else:
-    raise ex
 
 @app.get('/')
-async def index():
-  return FileResponse(os.path.join(CONFIG.ui_path, 'index.html'))
-
 @app.get('/{path:path}')
-async def arbitrary_file(path: str):
-  served_file = os.path.join(CONFIG.ui_path, path)
-  if os.path.exists(served_file):
-    return FileResponse(served_file)
+async def arbitrary_file(path: str | None = None):
+  if path is None or path == '':
+    path = 'index.html'
+  # Configured UI path
+  if CONFIG.ui_path is not None:
+    served_file = os.path.join(CONFIG.ui_path, path)
+    if os.path.exists(served_file):
+      return FileResponse(served_file)
+  # Configured external UI
+  elif CONFIG.frontend is not None:
+    return RedirectResponse(
+      '/'.join(CONFIG.frontend, path),
+      status_code=status.HTTP_302_FOUND
+    )
+  # Use bundled UI
   else:
-    return HTTPException(404)
+    with resources.as_file(resources.files(ui) / 'dist' / path) as module_file:
+      if module_file.exists():
+        return FileResponse(module_file)
+
+  raise StarletteHTTPException(404, f'Error loading file at {path}')

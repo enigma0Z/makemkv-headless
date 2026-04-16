@@ -1,5 +1,5 @@
 [project]
-dynamic = ["version"]
+version = "0.0.1"
 requires-python = ">= 3.14"
 name = "makemkv-headless-api"
 dependencies = [
@@ -45,12 +45,18 @@ Changelog = "https://github.com/enigma0Z/makemkv-headless/blob/main/CHANGELOG.md
 mmh_api = "makemkv_headless_api.__main__:main"
 
 [build-system]
-requires = ["hatchling >= 1.26"]
-build-backend = "hatchling.build"
+requires = ["uv_build >= 0.11.6, < 0.12"]
+build-backend = "uv_build"
 
-[tool.hatch.version]
-path = 'VERSION'
-pattern = "^(?P<version>.+)$"
+# [tool.hatch.version]
+# path = 'VERSION'
+# pattern = "^(?P<version>.+)$"
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/makemkv_headless_api"]
+# [tool.hatch.build.targets.wheel]
+# ignore-vcs = true
+# artifacts = [
+#   "*.js", 
+#   "*.html", 
+#   "ui/dist/**/*"
+# ]
+# packages = ["src/makemkv_headless_api"]
