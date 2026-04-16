@@ -4,14 +4,19 @@ on:
       - closed
 
 jobs:
-  if_merged:
+  version:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # To push the version bump back to the repo
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - run: |
+          fetch-tags: true
+      - name: Bump version
+        run: |
+          run: make install-uv
           commit_log=$(mktemp)
           git log --quiet HEAD^..HEAD > $commit_log
           update_level=$(grep -Fq '[major]' $commit_log && echo 'major' || \
@@ -19,4 +24,12 @@ jobs:
             grep -Fq '[patch]' $commit_log && echo 'patch' || \
             echo "none")
 
-          echo "Update level is $(cat $update_level)"
+          echo "Update level is $update_level"
+          update_log=$(mktemp)
+          ./version_bump.sh $update_level 2>&1 | tee $update_log
+
+          if ! git diff-files --quiet; then
+            git add -A .
+            git commit -am "Version bump $(tail -n1 $update_log)"
+            git push
+          fi

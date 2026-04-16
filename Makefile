@@ -10,6 +10,10 @@ tester:
 .PHONY: all
 all: web api
 
+.PHONY: install-uv
+install-uv:
+	@curl -LsSf https://astral.sh/uv/0.11.7/install.sh | sh
+
 .PHONY: clean-api
 clean-api:
 	@cd api && uv clean && echo "Cleaned UV"

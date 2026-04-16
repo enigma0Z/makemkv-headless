@@ -12,7 +12,7 @@ runs:
     - name: Install UV
       id: install-uv
       shell: bash
-      run: curl -LsSf https://astral.sh/uv/install.sh | sh
+      run: make install-uv
 
     - name: Build
       id: build
