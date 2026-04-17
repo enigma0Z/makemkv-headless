@@ -12,13 +12,17 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       UV_PUBLISH_USERNAME: __token__
       UV_PUBLISH_TOKEN: ${{ secrets.UV_PUBLISH_TOKEN }}
-      GIT_COMMITTER_NAME: "github-actions[bot]"
-      GIT_COMMITTER_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           fetch-tags: true
+      - name: Configure github actions name and email
+        id: configre-gha-name-email
+        shell: bash
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - uses: ./.github/actions/build-and-test-python
         with:
