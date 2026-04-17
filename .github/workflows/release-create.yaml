@@ -10,7 +10,6 @@ jobs:
       contents: write # To create a release
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      UV_PUBLISH_USERNAME: __token__
       UV_PUBLISH_TOKEN: ${{ secrets.UV_PUBLISH_TOKEN }}
     steps:
       - uses: actions/checkout@v6
