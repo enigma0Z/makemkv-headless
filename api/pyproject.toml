@@ -42,7 +42,7 @@ Repository = "https://github.com/enigma0Z/makemkv-headless.git"
 Changelog = "https://github.com/enigma0Z/makemkv-headless/blob/main/CHANGELOG.md"
 
 [project.scripts]
-mmh_api = "makemkv_headless_api.__main__:main"
+mmh = "makemkv_headless_api.__main__:main"
 
 [build-system]
 requires = ["uv_build >= 0.11.6, < 0.12"]
