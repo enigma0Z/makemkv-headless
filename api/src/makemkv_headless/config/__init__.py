@@ -1,9 +1,10 @@
 from argparse import ArgumentParser
 import json
 import logging
-from pydantic import ConfigDict
 import yaml
 from sys import argv
+
+from typing import cast
 
 from os.path import abspath
 
@@ -53,11 +54,15 @@ class Config(ConfigModel):
       self.__dict__[key] = kwargs[key] if key in kwargs else None
 
   def update(
-      self, **kwargs
+      self, **kwargs: dict | ConfigModel
   ):
     '''Sets the specified config values'''
-    for key in kwargs:
-      self.__dict__[key] = kwargs[key]
+    if isinstance(kwargs, dict):
+      for key in kwargs:
+        self.__dict__[key] = kwargs[key]
+    elif isinstance(kwargs, ConfigModel):
+      for key, value in cast(kwargs, ConfigModel).model_dump().items():
+        setattr(self, key, value)
 
   def update_from_file(self, config_file: str = None):
     if (config_file == None):
