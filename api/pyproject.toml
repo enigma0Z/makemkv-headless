@@ -1,5 +1,5 @@
 [project]
-version = "0.0.2"
+version = "0.0.2.dev43"
 requires-python = ">= 3.14"
 name = "makemkv-headless"
 dependencies = [
@@ -42,7 +42,7 @@ Repository = "https://github.com/enigma0Z/makemkv-headless.git"
 Changelog = "https://github.com/enigma0Z/makemkv-headless/blob/main/CHANGELOG.md"
 
 [project.scripts]
-mmh = "makemkv_headless_api.__main__:main"
+mmh = "makemkv_headless.__main__:main"
 
 [build-system]
 requires = ["uv_build >= 0.11.6, < 0.12"]
