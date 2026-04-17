@@ -138,8 +138,8 @@ wheels = [
 ]
 
 [[package]]
-name = "makemkv-headless-api"
-version = "0.0.2"
+name = "makemkv-headless"
+version = "0.0.2.dev42"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },

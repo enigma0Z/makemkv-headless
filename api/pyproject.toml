@@ -1,7 +1,7 @@
 [project]
-version = "0.0.2"
+version = "0.0.2.dev42"
 requires-python = ">= 3.14"
-name = "makemkv-headless-api"
+name = "makemkv-headless"
 dependencies = [
  "fastapi>=0.135.3",
  "pydantic>=2.12.5",
@@ -42,21 +42,14 @@ Repository = "https://github.com/enigma0Z/makemkv-headless.git"
 Changelog = "https://github.com/enigma0Z/makemkv-headless/blob/main/CHANGELOG.md"
 
 [project.scripts]
-mmh_api = "makemkv_headless_api.__main__:main"
+mmh = "makemkv_headless_api.__main__:main"
 
 [build-system]
 requires = ["uv_build >= 0.11.6, < 0.12"]
 build-backend = "uv_build"
 
-# [tool.hatch.version]
-# path = 'VERSION'
-# pattern = "^(?P<version>.+)$"
-
-# [tool.hatch.build.targets.wheel]
-# ignore-vcs = true
-# artifacts = [
-#   "*.js", 
-#   "*.html", 
-#   "ui/dist/**/*"
-# ]
-# packages = ["src/makemkv_headless_api"]
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true

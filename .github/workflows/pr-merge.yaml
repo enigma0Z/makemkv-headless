@@ -1,4 +1,4 @@
-name: PR Merge Handler
+name: PR - Merge
 
 on:
   pull_request:

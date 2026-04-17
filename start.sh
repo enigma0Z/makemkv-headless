@@ -18,7 +18,7 @@ fi
 
 if [[ "$SCREEN" == "true" ]]; then
   set -x
-  screen -dmS mmh-api-$API_PORT uv --project api run mmh_api --listen-port $API_PORT "$@"
+  screen -dmS mmh-api-$API_PORT uv --project api run mmh --listen-port $API_PORT "$@"
   set +x
 elif [[ "$DEV" == "true" ]]; then
   WEB_PID=""
@@ -32,7 +32,7 @@ elif [[ "$DEV" == "true" ]]; then
   }
 
   uv --project api sync
-  uv --project api run mmh_api \
+  uv --project api run mmh \
     --listen-port $API_PORT "$@" \
     --cors-origin http://127.0.0.1:3000 \
     --cors-origin http://localhost:3000 &
@@ -48,5 +48,5 @@ elif [[ "$DEV" == "true" ]]; then
   wait $API_PID 
   wait $WEB_PID
 else
-  uv --project api run mmh_api "$@"
+  uv --project api run mmh "$@"
 fi
