@@ -45,7 +45,7 @@ jobs:
 
       - name: Publish to PyPi
         id: publsh-to-pypi
-        if: ${{ steps.bump-version.outcome.version-bumped == 'true' }}
+        if: ${{ steps.bump-version.outputs.version-bumped == 'true' }}
         working-directory: api
         run: uv publish
 
