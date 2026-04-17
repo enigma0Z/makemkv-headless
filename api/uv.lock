@@ -139,7 +139,7 @@ wheels = [
 
 [[package]]
 name = "makemkv-headless"
-version = "0.0.2"
+version = "0.0.3.dev1"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
