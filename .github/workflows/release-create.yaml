@@ -35,7 +35,8 @@ jobs:
           update_log=$(mktemp)
 
           uv version --bump stable | tee $update_log
-          echo "update-message=$(tail -n1 $update_log)"
+          echo "new-version=$(uv version --short)" >> $GITHUB_OUTPUT
+          echo "update-message=$(tail -n1 $update_log)" >> $GITHUB_OUTPUT
           
       - name: Build and test
         uses: ./.github/actions/build-and-test-python
