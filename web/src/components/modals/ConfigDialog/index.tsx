@@ -1,11 +1,11 @@
 import { Button, Dialog, IconButton, TextField, Typography } from "@mui/material"
-import { ConfigDialogActions, ConfigDialogContent, ConfigDialogTitle } from "./ConfigDialog.styles"
 
 import RefreshIcon from '@mui/icons-material/Refresh';
 import CloseIcon from '@mui/icons-material/Close';
 import { useGetConfigQuery, useReloadConfigQuery } from "@/api/v1/config/api";
 import { useEffect, useState } from "react";
 import type { Config } from "@/api/v1/config/types";
+import { ConfigDialogActions, ConfigDialogContent, ConfigDialogTitle } from "./index.styles";
 
 type Props = {
   open: boolean
