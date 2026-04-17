@@ -1,0 +1,64 @@
+name: Release - Create
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # To create a release
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      UV_PUBLISH_USERNAME: __token__
+      UV_PUBLISH_TOKEN: ${{ secrets.UV_PUBLISH_TOKEN }}
+      GIT_AUTHOR_NAME: "github-actions[bot]"
+      GIT_AUTHOR_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - uses: ./.github/actions/build-and-test-python
+        with:
+          project: api
+
+      - name: Version Bump (to stable)
+        id: bump-version
+        working-directory: api
+        run: |
+          update_log=$(mktemp)
+          uv version --bump stable | tee $update_log
+          
+          if ! git diff-files --quiet; then
+            echo "version-bumped=true" >> $GITHUB_OUTPUT
+            echo "new-version=$(uv --project api version --short)" >> $GITHUB_OUTPUT
+            
+            # Push release commit
+            git add -A .
+            git commit -am "Version bump $(tail -n1 $update_log)"
+            git push
+          else
+            echo "version-bumped=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish to PyPi
+        id: publsh-to-pypi
+        if: ${{ steps.bump-version.outcome.version-bumped == 'true' }}
+        working-directory: api
+        run: uv publish
+
+      - name: Create GitHub release
+        id: publish-to-github
+        if: ${{ steps.bump-version.outputs.version-bumped == 'true' }}
+        run: |
+          # Get new version
+          new_version=$(uv --project api version --short)
+
+          gh release create "${{ steps.bump-version.outputs.new-version }}" --generate-notes
+          gh release upload "${{ steps.bump-version.outputs.new-version }}" api/dist/*.whl
+
+          # Update latest tag
+          git tag latest
+          git push -f --tags
