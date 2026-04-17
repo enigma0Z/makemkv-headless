@@ -47,3 +47,7 @@ web/dist:
 .PHONY: run-dev
 run-dev:
 	./start.sh dev 4000 3000
+
+.PHONY: release
+release:
+	gh workflow run --ref main release-create.yaml
