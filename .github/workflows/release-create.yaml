@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  create-release:
+  release-create:
     runs-on: ubuntu-latest
     permissions:
       contents: write # To create a release
@@ -70,8 +70,8 @@ jobs:
           # Get new version
           new_version=$(uv --project api version --short)
 
-          gh release create "${{ steps.release-commit.outputs.new-version }}" --generate-notes
-          gh release upload "${{ steps.release-commit.outputs.new-version }}" api/dist/*
+          gh release create "${{ steps.bump-version.outputs.new-version }}" --generate-notes
+          gh release upload "${{ steps.bump-version.outputs.new-version }}" api/dist/*
 
           # Update latest tag
           git tag --force latest
