@@ -1,5 +1,5 @@
 import { Button, Dialog, IconButton, Typography } from "@mui/material";
-import { ErrorDialogActions, ErrorDialogContent, ErrorDialogTitle } from "./ErrorDialog.styles";
+import { ErrorDialogActions, ErrorDialogContent, ErrorDialogTitle } from "./index.styles";
 
 import CloseIcon from '@mui/icons-material/Close';
 import type { ApiError } from "@/api/v1/error/types";

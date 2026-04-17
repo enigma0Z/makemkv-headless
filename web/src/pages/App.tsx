@@ -11,7 +11,7 @@ import { StatusScroller } from '@/components/status/StatusScroller'
 import { TocGrid } from '@/components/toc/TocGrid'
 import { useGetStateByPathQuery } from '@/api/v1/state/api'
 import { useGetErrorQuery } from '@/api/v1/error/api'
-import { ErrorDialog } from '@/components/modals/ErrorDialog/ErrorDialog'
+import { ErrorDialog } from '@/components/modals/ErrorDialog'
 import { socketConnect } from '@/api/v1/socket/middleware'
 
 function App() {
