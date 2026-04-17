@@ -55,14 +55,22 @@ class Config(ConfigModel):
 
   def update(
       self, **kwargs: dict | ConfigModel
-  ):
-    '''Sets the specified config values'''
+  ) -> bool:
+    '''
+    Sets the specified config values.  Returns true if the update requires a
+    server restart
+    '''
+    require_restart = False
     if isinstance(kwargs, dict):
       for key in kwargs:
         self.__dict__[key] = kwargs[key]
     elif isinstance(kwargs, ConfigModel):
       for key, value in cast(kwargs, ConfigModel).model_dump().items():
+        if ConfigModel.model_fields[key].json_schema_extra['requires_restart']:
+          require_restart = True
         setattr(self, key, value)
+
+    return require_restart
 
   def update_from_file(self, config_file: str = None):
     if (config_file == None):
@@ -108,5 +116,12 @@ class Config(ConfigModel):
 
     if self.destination is not None and self.destination.startswith('.'):
       self.destination = abspath(self.destination) + "/"
+
+  def write_config_file(self):
+    with open(self.config_file, 'r') as file:
+      if self.config_file.endswith('.json'):
+        print(self.model_dump(mode='json'), file=file)
+      elif self.config_file.endswith('.yaml'):
+        print(yaml.dump(self.model_dump()), file=file)
 
 CONFIG = Config()
