@@ -23,15 +23,22 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      - name: Install uv
+        id: install-uv
+        shell: bash
+        run: make install-uv
+
       - name: Version Bump (to stable)
         id: bump-version
         working-directory: api
         run: |
           update_log=$(mktemp)
+
           uv version --bump stable | tee $update_log
           echo "update-message=$(tail -n1 $update_log)"
           
-      - uses: ./.github/actions/build-and-test-python
+      - name: Build and test
+        uses: ./.github/actions/build-and-test-python
         with:
           project: api
 
