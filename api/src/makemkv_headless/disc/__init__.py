@@ -6,10 +6,10 @@ import time
 
 from sys import platform
 
-from makemkv_headless_api.config import CONFIG
-from makemkv_headless_api.interface import get_interface
-from makemkv_headless_api.interface.target import Target
-from makemkv_headless_api.util import cmd, grep, notify
+from makemkv_headless.config import CONFIG
+from makemkv_headless.interface import get_interface
+from makemkv_headless.interface.target import Target
+from makemkv_headless.util import cmd, grep, notify
 
 def disc_inserted(source):
   if source.startswith('dev'):

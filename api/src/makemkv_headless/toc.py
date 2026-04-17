@@ -3,17 +3,17 @@
 import re
 from traceback import format_exc
 
-from makemkv_headless_api.config import CONFIG
-from makemkv_headless_api.interface import get_interface
-from makemkv_headless_api.interface.base_interface import BaseInterface
-from makemkv_headless_api.interface.target import Target
+from makemkv_headless.config import CONFIG
+from makemkv_headless.interface import get_interface
+from makemkv_headless.interface.base_interface import BaseInterface
+from makemkv_headless.interface.target import Target
 
 import logging
 
-from makemkv_headless_api.models.makemkv import from_raw
-from makemkv_headless_api.models.socket import mkv_message_from_raw
-from makemkv_headless_api.models.toc import BaseInfoModel, SourceInfoModel, TocStateModel, TitleInfoModel, TrackInfoModel
-from makemkv_headless_api.util import cmd
+from makemkv_headless.models.makemkv import from_raw
+from makemkv_headless.models.socket import mkv_message_from_raw
+from makemkv_headless.models.toc import BaseInfoModel, SourceInfoModel, TocStateModel, TitleInfoModel, TrackInfoModel
+from makemkv_headless.util import cmd
 logger = logging.getLogger(__name__)
 
 failure_statuses = [

@@ -10,16 +10,16 @@ from string import ascii_lowercase
 
 from pydantic import PrivateAttr
 
-from makemkv_headless_api.interface.base_interface import BaseInterface
-from makemkv_headless_api.interface.target import Target
-from makemkv_headless_api.models.sort import ShowInfoModel, SortInfoModel
+from makemkv_headless.interface.base_interface import BaseInterface
+from makemkv_headless.interface.target import Target
+from makemkv_headless.models.sort import ShowInfoModel, SortInfoModel
 
 
-from makemkv_headless_api import features
-from makemkv_headless_api.interface import get_interface
-from makemkv_headless_api.mkvtoolnix import split_mkv
-from makemkv_headless_api.toc import Toc
-from makemkv_headless_api.util import rsync, sanitize
+from makemkv_headless import features
+from makemkv_headless.interface import get_interface
+from makemkv_headless.mkvtoolnix import split_mkv
+from makemkv_headless.toc import Toc
+from makemkv_headless.util import rsync, sanitize
 
 class SortInfo(SortInfoModel):
   # Initialize to -1 to prevent oboe with next_file()

@@ -3,13 +3,13 @@
 from asyncio import QueueShutDown, create_task
 from asyncio.queues import Queue
 
-from makemkv_headless_api.api.socket import SocketConnectionManager
-from makemkv_headless_api.api.state import STATE
-from makemkv_headless_api.interface.base_interface import BaseInterface
+from makemkv_headless.api.socket import SocketConnectionManager
+from makemkv_headless.api.state import STATE
+from makemkv_headless.interface.base_interface import BaseInterface
 
-from makemkv_headless_api.interface.target import Target
-from makemkv_headless_api.models.makemkv import from_raw
-from makemkv_headless_api.models.socket import CurrentProgressMessage, LogMessage, ProgressMessage, ProgressValueMessage, RipStartStopMessage, SocketMessage, TotalProgressMessage, mkv_message_from_raw
+from makemkv_headless.interface.target import Target
+from makemkv_headless.models.makemkv import from_raw
+from makemkv_headless.models.socket import CurrentProgressMessage, LogMessage, ProgressMessage, ProgressValueMessage, RipStartStopMessage, SocketMessage, TotalProgressMessage, mkv_message_from_raw
 
 import logging
 logger = logging.getLogger(__name__)

@@ -1,7 +1,7 @@
 import logging
 
-from makemkv_headless_api.api.socket import socket
-from makemkv_headless_api.models import socket as model
+from makemkv_headless.api.socket import socket
+from makemkv_headless.models import socket as model
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 

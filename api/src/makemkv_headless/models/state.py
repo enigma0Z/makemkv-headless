@@ -3,8 +3,8 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from makemkv_headless_api.models.tmdb import TMDBMovieSearchResultModel, TMDBShowSearchResultModel
-from makemkv_headless_api.models.toc import TocStateModel
+from makemkv_headless.models.tmdb import TMDBMovieSearchResultModel, TMDBShowSearchResultModel
+from makemkv_headless.models.toc import TocStateModel
 
 type StatusMessage = Literal[
   "Scanning CD-ROM devices",

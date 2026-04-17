@@ -18,9 +18,9 @@ import subprocess
 import logging
 from typing import Any, Callable
 
-from makemkv_headless_api.interface.base_interface import BaseInterface
-from makemkv_headless_api.interface.target import Target
-from makemkv_headless_api.models.socket import CurrentProgressMessage, LogMessage
+from makemkv_headless.interface.base_interface import BaseInterface
+from makemkv_headless.interface.target import Target
+from makemkv_headless.models.socket import CurrentProgressMessage, LogMessage
 logger = logging.getLogger(__name__)
 
 def grep(term, lines):

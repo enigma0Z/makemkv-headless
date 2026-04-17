@@ -6,7 +6,7 @@ import logging
 
 from pydantic import BaseModel
 
-from makemkv_headless_api.interface.target import Target
+from makemkv_headless.interface.target import Target
 logger = logging.getLogger(__name__)
 
 class BaseInterface(ABC):

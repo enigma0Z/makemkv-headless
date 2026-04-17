@@ -7,7 +7,7 @@ from sys import argv
 
 from os.path import abspath
 
-from makemkv_headless_api.models.config import ConfigModel, LogLevelStr
+from makemkv_headless.models.config import ConfigModel, LogLevelStr
 
 class Config(ConfigModel):
   keys: list[str] = []

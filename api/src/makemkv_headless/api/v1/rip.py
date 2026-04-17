@@ -5,14 +5,14 @@ import os
 from fastapi import APIRouter, BackgroundTasks
 from pydantic import BaseModel
 
-from makemkv_headless_api.api.api_response import GenericAPIError, APIException, APIResponse
-from makemkv_headless_api.api.state import STATE
-from makemkv_headless_api.config import CONFIG
-from makemkv_headless_api.interface import get_interface
-from makemkv_headless_api.models.socket import RipStartStopMessage
-from makemkv_headless_api.rip_titles.asyncio import rip_titles
-from makemkv_headless_api.sort import ShowInfo, SortInfo
-from makemkv_headless_api.toc import Toc
+from makemkv_headless.api.api_response import GenericAPIError, APIException, APIResponse
+from makemkv_headless.api.state import STATE
+from makemkv_headless.config import CONFIG
+from makemkv_headless.interface import get_interface
+from makemkv_headless.models.socket import RipStartStopMessage
+from makemkv_headless.rip_titles.asyncio import rip_titles
+from makemkv_headless.sort import ShowInfo, SortInfo
+from makemkv_headless.toc import Toc
 
 class RequestModel(BaseModel):
   destination: str

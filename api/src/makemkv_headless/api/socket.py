@@ -1,7 +1,7 @@
 import logging
 from fastapi import WebSocket, WebSocketDisconnect
 
-from makemkv_headless_api.models import socket as model
+from makemkv_headless.models import socket as model
 
 logger = logging.getLogger(__name__)
 
