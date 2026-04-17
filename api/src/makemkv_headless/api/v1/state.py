@@ -4,12 +4,12 @@ from math import ceil
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from makemkv_headless_api.api.api_response import GenericAPIError, APIResponse, PaginatedAPIResponse
+from makemkv_headless.api.api_response import GenericAPIError, APIResponse, PaginatedAPIResponse
 
 import logging
 
-from makemkv_headless_api.api.state import STATE
-from makemkv_headless_api.models.state import StateModel
+from makemkv_headless.api.state import STATE
+from makemkv_headless.models.state import StateModel
 logger = logging.getLogger(__name__)
 
 class RequestModel(BaseModel):

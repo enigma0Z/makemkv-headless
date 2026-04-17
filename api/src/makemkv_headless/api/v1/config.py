@@ -1,7 +1,7 @@
 import logging
 from fastapi import APIRouter
-from makemkv_headless_api.api.api_response import APIResponse
-from makemkv_headless_api.config import CONFIG
+from makemkv_headless.api.api_response import APIResponse
+from makemkv_headless.config import CONFIG
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/config")

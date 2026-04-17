@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
-from makemkv_headless_api.api.api_response import APIResponse
-from makemkv_headless_api.api.state import STATE
+from makemkv_headless.api.api_response import APIResponse
+from makemkv_headless.api.state import STATE
 
 router = APIRouter(prefix="/error")
 

@@ -2,8 +2,8 @@ import json
 from unittest import TestCase
 from unittest.mock import DEFAULT, MagicMock, patch
 
-from makemkv_headless_api.sort import ShowInfo, SortInfo, sort_titles
-from makemkv_headless_api.toc import Toc
+from makemkv_headless.sort import ShowInfo, SortInfo, sort_titles
+from makemkv_headless.toc import Toc
 
 from test.data.toc_test_data import generate_CINFO, generate_SINFO, generate_TINFO
 

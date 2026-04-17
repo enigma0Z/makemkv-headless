@@ -33,8 +33,8 @@ clean: clean-api clean-web clean-dist
 .PHONY: api
 api: api/dist
 api/dist: web/dist
-	mkdir -p api/src/makemkv_headless_api/ui
-	cp -rv web/dist api/src/makemkv_headless_api/ui
+	mkdir -p api/src/makemkv_headless/ui
+	cp -rv web/dist api/src/makemkv_headless/ui
 	cd api && uv sync && uv build
 
 .PHONY: web

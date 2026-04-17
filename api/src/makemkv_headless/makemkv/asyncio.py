@@ -2,14 +2,14 @@
 
 import logging
 
-from makemkv_headless_api.interface import get_interface
-from makemkv_headless_api.interface.target import Target
-from makemkv_headless_api.models.socket import RipStartStopMessage, mkv_message_from_raw
+from makemkv_headless.interface import get_interface
+from makemkv_headless.interface.target import Target
+from makemkv_headless.models.socket import RipStartStopMessage, mkv_message_from_raw
 logger = logging.getLogger(__name__)
 
-from makemkv_headless_api.config import CONFIG
-from makemkv_headless_api.disc import wait_for_disc_inserted
-from makemkv_headless_api.util import cmd
+from makemkv_headless.config import CONFIG
+from makemkv_headless.disc import wait_for_disc_inserted
+from makemkv_headless.util import cmd
 
 async def rip_disc(
     source, 

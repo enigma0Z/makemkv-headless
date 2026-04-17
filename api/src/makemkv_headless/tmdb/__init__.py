@@ -4,9 +4,9 @@ import logging
 from typing import Any
 import requests
 
-from makemkv_headless_api.api.api_response import APIException, GenericAPIError
-from makemkv_headless_api.config import CONFIG
-from makemkv_headless_api.models.tmdb import TMDBConfigurationModel, TMDBMovieSearchResultModel, TMDBShowSearchResultModel
+from makemkv_headless.api.api_response import APIException, GenericAPIError
+from makemkv_headless.config import CONFIG
+from makemkv_headless.models.tmdb import TMDBConfigurationModel, TMDBMovieSearchResultModel, TMDBShowSearchResultModel
 
 logger = logging.getLogger(__name__)
 

@@ -3,8 +3,8 @@ import uvicorn
 
 from argparse import ArgumentParser
 from sys import exit, argv
-from makemkv_headless_api.config import CONFIG
-from makemkv_headless_api.models.config import ConfigModel
+from makemkv_headless.config import CONFIG
+from makemkv_headless.models.config import ConfigModel
 
 def main():
   # parser = ArgumentParser()
@@ -53,7 +53,7 @@ def main():
   logger = logging.getLogger(__name__)
 
   CONFIG.normalize_paths()
-  from makemkv_headless_api.api import app
+  from makemkv_headless.api import app
   logger.info(f'Starting app {app} with config {CONFIG}')
   uvicorn.run(app, host="0.0.0.0", port=CONFIG.listen_port) 
 
