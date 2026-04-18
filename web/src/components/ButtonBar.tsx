@@ -5,15 +5,16 @@ import { tocActions } from "@/api/v1/toc/store";
 import { ConfirmationDialog } from "./ConfirmationModal";
 import { useState } from "react";
 
-import MenuIcon from '@mui/icons-material/Menu';
 import EjectIcon from '@mui/icons-material/Eject';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { StatusWrapper } from "./ButtonBar.styles";
 import { endpoints, type ApiModel } from "@/api/endpoints";
 import { ripActions } from "@/api/v1/rip/store";
 import { uniqueFilter } from "@/util/array";
+import { ConfigDialog } from "./modals/ConfigDialog";
 
 type Props = {}
 
@@ -35,6 +36,7 @@ export const ButtonBar = ({ }: Props) => {
   const tocLoading = useAppSelector((state) => state.toc.loading)
 
   const [cancelModalOpen, setCancelModalOpen] = useState<boolean>(false)
+  const [configDialogOpen, setConfigDialogOpen] = useState<boolean>(false)
 
   let current_progress: SocketProgress | undefined
   if (socketRipState.current_title !== null && socketRipState.current_title !== undefined) {
@@ -86,12 +88,22 @@ export const ButtonBar = ({ }: Props) => {
     }
   }
 
+  const handleConfigDialogOpen = () => {
+    setConfigDialogOpen(true)
+  }
+
+  const handleConfigDialogClose = () => {
+    setConfigDialogOpen(false)
+  }
+
   return <>
     <AppBar>
       <Toolbar>
         <Tooltip title="Menu">
-          <IconButton>
-            <MenuIcon />
+          <IconButton
+            onClick={handleConfigDialogOpen}
+          >
+            <SettingsIcon />
           </IconButton>
         </Tooltip>
         <Tooltip title="Eject Disc">
@@ -122,13 +134,6 @@ export const ButtonBar = ({ }: Props) => {
             : "Start Rip"
           }
         </Button>
-        <ConfirmationDialog
-          open={cancelModalOpen}
-          onClose={() => { setCancelModalOpen(false) }}
-          onConfirm={() => { handleCancelRip() }}
-          title={'Cancel Rip?'}
-          message={'This disc will not get uploaded if it is cancelled now'}
-        />
       </Toolbar>
       {socketRipState?.total_status && <StatusWrapper>
         <Typography variant="caption">
@@ -154,6 +159,17 @@ export const ButtonBar = ({ }: Props) => {
         </>}
       </StatusWrapper>}
     </AppBar>
+    <ConfirmationDialog
+      open={cancelModalOpen}
+      onClose={() => { setCancelModalOpen(false) }}
+      onConfirm={() => { handleCancelRip() }}
+      title={'Cancel Rip?'}
+      message={'This disc will not get uploaded if it is cancelled now'}
+    />
+    <ConfigDialog
+      open={configDialogOpen}
+      onClose={handleConfigDialogClose}
+    />
     <div style={{ height: socketRipState?.total_status ? "8rem" : "4rem" }} />
   </>
 }

@@ -4,14 +4,11 @@ import logging
 import yaml
 from sys import argv
 
-from typing import cast
-
 from os.path import abspath
 
-from makemkv_headless.models.config import ConfigModel, LogLevelStr
+from makemkv_headless.models.config import ConfigModel
 
 class Config(ConfigModel):
-  keys: list[str] = []
   _parser: ArgumentParser
 
   def __str__(self):
@@ -46,29 +43,23 @@ class Config(ConfigModel):
       if opt is not None:
         setattr(CONFIG, key, opt)
 
-  def overwrite(
-      self, **kwargs
-  ):
-    '''Initialize all config values specified, set unspecified values to None'''
-    for key in Config.keys:
-      self.__dict__[key] = kwargs[key] if key in kwargs else None
-
   def update(
-      self, **kwargs: dict | ConfigModel
+      self, /, *, config_model: ConfigModel = None, **kwargs: dict | ConfigModel
   ) -> bool:
     '''
     Sets the specified config values.  Returns true if the update requires a
     server restart
     '''
     require_restart = False
-    if isinstance(kwargs, dict):
+    if config_model is not None:
+      for key, value in config_model.model_dump().items():
+        if value != ConfigModel.model_fields[key].default:
+          if ConfigModel.model_fields[key].json_schema_extra['requires_restart']:
+            require_restart = True
+          setattr(self, key, value)
+    else:
       for key in kwargs:
         self.__dict__[key] = kwargs[key]
-    elif isinstance(kwargs, ConfigModel):
-      for key, value in cast(kwargs, ConfigModel).model_dump().items():
-        if ConfigModel.model_fields[key].json_schema_extra['requires_restart']:
-          require_restart = True
-        setattr(self, key, value)
 
     return require_restart
 
@@ -118,7 +109,9 @@ class Config(ConfigModel):
       self.destination = abspath(self.destination) + "/"
 
   def write_config_file(self):
-    with open(self.config_file, 'r') as file:
+    self.normalize_paths()
+    logging.info(f"Writing config file with data {self.model_dump()}")
+    with open(self.config_file, 'w') as file:
       if self.config_file.endswith('.json'):
         print(self.model_dump(mode='json'), file=file)
       elif self.config_file.endswith('.yaml'):

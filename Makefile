@@ -45,7 +45,7 @@ web/dist:
 .DEFAULT_GOAL := all
 
 .PHONY: run-dev
-run-dev:
+run-dev: 
 	./start.sh dev 4000 3000
 
 .PHONY: release

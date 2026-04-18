@@ -40,7 +40,6 @@ elif [[ "$DEV" == "true" ]]; then
 
   export VITE_BACKEND_PORT=$API_PORT
   cd web
-  npm ci
   npm run dev -- --port 3000
   WEB_PID=$!
 

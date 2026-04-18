@@ -15,8 +15,9 @@ async def get_config():
 @router.put('')
 @router.put('/')
 async def put_config(config: ConfigModel):
-  CONFIG.update(config)
-  
+  CONFIG.update(config_model=config)
+  CONFIG.write_config_file()
+  return APIResponse(status="success", data=CONFIG)
 
 @router.get('.reload')
 def get_config_reload():

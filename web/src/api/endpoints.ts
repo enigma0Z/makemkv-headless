@@ -59,8 +59,12 @@ export const endpointsV1 = {
   },
   config: {
     get: () => `/api/v1/config`,
-    put: () => `/api/v1/config`,
-    reload: () => `/api/v1/config.reload`
+    put: () => (body: Partial<Config>) => ({
+      url: '/api/v1/config',
+      method: 'PUT',
+      body
+    }),
+    reload: () => () => `/api/v1/config.reload`
   },
   error: {
     get: () => `/api/v1/error`,

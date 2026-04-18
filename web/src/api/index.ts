@@ -32,7 +32,7 @@ const updateRipStateOnApi = throttle(async (ripState: RipState) => {
 }, 500, { leading: false, trailing: true })
 
 export const api = createApi({
-  tagTypes: ['error'],
+  tagTypes: ['error', 'config'],
   baseQuery: fetchBaseQuery({ baseUrl: BACKEND }),
   endpoints: () => ({}),
 })
