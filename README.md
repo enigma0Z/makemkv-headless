@@ -17,69 +17,22 @@ A headless interface for [makemkv](https://makemkv.com).
 
 ### Prerequisites
 
-* [uv](https://docs.astral.sh/uv/getting-started/installation/)
-* [node](https://nodejs.org/en/download)
+* [Python 3.14](https://www.python.org/downloads/)
 * [makemkv](https://makemkv.com/download/)
+* [pipx](https://pipx.pypa.io/stable/how-to/install-pipx/) (not required but very useful)
 
-### Building everything
-
-```bash
-make clean && make
-```
-
-### API only
+### Installing makemkv-headless
 
 ```bash
-cd api && uv sync
+pipx install --python 3.14 makemkv-headless
 ```
 
-### CLI (deprecated)
+## Running
 
 ```bash
-cd cli && uv sync
+mmh --help
 ```
 
-### WEB
-
-```bash
-cd web && npm install
-```
-
-## Setup
-
-1. Copy `config.example.yaml` to `config.yaml`
-2. Get your own [TMDB API key](https://developer.themoviedb.org/docs/getting-started) and put it in here 
-
-## Running everything
-
-### From source
-
-```bash
-make clean all
-./start.sh --ui-path web/dist # api options; use --help to see what there is
-```
-
-### In production-ish
-
-This part is not yet done, but we can do it from built source
-
-```bash
-make clean all
-./start.sh screen <listen port> # api options ...
-```
-
-If you give `start.sh` `screen` and a port it will run in a screen session and
-give you back your terminal.
-
-### In development
-
-This starts the frontend server in development mode, and in the future will also
-start the backend in development mode too (watch files mode), but we're not
-there yet.  The two numbers after `dev` are the API and WEB ports, which are
-separated so that we can run the frontend dynamically.  You'll still get a UI on
-the API port as well, so be wary about that.
-
-```bash
-make clean all
-./start.sh dev 4000 3000 # API options
-```
+You can now access the UI from a web browser at http://127.0.0.1:4000.  Running
+on a remote system may potentially require setting cors origins depending on
+your setup, but for most basic setups it probably isn't required.
