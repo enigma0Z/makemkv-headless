@@ -23,11 +23,14 @@ class JsonSchemaExtra(BaseModel):
   cli_argument: CliArgument
   environment_var: Optional[str] = None
 
+  # Server requires a restart for this change to take effect
+  requires_restart: bool = False 
+
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
 class ConfigModel(BaseModel):
-  config_file: str | None = Field(
+  config_file: str = Field(
     default='./config.yaml', 
     json_schema_extra=JsonSchemaExtra(
       cli_argument=CliArgument(
@@ -73,6 +76,7 @@ class ConfigModel(BaseModel):
     )
   ).model_dump())
   log_level: LogLevelStr = Field(default='INFO', json_schema_extra=JsonSchemaExtra(
+    requires_restart=True,
     cli_argument=CliArgument(
       args=['--log-level'],
       kwargs=ParserKwargs(
@@ -81,6 +85,7 @@ class ConfigModel(BaseModel):
     )
   ).model_dump())
   log_file: str = Field(default='api.log', json_schema_extra=JsonSchemaExtra(
+    requires_restart=True,
     cli_argument=CliArgument(
       args=['--log-file'],
       kwargs=ParserKwargs(
@@ -97,6 +102,7 @@ class ConfigModel(BaseModel):
     )
   ).model_dump())
   frontend: str | None = Field(default=None, json_schema_extra=JsonSchemaExtra(
+    requires_restart=True,
     cli_argument=CliArgument(
       args=['--frontend'],
       kwargs=ParserKwargs(
@@ -105,6 +111,7 @@ class ConfigModel(BaseModel):
     )
   ).model_dump())
   listen_port: int = Field(default=4000, json_schema_extra=JsonSchemaExtra(
+    requires_restart=True,
     cli_argument=CliArgument(
       args=['--listen-port'],
       kwargs=ParserKwargs(
@@ -114,6 +121,7 @@ class ConfigModel(BaseModel):
     )
   ).model_dump())
   cors_origins: list[str] = Field(default=[], json_schema_extra=JsonSchemaExtra(
+    requires_restart=True,
     cli_argument=CliArgument(
       args=['--cors-origin'],
       kwargs=ParserKwargs(

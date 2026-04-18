@@ -21,3 +21,5 @@ start-all.sh
 
 **/.venv*/
 **/dist/
+
+**/*.bak

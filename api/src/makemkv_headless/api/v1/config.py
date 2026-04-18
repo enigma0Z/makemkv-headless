@@ -2,6 +2,7 @@ import logging
 from fastapi import APIRouter
 from makemkv_headless.api.api_response import APIResponse
 from makemkv_headless.config import CONFIG
+from makemkv_headless.models.config import ConfigModel
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/config")
@@ -9,6 +10,13 @@ router = APIRouter(prefix="/config")
 @router.get('')
 @router.get('/')
 async def get_config():
+  return APIResponse(status="success", data=CONFIG)
+
+@router.put('')
+@router.put('/')
+async def put_config(config: ConfigModel):
+  CONFIG.update(config_model=config)
+  CONFIG.write_config_file()
   return APIResponse(status="success", data=CONFIG)
 
 @router.get('.reload')
