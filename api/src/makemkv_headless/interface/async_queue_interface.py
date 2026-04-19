@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from asyncio import QueueShutDown, create_task
+from asyncio import create_task
 from asyncio.queues import Queue
 
 from makemkv_headless.api.socket import SocketConnectionManager
@@ -10,6 +10,11 @@ from makemkv_headless.interface.base_interface import BaseInterface
 from makemkv_headless.interface.target import Target
 from makemkv_headless.models.makemkv import from_raw
 from makemkv_headless.models.socket import CurrentProgressMessage, LogMessage, ProgressMessage, ProgressValueMessage, RipStartStopMessage, SocketMessage, TotalProgressMessage, mkv_message_from_raw
+
+from sys import version_info
+
+if version_info >= (3, 13):
+  from asyncio.queues import QueueShutDown
 
 import logging
 logger = logging.getLogger(__name__)
@@ -119,12 +124,13 @@ class AsyncQueueInterface(BaseInterface):
         message = await self.queue.get()
         if isinstance(message, SocketMessage):
           await self.socket.broadcast(message)
-      except QueueShutDown as ex:
-        logger.debug(f'{hex(id(self))} run(): Shutting Down {ex}')
-        logger.debug(ex)
-        return
       except Exception as ex:
-        logger.error(f'Unhandled exception in async_queue_interface.py:run()')
-        logger.error(ex)
+        if version_info >= (3, 13) and isinstance(ex, QueueShutDown):
+          logger.debug(f'{hex(id(self))} run(): Shutting Down {ex}')
+          logger.debug(ex)
+          return
+        else:
+          logger.error(f'Unhandled exception in async_queue_interface.py:run()')
+          logger.error(ex)
 
 INTERFACE = AsyncQueueInterface()
