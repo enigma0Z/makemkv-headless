@@ -17,14 +17,15 @@ A headless interface for [makemkv](https://makemkv.com).
 
 ### Prerequisites
 
-* [Python 3.14](https://www.python.org/downloads/)
+* [Python 3.12](https://www.python.org/downloads/)
 * [makemkv](https://makemkv.com/download/)
-* [pipx](https://pipx.pypa.io/stable/how-to/install-pipx/) (not required but very useful)
+* [pipx](https://pipx.pypa.io/stable/how-to/install-pipx/) (not required but
+  very useful)
 
 ### Installing makemkv-headless
 
 ```bash
-pipx install --python 3.14 makemkv-headless
+pipx install makemkv-headless
 ```
 
 ## Running
