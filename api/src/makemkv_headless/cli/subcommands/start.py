@@ -27,10 +27,10 @@ def main(opts: Namespace):
       log_config['handlers']['default']['filename'] = CONFIG.log_file
 
   # Erase log file
-  open(CONFIG.log_file, 'w').close()
+  if CONFIG.log_file:
+    open(CONFIG.log_file, 'w').close()
 
   logging.config.dictConfig(log_config)
-
   logger = logging.getLogger(__name__)
 
   CONFIG.normalize_paths()
