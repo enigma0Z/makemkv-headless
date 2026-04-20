@@ -1,5 +1,5 @@
 
-from argparse import ArgumentParser, Namespace
+from argparse import Namespace
 import logging
 from sys import argv
 import uvicorn
@@ -34,4 +34,16 @@ def main(opts: Namespace):
 
 parser = subparsers.add_parser('start', help='Start the makemkv headless server')
 parser.set_defaults(func=main)
-CONFIG.initialize_parser(parser)
+
+CONFIG.initialize_parser(parser) # Add CLI-aligned options to parser
+
+parser.add_argument(
+  '--daemon', '-D',
+  help='Start a daemon & exit',
+  action='store_true'
+)
+parser.add_argument(
+  '--pid-file', 
+  help='The PID file to store the daemon pid in',
+  default=f'{argv[0]}.pid'
+)
