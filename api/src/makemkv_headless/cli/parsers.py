@@ -1,5 +1,4 @@
 from argparse import ArgumentParser
-
 from sys import exit
 
 def default(*args):
@@ -8,4 +7,5 @@ def default(*args):
 
 top_level_parser = ArgumentParser(prog='mmh')
 top_level_parser.set_defaults(func=default)
+
 subparsers = top_level_parser.add_subparsers()

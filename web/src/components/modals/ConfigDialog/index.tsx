@@ -3,7 +3,7 @@ import { Button, Dialog, IconButton, TextField, Typography } from "@mui/material
 import RefreshIcon from '@mui/icons-material/Refresh';
 import CloseIcon from '@mui/icons-material/Close';
 import { useGetConfigQuery, usePutConfigMutation, useReloadConfigMutation } from "@/api/v1/config/api";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Config } from "@/api/v1/config/types";
 import { ConfigDialogActions, ConfigDialogContent, ConfigDialogTitle } from "./index.styles";
 
@@ -13,7 +13,7 @@ type Props = {
 }
 
 export const ConfigDialog = ({ open, onClose = () => {} }: Props) => {
-  const { data, refetch, isLoading, isSuccess } = useGetConfigQuery()
+  const { data, isLoading, isSuccess } = useGetConfigQuery()
   const [putConfig, _putConfigResult] = usePutConfigMutation()
   const [reloadConfig, _reloadConfigResult] = useReloadConfigMutation()
 
@@ -24,7 +24,7 @@ export const ConfigDialog = ({ open, onClose = () => {} }: Props) => {
   const destination = formData?.destination ?? data?.destination ?? '';
   const tmdb_token = formData?.tmdb_token ?? data?.tmdb_token ?? '';
   const makemkvcon_path = formData?.makemkvcon_path ?? data?.makemkvcon_path ?? '';
-  const log_level = formData?.log_level ?? data?.log_level ?? '';
+  // const log_level = formData?.log_level ?? data?.log_level ?? '';
   const log_file = formData?.log_file ?? data?.log_file ?? '';
   const temp_prefix = formData?.temp_prefix ?? data?.temp_prefix ?? '';
   const frontend = formData?.frontend ?? data?.frontend ?? '';

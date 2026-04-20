@@ -1,8 +1,7 @@
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 import json
 import logging
 import yaml
-from sys import argv
 
 from os.path import abspath
 
@@ -17,17 +16,14 @@ class Config(ConfigModel):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
-    self._parser = ArgumentParser()
-
+  @staticmethod
+  def initialize_parser(parser: ArgumentParser):
     for (_, value) in ConfigModel.model_fields.items():
       args = value.json_schema_extra['cli_argument']['args']
       kwargs = value.json_schema_extra['cli_argument']['kwargs']
-      self._parser.add_argument(*args, **kwargs)
+      parser.add_argument(*args, **kwargs)
 
-  def load(self):
-
-    opts = self._parser.parse_args(argv[1:])
-
+  def load(self, opts: Namespace):
     # Load config file into opts
     if ('config_file' in opts and opts.config_file is not None):
       self.config_file = opts.config_file

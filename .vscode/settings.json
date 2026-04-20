@@ -41,18 +41,6 @@
   "vite.port": 3000,
   "vite.vitepress": false,
   "vite.buildCommand": "cd web && npm run build",
-  "python-envs.pythonProjects": [
-    {
-      "path": "api",
-      "envManager": "ms-python.python:venv",
-      "packageManager": "ms-python.python:pip"
-    },
-    {
-      "path": "cli",
-      "envManager": "ms-python.python:venv",
-      "packageManager": "ms-python.python:pip"
-    }
-  ],
   "editor.tabSize": 2,
   "editor.indentSize": "tabSize",
   "editor.detectIndentation": false,

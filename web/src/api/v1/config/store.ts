@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
 import type { Config } from "./types"
 
-const initialState: Config = { }
+const initialState: Partial<Config> = { }
 
 const configSlice = createSlice({
   name: "config",
