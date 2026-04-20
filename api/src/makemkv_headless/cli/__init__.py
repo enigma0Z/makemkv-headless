@@ -1,6 +1,4 @@
-from argparse import ArgumentParser
-from sys import exit
 
-from makemkv_headless.cli.parsers import top_level_parser
-
-from .subcommands import *
+from makemkv_headless.cli.subcommands import (
+  find_duplicate_media, start, stop
+)

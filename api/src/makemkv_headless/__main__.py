@@ -1,6 +1,6 @@
 from sys import argv
 
-from makemkv_headless.cli import top_level_parser
+from makemkv_headless.cli.parsers import top_level_parser
 
 def main():
 	opts = top_level_parser.parse_args(argv[1:])
