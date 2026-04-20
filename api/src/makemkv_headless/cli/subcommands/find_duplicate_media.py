@@ -4,15 +4,14 @@ from pathlib import Path
 from typing import Callable
 
 from humanfriendly import format_size
-from makemkv_headless_cli.cli.parsers import subparsers
-from makemkv_headless_cli.heuristics.HeuristicRegistry import (
+from makemkv_headless.cli.parsers import subparsers
+from makemkv_headless.heuristics.HeuristicRegistry import (
     get_all_heuristics, get_heuristic)
-from makemkv_headless_cli.heuristics.Match import Match
-from makemkv_headless_cli.heuristics.MatchSet import MatchSet
-from makemkv_headless_cli.heuristics.NamedHeuristic import NamedHeuristic
-from makemkv_headless_cli.heuristics.SizeMatch import (CloseSizeMatch,
+from makemkv_headless.heuristics.Match import Match
+from makemkv_headless.heuristics.MatchSet import MatchSet
+from makemkv_headless.heuristics.NamedHeuristic import NamedHeuristic
+from makemkv_headless.heuristics.SizeMatch import (CloseSizeMatch,
                                                        ExactSizeMatch)
-
 
 def input_loop(prompt: str, validator: Callable[[any], bool]):
     while True:
@@ -111,7 +110,7 @@ def main(opts: Namespace):
 					else:
 						print(f'(dry run) deleting {file.path}')
 
-parser = subparsers.add_parser('find-duplicate-media')
+parser = subparsers.add_parser('find-duplicate-media', help='Apply heuristics to a media directory to identify potentially duplicate files (either true duplicates, or extra versions of the same media)')
 parser.set_defaults(func=main)
 parser.add_argument('--globstr', '-g', default="**/*.mkv", help='The glob to use to find files')
 parser.add_argument('--apply', help='Actually delete files', action='store_true')

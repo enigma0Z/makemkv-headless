@@ -4,6 +4,7 @@ requires-python = ">= 3.12"
 name = "makemkv-headless"
 dependencies = [
  "fastapi>=0.135.3",
+ "humanfriendly>=10.0",
  "pydantic>=2.12.5",
  "pyyaml>=6.0.3",
  "requests>=2.33.1",

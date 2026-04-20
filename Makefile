@@ -17,7 +17,7 @@ install-uv:
 .PHONY: clean-api
 clean-api:
 	@cd api && uv clean && echo "Cleaned UV"
-	@rm -rf $(PYCACHE_DIRS) $(VEND_DIRS) && echo "Cleaned pycache & venv"
+	@rm -rf $(PYCACHE_DIRS) $(VENV_DIRS) && echo "Cleaned pycache & venv"
 
 .PHONY: clean-web
 clean-web:
