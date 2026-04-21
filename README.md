@@ -24,16 +24,20 @@ A headless interface for [makemkv](https://makemkv.com).
 
 ### Installing makemkv-headless
 
+Install
 ```bash
 pipx install makemkv-headless
 ```
 
+### Setup / config
+
+Copy [config.example.yaml](config.example.yaml) and edit it to suit your needs
+
 ## Running
 
 ```bash
-mmh --help
+mmh --config-file <your config.yaml>
 ```
 
-You can now access the UI from a web browser at http://127.0.0.1:4000.  Running
-on a remote system may potentially require setting cors origins depending on
-your setup, but for most basic setups it probably isn't required.
+You can now access the UI from a web browser at http://127.0.0.1:4000 (or
+whatever your configured `listen_port` is).
