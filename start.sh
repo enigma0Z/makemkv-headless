@@ -5,22 +5,13 @@ DEV="false"
 API_PORT=""
 WEB_PORT=""
 
-if [[ "$1" == "screen" ]]; then
-  SCREEN="true"; shift
-  API_PORT="$1"; shift
-fi
-
 if [[ "$1" == "dev" ]]; then
   DEV="true"; shift
   API_PORT="$1"; shift
   WEB_PORT="$1"; shift
 fi
 
-if [[ "$SCREEN" == "true" ]]; then
-  set -x
-  screen -dmS mmh-api-$API_PORT uv --project api run mmh start --listen-port $API_PORT "$@"
-  set +x
-elif [[ "$DEV" == "true" ]]; then
+if [[ "$DEV" == "true" ]]; then
   WEB_PID=""
   API_PID=""
   cleanup() {
@@ -47,5 +38,5 @@ elif [[ "$DEV" == "true" ]]; then
   wait $API_PID 
   wait $WEB_PID
 else
-  uv --project api run mmh start "$@"
+  ./run.sh start "$@"
 fi
