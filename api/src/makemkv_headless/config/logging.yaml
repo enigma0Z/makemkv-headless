@@ -3,7 +3,7 @@ disable_existing_loggers: True
 formatters:
   standard:
     style: "{"
-    format: "{asctime} [{levelname}] {module}:{lineno} {threadName} - {message}"
+    format: "{asctime} [{levelname}] {threadName} - {message}"
 handlers:
   default:
     level: INFO
