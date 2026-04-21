@@ -28,6 +28,10 @@ jobs:
         shell: bash
         run: make install-uv
 
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 23
+
       - name: Version Bump (to stable)
         id: bump-version
         working-directory: api
@@ -38,10 +42,8 @@ jobs:
           echo "new-version=$(uv version --short)" >> $GITHUB_OUTPUT
           echo "update-message=$(tail -n1 $update_log)" >> $GITHUB_OUTPUT
           
-      - name: Build and test
-        uses: ./.github/actions/build-and-test-python
-        with:
-          project: api
+      - name: Build dist package
+        run: make clean all
 
       - name: Create release commit
         id: release-commit
