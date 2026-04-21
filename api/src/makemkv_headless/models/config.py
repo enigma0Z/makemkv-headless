@@ -145,7 +145,7 @@ class ConfigModel(BaseModel):
     cli_argument=CliArgument(
       args=['--pid-file'],
       kwargs=ParserKwargs(
-        help="The path to the file to store the pid (if --daemon is used)"
+        help="The path to the pid file (if --daemon is/was used)"
       )
     )
   ).model_dump())
