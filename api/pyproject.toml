@@ -35,6 +35,19 @@ keywords = [
     "mkv",
 ]
 
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: System Administrators",
+  "Programming Language :: Python 3.12",
+  "Programming Language :: Python 3.13",
+  "Programming Language :: Python 3.14",
+  "Topic :: Multimedia",
+  "Topic :: Multimedia :: Video",
+  "Topic :: Multimedia :: Video :: Conversion",
+  "Topic :: System :: Archiving",
+  "Topic :: System :: Archiving :: Backup"
+]
+
 [project.urls]
 Homepage = "https://github.com/enigma0Z/makemkv-headless"
 Documentation = "https://github.com/enigma0Z/makemkv-headless/blob/main/README.md"
