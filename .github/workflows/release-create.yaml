@@ -35,7 +35,6 @@ jobs:
       - name: Version Bump (to stable)
         id: bump-version
         working-directory: api
-        if: false
         run: |
           update_log=$(mktemp)
 
@@ -48,7 +47,6 @@ jobs:
 
       - name: Create release commit
         id: release-commit
-        if: false
         run: |
           if ! git diff-files --quiet; then
             echo "version-bumped=true" >> $GITHUB_OUTPUT
@@ -63,13 +61,13 @@ jobs:
 
       - name: Publish to PyPi
         id: publsh-to-pypi
-        # if: ${{ steps.release-commit.outputs.version-bumped == 'true' }}
+        if: ${{ steps.release-commit.outputs.version-bumped == 'true' }}
         working-directory: api
         run: uv publish
 
       - name: Create GitHub release
         id: publish-to-github
-        # if: ${{ steps.release-commit.outputs.version-bumped == 'true' }}
+        if: ${{ steps.release-commit.outputs.version-bumped == 'true' }}
         run: |
           # Get new version
           new_version=$(uv --project api version --short)
