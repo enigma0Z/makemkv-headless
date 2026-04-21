@@ -17,11 +17,13 @@ class Config(ConfigModel):
     super().__init__(*args, **kwargs)
 
   @staticmethod
-  def initialize_parser(parser: ArgumentParser):
-    for (_, value) in ConfigModel.model_fields.items():
+  def initialize_parser(parser: ArgumentParser, opts: list[str] | None = None):
+    for (key, value) in ConfigModel.model_fields.items():
+      if opts is not None and key not in opts:
+        continue
       args = value.json_schema_extra['cli_argument']['args']
       kwargs = value.json_schema_extra['cli_argument']['kwargs']
-      parser.add_argument(*args, **kwargs)
+      parser.add_argument(*args, **{key: value for key, value in kwargs.items() if value is not None})
 
   def load(self, opts: Namespace):
     # Load config file into opts

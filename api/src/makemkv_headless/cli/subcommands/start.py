@@ -23,6 +23,9 @@ def main(opts: Namespace):
     log_config = yaml.safe_load(file)
     log_config['loggers']['']['level'] = CONFIG.log_level
     if CONFIG.log_file:
+      # Erase the log file
+      with open(CONFIG.log_file, 'w'):
+        pass
       log_config['handlers']['default']['class'] = 'logging.FileHandler'
       log_config['handlers']['default']['filename'] = CONFIG.log_file
 
@@ -45,28 +48,17 @@ def main(opts: Namespace):
 
   pid = 0
 
-  if (opts.daemon):
+  if (CONFIG.daemon):
     pid = fork()
 
   if (pid == 0):
     server = uvicorn.Server(server_config)
     server.run()
   else:
-    with open(opts.pid_file, 'w') as file:
+    with open(CONFIG.pid_file, 'w') as file:
       print(pid, file=file)
 
 parser = subparsers.add_parser('start', help='Start the makemkv headless server')
 parser.set_defaults(func=main)
 
 CONFIG.initialize_parser(parser) # Add CLI-aligned options to parser
-
-parser.add_argument(
-  '--daemon', '-D',
-  help='Start a daemon & exit',
-  action='store_true'
-)
-parser.add_argument(
-  '--pid-file', 
-  help='The PID file to store the daemon pid in',
-  default=f'{basename(argv[0])}.pid'
-)

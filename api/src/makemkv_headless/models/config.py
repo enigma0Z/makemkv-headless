@@ -1,8 +1,9 @@
+from argparse import Action, BooleanOptionalAction
+from os.path import basename
+from sys import argv
 
-
-import logging
 from typing import Any, Callable, Literal, Optional, Type
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from pydantic.fields import FieldInfo
 
 type LogLevelStr = Literal['INFO'] | Literal['WARN'] | Literal['WARNING'] | Literal['ERROR'] | Literal['DEBUG']
@@ -10,10 +11,11 @@ type LogLevelStr = Literal['INFO'] | Literal['WARN'] | Literal['WARNING'] | Lite
 ENV_VAR_PREIFX="MMH_API"
 
 class ParserKwargs(BaseModel):
+  model_config = ConfigDict(arbitrary_types_allowed=True)
   help: str
-  action: Optional[str] = None
-  dest: Optional[str] = None
-  type: Optional[Callable[..., Any]] = None
+  action: str | Type | None = None
+  dest: str | None = None
+  type: Callable[..., Any] | None = None
 
 class CliArgument(BaseModel):
   args: list[str]
@@ -136,6 +138,23 @@ class ConfigModel(BaseModel):
       args=['--ui-path'],
       kwargs=ParserKwargs(
         help="The path to the source of compiled UI files"
+      )
+    )
+  ).model_dump())
+  pid_file: str | None = Field(default=f'{basename(argv[0])}.pid', json_schema_extra=JsonSchemaExtra(
+    cli_argument=CliArgument(
+      args=['--pid-file'],
+      kwargs=ParserKwargs(
+        help="The path to the file to store the pid (if --daemon is used)"
+      )
+    )
+  ).model_dump())
+  daemon: bool = Field(default=False, json_schema_extra=JsonSchemaExtra(
+    cli_argument=CliArgument(
+      args=['--daemon'],
+      kwargs=ParserKwargs(
+        action=BooleanOptionalAction,
+        help="Run as a daemon (fork and return to the terminal)"
       )
     )
   ).model_dump())
