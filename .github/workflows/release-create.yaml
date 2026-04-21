@@ -44,7 +44,6 @@ jobs:
           echo "update-message=$(tail -n1 $update_log)" >> $GITHUB_OUTPUT
           
       - name: Build dist package
-        if: false
         run: make clean all
 
       - name: Create release commit
