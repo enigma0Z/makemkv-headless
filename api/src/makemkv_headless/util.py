@@ -147,21 +147,30 @@ def input_with_default(
       continue
 
 
-async def cmd(*args, callback: Callable[[str], Any] | None = None, timeout=0.25):
+async def cmd(
+  *args, 
+  callback: Callable[[str], Any] | None = None, 
+  timeout=0.25,
+):
   process = await create_subprocess_shell(
     shlex.join(args),
     stdout=PIPE,
     stderr=PIPE
   )
 
+  assert process.stdout is not None
+  assert process.stderr is not None
+
   while process.returncode is None and not process.stdout.at_eof():
     try:
-      stdout = await asyncio.wait_for(process.stdout.readline(), 0.25)
+      stdout = await asyncio.wait_for(process.stdout.readline(), timeout)
+
     except TimeoutError:
       if (process.returncode is not None):
         logger.debug('Process has exited')
         process.stdout.feed_eof()
-      pass
+    except asyncio.CancelledError:
+      process.kill()
     else:
       if not stdout:
         process.stdout.feed_eof()
