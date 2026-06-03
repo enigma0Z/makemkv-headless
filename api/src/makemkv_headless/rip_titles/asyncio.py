@@ -62,38 +62,32 @@ async def rip_titles(
   if features.DO_RIP:
     interface.print(f"These titles will be copied to {sort_info.base_path()}", target=Target.SORT)
 
-    async def handle_rip():
-      try:
-        if rip_all:
-          await rip_disc(
-            source, rip_path,
-            rip_titles=['all'],
-          )
-
-        else:
-          await rip_disc(
-            source, rip_path,
-            rip_titles=sort_info.main_indexes,
-          )
-
-          await rip_disc(
-            source, rip_path,
-            rip_titles=sort_info.extra_indexes,
-          )
-
-        await sort_titles(
-          toc=toc,
-          rip_path_base=rip_path_base,
-          dest_path_base=dest_path,
-          sort_info=sort_info,
-          interface=interface,
+    try:
+      if rip_all:
+        await rip_disc(
+          source, rip_path,
+          rip_titles=['all'],
         )
 
-      except asyncio.CancelledError as ex:
-        shutil.rmtree(rip_path_base, ignore_errors=True)
-        raise ex
+      else:
+        await rip_disc(
+          source, rip_path,
+          rip_titles=sort_info.main_indexes,
+        )
 
-    (rip_task, cancel_task) = create_cancelable_task(handle_rip(), CANCEL)
+        await rip_disc(
+          source, rip_path,
+          rip_titles=sort_info.extra_indexes,
+        )
 
-    await rip_task
-    cancel_task.cancel()
+      await sort_titles(
+        toc=toc,
+        rip_path_base=rip_path_base,
+        dest_path_base=dest_path,
+        sort_info=sort_info,
+        interface=interface,
+      )
+
+    except asyncio.CancelledError as ex:
+      shutil.rmtree(rip_path_base, ignore_errors=True)
+      raise ex
