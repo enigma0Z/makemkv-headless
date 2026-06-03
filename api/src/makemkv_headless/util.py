@@ -181,9 +181,11 @@ async def cmd(
 async def cancel_event_task(task: asyncio.Task, event: asyncio.Event):
   await event.wait()
   task.cancel()
+  event.clear()
 
-def create_cancelable_task(coroutine: Coroutine, event: asyncio.Event):
+async def cancellable_async(coroutine: Coroutine, event: asyncio.Event):
   coro_task = asyncio.create_task(coroutine)
   cancel_task = asyncio.create_task(cancel_event_task(coro_task, event))
 
-  return (coro_task, cancel_task)
+  await coro_task
+  cancel_task.cancel()
