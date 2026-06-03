@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import asyncio
 import os
+import shutil
 import tempfile
 # import threading
 
@@ -10,13 +12,14 @@ from makemkv_headless import features
 from makemkv_headless.interface import get_interface
 from makemkv_headless.interface.target import Target
 from makemkv_headless.makemkv.asyncio import rip_disc
+from makemkv_headless.util import create_cancelable_task
 logger = logging.getLogger(__name__)
 
 from makemkv_headless.sort import SortInfo, sort_titles
 
 from makemkv_headless.toc import Toc
 
-
+CANCEL = asyncio.Event()
 EPISODE_LENGTH_TOLERANCE = 90
 
 async def rip_titles(
@@ -25,7 +28,7 @@ async def rip_titles(
     sort_info: SortInfo,
     toc: Toc,
     rip_all=False,
-    temp_prefix: str = None,
+    temp_prefix: str | None = None,
   ):
 
   interface = get_interface()
@@ -59,27 +62,38 @@ async def rip_titles(
   if features.DO_RIP:
     interface.print(f"These titles will be copied to {sort_info.base_path()}", target=Target.SORT)
 
-    if rip_all:
-      await rip_disc(
-        source, rip_path,
-        rip_titles=['all'], 
-      )
+    async def handle_rip():
+      try:
+        if rip_all:
+          await rip_disc(
+            source, rip_path,
+            rip_titles=['all'],
+          )
 
-    else:
-      await rip_disc(
-        source, rip_path,
-        rip_titles=sort_info.main_indexes,
-      )
+        else:
+          await rip_disc(
+            source, rip_path,
+            rip_titles=sort_info.main_indexes,
+          )
 
-      await rip_disc(
-        source, rip_path,
-        rip_titles=sort_info.extra_indexes,
-      )
+          await rip_disc(
+            source, rip_path,
+            rip_titles=sort_info.extra_indexes,
+          )
 
-    await sort_titles(
-      toc=toc,
-      rip_path_base=rip_path_base,
-      dest_path_base=dest_path,
-      sort_info=sort_info,
-      interface=interface
-    )
+        await sort_titles(
+          toc=toc,
+          rip_path_base=rip_path_base,
+          dest_path_base=dest_path,
+          sort_info=sort_info,
+          interface=interface,
+        )
+
+      except asyncio.CancelledError as ex:
+        shutil.rmtree(rip_path_base, ignore_errors=True)
+        raise ex
+
+    (rip_task, cancel_task) = create_cancelable_task(handle_rip(), CANCEL)
+
+    await rip_task
+    cancel_task.cancel()
