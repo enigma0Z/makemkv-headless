@@ -16,7 +16,7 @@ import shutil
 import subprocess
 
 import logging
-from typing import Any, Callable
+from typing import Any, Callable, Coroutine
 
 from makemkv_headless.interface.base_interface import BaseInterface
 from makemkv_headless.interface.target import Target
