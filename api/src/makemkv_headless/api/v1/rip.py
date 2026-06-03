@@ -87,7 +87,7 @@ async def get_rip_stop():
   try:
     if LOCK.locked():
       CANCEL.set()
-      interface.send(RipStartStopMessage(state="stop"))
+      get_interface().send(RipStartStopMessage(state="stop"))
       return APIResponse(status="in progress")
 
     return APIResponse(status="stopped")
