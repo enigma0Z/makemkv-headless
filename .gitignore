@@ -25,3 +25,5 @@ start-all.sh
 **/*.bak
 
 **/*.pid
+
+**/local.*

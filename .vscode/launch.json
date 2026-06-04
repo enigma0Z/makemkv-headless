@@ -12,8 +12,9 @@
       "name": "Debug API",
       "type": "debugpy",
       "request": "launch",
-      "module": "src.main_api",
+      "module": "makemkv_headless.__main__",
       "cwd": "${workspaceFolder}/api",
+      "args": ["start", "--config-file", "local.config.yaml"],
       "console": "integratedTerminal"
     },
     {
