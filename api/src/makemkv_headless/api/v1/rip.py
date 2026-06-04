@@ -1,4 +1,5 @@
 from asyncio import Event, Lock, Task
+import asyncio
 import logging
 import os
 
@@ -44,20 +45,23 @@ async def rip_task_fn(data: RequestModel):
     STATE.socket.rip.started = True
     toc = Toc()
 
-    await cancellable_async(toc.get_from_disc(CONFIG.source), CANCEL)
-    await cancellable_async(
-      rip_titles(
-        source=CONFIG.source,
-        dest_path=os.path.join(CONFIG.destination, data.destination),
-        sort_info=data.sort_info,
-        toc=toc,
-        rip_all=data.rip_all,
-        temp_prefix=CONFIG.temp_prefix
-      ),
-      CANCEL
-    )
-
-    get_interface().send(RipStartStopMessage(state="stop"))
+    try:
+      await cancellable_async(toc.get_from_disc(CONFIG.source), CANCEL)
+      await cancellable_async(
+        rip_titles(
+          source=CONFIG.source,
+          dest_path=os.path.join(CONFIG.destination, data.destination),
+          sort_info=data.sort_info,
+          toc=toc,
+          rip_all=data.rip_all,
+          temp_prefix=CONFIG.temp_prefix
+        ),
+        CANCEL
+      )
+    except asyncio.CancelledError:
+      logger.info('Rip cancelled')
+    finally:
+      get_interface().send(RipStartStopMessage(state="stop"))
 
 @router.post('')
 @router.post('/')
