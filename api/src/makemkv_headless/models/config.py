@@ -86,7 +86,7 @@ class ConfigModel(BaseModel):
       )
     )
   ).model_dump())
-  log_file: str = Field(default=None, json_schema_extra=JsonSchemaExtra(
+  log_file: str | None = Field(default=None, json_schema_extra=JsonSchemaExtra(
     requires_restart=True,
     cli_argument=CliArgument(
       args=['--log-file'],
