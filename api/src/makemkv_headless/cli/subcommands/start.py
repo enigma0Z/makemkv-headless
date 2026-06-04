@@ -4,6 +4,7 @@ from importlib import resources
 import logging
 import logging.config
 from sys import argv
+import makemkv_headless
 import uvicorn
 
 from os import fork
@@ -19,7 +20,7 @@ from makemkv_headless import config
 def main(opts: Namespace):
   CONFIG.load(opts)
 
-  with open(resources.files(config) / 'logging.yaml') as file:
+  with (resources.files(config) / 'logging.yaml').open() as file:
     log_config = yaml.safe_load(file)
     log_config['loggers']['makemkv_headless']['level'] = CONFIG.log_level
     log_config['handlers']['default']['level'] = CONFIG.log_level
@@ -39,7 +40,9 @@ def main(opts: Namespace):
     app=app, 
     host="0.0.0.0", 
     port=CONFIG.listen_port,
-    log_config=log_config
+    log_config=log_config,
+    reload=True,
+    reload_dirs=[str(resources.files(makemkv_headless))],
   )
 
   pid = 0
