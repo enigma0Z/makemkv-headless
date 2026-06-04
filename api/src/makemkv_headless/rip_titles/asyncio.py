@@ -88,5 +88,6 @@ async def rip_titles(
       )
 
     except asyncio.CancelledError as ex:
+      logger.info(f'Cleaning up {rip_path_base}')
       shutil.rmtree(rip_path_base, ignore_errors=True)
       raise ex
