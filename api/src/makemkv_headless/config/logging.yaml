@@ -16,7 +16,7 @@ loggers:
     propagate: true
   makemkv_headless.interface.async_queue_interface:
     handlers: ['default']
-    level: INFO
+    level: ERROR
     propagate: true
   uvicorn:
     handlers: ['default']
