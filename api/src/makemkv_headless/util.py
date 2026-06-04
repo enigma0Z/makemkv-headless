@@ -169,8 +169,10 @@ async def cmd(
       if (process.returncode is not None):
         logger.debug('Process has exited')
         process.stdout.feed_eof()
-    except asyncio.CancelledError:
+    except asyncio.CancelledError as ex:
+      logger.info(f'Killing process; PID: {process.pid}, Command: {shlex.join(args)}')
       process.kill()
+      raise(ex)
     else:
       if not stdout:
         process.stdout.feed_eof()
@@ -180,6 +182,7 @@ async def cmd(
 
 async def cancel_event_task(task: asyncio.Task, event: asyncio.Event):
   await event.wait()
+  logger.info(f'Cancelling task {task}')
   task.cancel()
   event.clear()
 
