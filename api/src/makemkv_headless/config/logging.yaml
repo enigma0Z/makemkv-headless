@@ -3,14 +3,18 @@ disable_existing_loggers: True
 formatters:
   standard:
     style: "{"
-    format: "{asctime} [{levelname}] {threadName} - {message}"
+    format: "{asctime} [{levelname}] {name} - {message}"
 handlers:
   default:
     level: INFO
     formatter: standard
     class: logging.StreamHandler
 loggers:
-  '':
+  'makemkv_headless':
+    handlers: ['default']
+    level: INFO
+    propagate: true
+  makemkv_headless.interface.async_queue_interface:
     handlers: ['default']
     level: INFO
     propagate: true
