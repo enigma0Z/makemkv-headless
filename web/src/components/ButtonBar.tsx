@@ -1,4 +1,4 @@
-import { AppBar, Button, IconButton, LinearProgress, Toolbar, Tooltip, Typography } from "@mui/material";
+import { AppBar, Button, CircularProgress, IconButton, LinearProgress, Toolbar, Tooltip, Typography } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "@/api";
 import { socketActions, type SocketProgress } from "@/api/v1/socket/store";
 import { tocActions } from "@/api/v1/toc/store";
@@ -56,7 +56,13 @@ export const ButtonBar = ({ }: Props) => {
     dispatch(socketActions.setSocketRipState())
     dispatch(ripActions.setMainIndexes([]))
     dispatch(ripActions.setExtraIndexes([]))
-    fetch(endpoints.toc_async(), { method: 'GET' })
+    fetch(endpoints.toc.get(), { method: 'GET' })
+  }
+
+  const handleCancelLoadToc = () => {
+    console.info('Cancelling laod TOC')
+    fetch(endpoints.toc.stop(), { method: 'GET' })
+    dispatch(tocActions.setTocLoading(false))
   }
 
   const handleCancelRip = () => {
@@ -114,15 +120,23 @@ export const ButtonBar = ({ }: Props) => {
             <EjectIcon />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Load ToC (Table of Contents)">
+        <Tooltip title={tocLoading ? "Cancel ToC Loading" : "Load ToC (Table of Contents)"}>
           <IconButton
-            onClick={handleLoadToc}
-            disabled={socketRipState?.started}
-            loading={tocLoading}
+            onClick={ tocLoading ? handleCancelLoadToc : handleLoadToc}
+            // loading={tocLoading}
           >
-            <SaveAltIcon />
+            {
+              tocLoading 
+              ? <CancelIcon />
+              : <SaveAltIcon />
+            }
           </IconButton>
         </Tooltip>
+        <CircularProgress 
+          size={24}
+          sx={{ marginLeft: '10px', display: tocLoading ? 'auto' : 'none' }}
+          aria-label="Loading TOC" 
+        />
         <Button
           sx={{ marginLeft: "auto", textWrap: "nowrap", minWidth: 'max-content' }}
           onClick={handleStartRip}
