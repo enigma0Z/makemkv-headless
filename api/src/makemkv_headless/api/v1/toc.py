@@ -29,6 +29,7 @@ async def get_toc_from_disc(source):
     toc = Toc()
     # STATE.reset_rip_indexes() # Reset which indexes are selected
     STATE.reset_socket() # Reset which indexes are complete
+    logger.info('Getting TOC...')
     await cancellable_async(toc.get_from_disc(source), CANCEL)
     STATE.toc = toc
     get_interface().send(TocStatusMessage(state="complete"))
