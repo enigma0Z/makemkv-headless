@@ -27,15 +27,19 @@ class JsonSchemaExtra(BaseModel):
   @computed_field
   @property
   def environment_var(self) -> str:
-    var_name = [ arg for arg in self.cli_argument.args if arg.startswith('--') ][0].strip('--').replace('-', '_').upper()
-    return f'{ENV_VAR_PREIFX}_{var_name}'
+    if self.cli_argument.kwargs.dest is not None:
+      var_name = self.cli_argument.kwargs.dest
+    else:
+      var_name = [ arg for arg in self.cli_argument.args if arg.startswith('--') ][0]
+
+    return f'{ENV_VAR_PREIFX}_{var_name.strip('--').replace('-', '_').upper()}'
 
   # Server requires a restart for this change to take effect
   requires_restart: bool = False 
 
 class ConfigModel(BaseModel):
-  config_file: str = Field(
-    default='./config.yaml', 
+  config_file: str | None = Field(
+    default=None,
     json_schema_extra=JsonSchemaExtra(
       cli_argument=CliArgument(
         args=['--config-file'],
