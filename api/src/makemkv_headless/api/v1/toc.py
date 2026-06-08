@@ -53,7 +53,7 @@ async def get_toc_async(background_tasks: BackgroundTasks):
 
 @router.get('.status')
 @router.get('.async.status') # Deprecated
-async def get_toc_async(background_tasks: BackgroundTasks):
+async def get_toc_async_status():
   if LOCK.locked():
     return APIResponse("in progress")
   else:
