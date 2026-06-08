@@ -2,6 +2,7 @@ from argparse import ArgumentParser, Namespace
 import json
 import logging
 import yaml
+from dotenv import dotenv_values
 
 from os.path import abspath
 
@@ -98,6 +99,17 @@ class Config(ConfigModel):
   def update_from_yaml(self, config_file: str):
     with open(config_file, 'r') as file:
       self.update(**yaml.safe_load(file)) 
+  
+  def update_from_dotenv(self, dotenv_file: str):
+    dotenv_file_values = dotenv_values(dotenv_file)
+    for key, value in self.__class__.model_fields.items():
+      json_schema_extra = JsonSchemaExtra.model_validate(value.json_schema_extra)
+      environment_var = json_schema_extra.environment_var
+      if environment_var in dotenv_file_values:
+        if value.annotation == list[str]:
+          setattr(self, key, dotenv_file_values[environment_var].split(','))  # pyright: ignore[reportOptionalMemberAccess]
+        else:
+          setattr(self, key, dotenv_file_values[environment_var])
 
   def get_log_level(self) -> int:
     if self.log_level == 'ERROR':
@@ -124,10 +136,24 @@ class Config(ConfigModel):
   def write_config_file(self):
     self.normalize_paths()
     logging.info(f"Writing config file with data {self.model_dump()}")
-    with open(self.config_file, 'w') as file:
-      if self.config_file.endswith('.json'):
-        print(self.model_dump(mode='json'), file=file)
-      elif self.config_file.endswith('.yaml'):
-        print(yaml.dump(self.model_dump()), file=file)
+    if self.config_file is not None:
+      with open(self.config_file, 'w') as file:
+        if self.config_file.endswith('.json'):
+          print(self.model_dump(mode='json'), file=file)
+        elif self.config_file.endswith('.yaml'):
+          print(yaml.dump(self.model_dump()), file=file)
+    
+  def env_file_lines(self) -> list[str]:
+    env_file_lines = []
+    for key, value in ConfigModel.model_fields.items():
+      json_schema_extra = JsonSchemaExtra.model_validate(value.json_schema_extra)
+      config_value = self.model_dump()[key]
+      if isinstance(config_value, list):
+        config_value = ','.join(config_value)
+      elif config_value is None:
+        config_value = ''
+      env_file_lines.append(f'{json_schema_extra.environment_var}={config_value}')
+
+    return env_file_lines
 
 CONFIG = Config()
