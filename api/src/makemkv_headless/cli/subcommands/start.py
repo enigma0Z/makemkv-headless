@@ -3,8 +3,6 @@ from argparse import Namespace
 from importlib import resources
 import logging
 import logging.config
-from sys import argv
-import makemkv_headless
 import uvicorn
 
 from os import fork
@@ -37,12 +35,10 @@ def main(opts: Namespace):
   from makemkv_headless.api import app
   logger.info(f'Starting app {app} with config {CONFIG}')
   server_config = uvicorn.Config(
-    app=app, 
+    app=app,
     host="0.0.0.0", 
     port=CONFIG.listen_port,
-    log_config=log_config,
-    reload=True,
-    reload_dirs=[str(resources.files(makemkv_headless))],
+    log_config=log_config
   )
 
   pid = 0
