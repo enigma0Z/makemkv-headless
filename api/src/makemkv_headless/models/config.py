@@ -3,7 +3,7 @@ from os.path import basename
 from sys import argv
 
 from typing import Any, Callable, Literal, Optional, Type
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, computed_field
 from pydantic.fields import FieldInfo
 
 type LogLevelStr = Literal['INFO'] | Literal['WARN'] | Literal['WARNING'] | Literal['ERROR'] | Literal['DEBUG']
@@ -23,25 +23,30 @@ class CliArgument(BaseModel):
 
 class JsonSchemaExtra(BaseModel):
   cli_argument: CliArgument
-  environment_var: Optional[str] = None
+
+  @computed_field
+  @property
+  def environment_var(self) -> str:
+    if self.cli_argument.kwargs.dest is not None:
+      var_name = self.cli_argument.kwargs.dest
+    else:
+      var_name = [ arg for arg in self.cli_argument.args if arg.startswith('--') ][0]
+
+    return f'{ENV_VAR_PREIFX}_{var_name.strip('--').replace('-', '_').upper()}'
 
   # Server requires a restart for this change to take effect
   requires_restart: bool = False 
 
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-
 class ConfigModel(BaseModel):
-  config_file: str = Field(
-    default='./config.yaml', 
+  config_file: str | None = Field(
+    default=None,
     json_schema_extra=JsonSchemaExtra(
       cli_argument=CliArgument(
         args=['--config-file'],
         kwargs=ParserKwargs(
           help='The config file to load options from'
         )
-      ),
-      environment_var='CONFIG_FILE'
+      )
     ).model_dump()
   )
   destination: str | None = Field(default=None, json_schema_extra=JsonSchemaExtra(
@@ -50,8 +55,7 @@ class ConfigModel(BaseModel):
       kwargs=ParserKwargs(
         help="Base path to store output (ripped) files.  Subdirectories are added here for library, media type, and title"
       )
-    ),
-    environment_var='DESTINATION',
+    )
   ).model_dump())
   source: str | None = Field(default=None, json_schema_extra=JsonSchemaExtra(
     cli_argument=CliArgument(
@@ -75,7 +79,7 @@ class ConfigModel(BaseModel):
       kwargs=ParserKwargs(
         help='The path to makemkvcon'
       )
-    )
+    ),
   ).model_dump())
   log_level: LogLevelStr = Field(default='INFO', json_schema_extra=JsonSchemaExtra(
     requires_restart=True,
@@ -84,16 +88,16 @@ class ConfigModel(BaseModel):
       kwargs=ParserKwargs(
         help="The log level to use, options include ERROR, INFO, WARNING, and DEBUG (Default: INFO)"
       )
-    )
+    ),
   ).model_dump())
-  log_file: str = Field(default=None, json_schema_extra=JsonSchemaExtra(
+  log_file: str | None = Field(default=None, json_schema_extra=JsonSchemaExtra(
     requires_restart=True,
     cli_argument=CliArgument(
       args=['--log-file'],
       kwargs=ParserKwargs(
         help="The log file to store logs in"
       )
-    )
+    ),
   ).model_dump())
   temp_prefix: str | None = Field(default=None, json_schema_extra=JsonSchemaExtra(
     cli_argument=CliArgument(
@@ -141,7 +145,7 @@ class ConfigModel(BaseModel):
       )
     )
   ).model_dump())
-  pid_file: str | None = Field(default=f'{basename(argv[0])}.pid', json_schema_extra=JsonSchemaExtra(
+  pid_file: str = Field(default=f'{basename(argv[0])}.pid', json_schema_extra=JsonSchemaExtra(
     cli_argument=CliArgument(
       args=['--pid-file'],
       kwargs=ParserKwargs(

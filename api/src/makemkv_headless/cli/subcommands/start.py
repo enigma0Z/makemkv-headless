@@ -3,7 +3,6 @@ from argparse import Namespace
 from importlib import resources
 import logging
 import logging.config
-from sys import argv
 import uvicorn
 
 from os import fork
@@ -19,19 +18,15 @@ from makemkv_headless import config
 def main(opts: Namespace):
   CONFIG.load(opts)
 
-  with open(resources.files(config) / 'logging.yaml') as file:
+  with (resources.files(config) / 'logging.yaml').open() as file:
     log_config = yaml.safe_load(file)
-    log_config['loggers']['']['level'] = CONFIG.log_level
+    log_config['loggers']['makemkv_headless']['level'] = CONFIG.log_level
+    log_config['handlers']['default']['level'] = CONFIG.log_level
     if CONFIG.log_file:
       # Erase the log file
-      with open(CONFIG.log_file, 'w'):
-        pass
+      with open(CONFIG.log_file, 'w'): pass
       log_config['handlers']['default']['class'] = 'logging.FileHandler'
       log_config['handlers']['default']['filename'] = CONFIG.log_file
-
-  # Erase log file
-  if CONFIG.log_file:
-    open(CONFIG.log_file, 'w').close()
 
   logging.config.dictConfig(log_config)
   logger = logging.getLogger(__name__)
@@ -40,7 +35,7 @@ def main(opts: Namespace):
   from makemkv_headless.api import app
   logger.info(f'Starting app {app} with config {CONFIG}')
   server_config = uvicorn.Config(
-    app=app, 
+    app=app,
     host="0.0.0.0", 
     port=CONFIG.listen_port,
     log_config=log_config

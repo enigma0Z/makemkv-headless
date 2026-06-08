@@ -1,3 +1,4 @@
+from asyncio import Event
 from functools import lru_cache
 import logging
 from threading import Lock
@@ -11,50 +12,35 @@ from makemkv_headless.config import CONFIG
 from makemkv_headless.interface import get_interface
 from makemkv_headless.models.socket import TocStatusMessage
 from makemkv_headless.toc import Toc
+from makemkv_headless.util import cancellable_async
 
 class TocError(Exception): ...
 
 logger = logging.getLogger(__name__)
 
-lock = Lock()
+LOCK = Lock()
+CANCEL = Event()
 
 router = APIRouter(prefix="/toc")
 
 # @lru_cache
 async def get_toc_from_disc(source):
-  with lock:
+  with LOCK:
     toc = Toc()
     # STATE.reset_rip_indexes() # Reset which indexes are selected
     STATE.reset_socket() # Reset which indexes are complete
-    await toc.get_from_disc(source)
+    logger.info('Getting TOC...')
+    await cancellable_async(toc.get_from_disc(source), CANCEL)
     STATE.toc = toc
     get_interface().send(TocStatusMessage(state="complete"))
     return toc
 
 @router.get('')
 @router.get('/')
-async def get_toc():
-  try:
-    logger.debug(f"Getting TOC from {CONFIG.source}")
-    toc = await get_toc_from_disc(CONFIG.source)
-    failures = toc.get_failures()
-
-    if len(failures) > 0: 
-      raise TocError(failures)
-
-    STATE.toc = toc
-    return APIResponse("success", toc)
-  except TocError as ex:
-    logger.error(ex.args[0])
-    raise APIException(404, failures)
-  except Exception as ex:
-    logger.error(format_exc())
-    raise APIException(500, GenericAPIError("error", ex))
-
-@router.get('.async')
+@router.get('.async') # Deprecated
 async def get_toc_async(background_tasks: BackgroundTasks):
   try:
-    if lock.locked():
+    if LOCK.locked():
       return APIResponse("in progress")
     else:
       background_tasks.add_task(get_toc_from_disc, CONFIG.source)
@@ -65,9 +51,18 @@ async def get_toc_async(background_tasks: BackgroundTasks):
     logger.error(format_exc())
     raise APIException(500, GenericAPIError("error", ex))
 
-@router.get('.async.status')
-async def get_toc_async(background_tasks: BackgroundTasks):
-  if lock.locked():
+@router.get('.status')
+@router.get('.async.status') # Deprecated
+async def get_toc_async_status():
+  if LOCK.locked():
+    return APIResponse("in progress")
+  else:
+    return APIResponse("done")
+
+@router.get('.stop')
+async def toc_get_stop():
+  if LOCK.locked():
+    CANCEL.set()
     return APIResponse("in progress")
   else:
     return APIResponse("done")

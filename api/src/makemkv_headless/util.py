@@ -16,7 +16,7 @@ import shutil
 import subprocess
 
 import logging
-from typing import Any, Callable
+from typing import Any, Callable, Coroutine
 
 from makemkv_headless.interface.base_interface import BaseInterface
 from makemkv_headless.interface.target import Target
@@ -147,24 +147,48 @@ def input_with_default(
       continue
 
 
-async def cmd(*args, callback: Callable[[str], Any] | None = None, timeout=0.25):
+async def cmd(
+  *args, 
+  callback: Callable[[str], Any] | None = None, 
+  timeout=0.25,
+):
   process = await create_subprocess_shell(
     shlex.join(args),
     stdout=PIPE,
     stderr=PIPE
   )
 
+  assert process.stdout is not None
+  assert process.stderr is not None
+
   while process.returncode is None and not process.stdout.at_eof():
     try:
-      stdout = await asyncio.wait_for(process.stdout.readline(), 0.25)
+      stdout = await asyncio.wait_for(process.stdout.readline(), timeout)
+
     except TimeoutError:
       if (process.returncode is not None):
         logger.debug('Process has exited')
         process.stdout.feed_eof()
-      pass
+    except asyncio.CancelledError as ex:
+      logger.info(f'Killing process; PID: {process.pid}, Command: {shlex.join(args)}')
+      process.kill()
+      raise(ex)
     else:
       if not stdout:
         process.stdout.feed_eof()
       else:
         if callback is not None:
           callback(stdout.decode().strip())
+
+async def cancel_event_task(task: asyncio.Task, event: asyncio.Event):
+  await event.wait()
+  logger.info(f'Cancelling task {task}')
+  task.cancel()
+  event.clear()
+
+async def cancellable_async(coroutine: Coroutine, event: asyncio.Event):
+  coro_task = asyncio.create_task(coroutine)
+  cancel_task = asyncio.create_task(cancel_event_task(coro_task, event))
+
+  await coro_task
+  cancel_task.cancel()

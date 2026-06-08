@@ -2,10 +2,11 @@ from argparse import ArgumentParser, Namespace
 import json
 import logging
 import yaml
+from dotenv import dotenv_values
 
 from os.path import abspath
 
-from makemkv_headless.models.config import ConfigModel
+from makemkv_headless.models.config import ConfigModel, JsonSchemaExtra
 
 class Config(ConfigModel):
   _parser: ArgumentParser
@@ -18,12 +19,26 @@ class Config(ConfigModel):
 
   @staticmethod
   def initialize_parser(parser: ArgumentParser, opts: list[str] | None = None):
+    '''
+    Initialze an argparse parser from the config base model
+
+    Args:    
+      * `parser`: The ArgumentParser instance to modify
+      * `opts`: An optional list[str] of args to include for the parser.
+        If left unspecified, all config items have args generated for the parser.
+    '''
     for (key, value) in ConfigModel.model_fields.items():
+      # If opts are listed, skip those in the config which are not.
       if opts is not None and key not in opts:
         continue
-      args = value.json_schema_extra['cli_argument']['args']
-      kwargs = value.json_schema_extra['cli_argument']['kwargs']
-      parser.add_argument(*args, **{key: value for key, value in kwargs.items() if value is not None})
+
+      # Load JSON schema extra from the config file
+      json_schema_extra = JsonSchemaExtra.model_validate(value.json_schema_extra)
+      args = json_schema_extra.cli_argument.args
+      kwargs = json_schema_extra.cli_argument.kwargs
+
+      # Get parser args from the config item
+      parser.add_argument(*args, **kwargs.model_dump())
 
   def load(self, opts: Namespace):
     # Load config file into opts
@@ -42,7 +57,7 @@ class Config(ConfigModel):
         setattr(CONFIG, key, opt)
 
   def update(
-      self, /, *, config_model: ConfigModel = None, **kwargs: dict | ConfigModel
+      self, /, *, config_model: ConfigModel | None = None, **kwargs: dict | ConfigModel
   ) -> bool:
     '''
     Sets the specified config values.  Returns true if the update requires a
@@ -52,12 +67,13 @@ class Config(ConfigModel):
     if config_model is not None:
       for key, value in config_model.model_dump().items():
         if value != ConfigModel.model_fields[key].default:
-          if ConfigModel.model_fields[key].json_schema_extra['requires_restart']:
+          json_schema_extra = JsonSchemaExtra.model_validate(ConfigModel.model_fields[key].json_schema_extra)
+          if json_schema_extra.requires_restart:
             require_restart = True
           setattr(self, key, value)
     else:
       for key in kwargs:
-        self.__dict__[key] = kwargs[key]
+        self.__setattr__(key, kwargs[key])
 
     return require_restart
 
@@ -83,6 +99,17 @@ class Config(ConfigModel):
   def update_from_yaml(self, config_file: str):
     with open(config_file, 'r') as file:
       self.update(**yaml.safe_load(file)) 
+  
+  def update_from_dotenv(self, dotenv_file: str):
+    dotenv_file_values = dotenv_values(dotenv_file)
+    for key, value in self.__class__.model_fields.items():
+      json_schema_extra = JsonSchemaExtra.model_validate(value.json_schema_extra)
+      environment_var = json_schema_extra.environment_var
+      if environment_var in dotenv_file_values:
+        if value.annotation == list[str]:
+          setattr(self, key, dotenv_file_values[environment_var].split(','))  # pyright: ignore[reportOptionalMemberAccess]
+        else:
+          setattr(self, key, dotenv_file_values[environment_var])
 
   def get_log_level(self) -> int:
     if self.log_level == 'ERROR':
@@ -109,10 +136,24 @@ class Config(ConfigModel):
   def write_config_file(self):
     self.normalize_paths()
     logging.info(f"Writing config file with data {self.model_dump()}")
-    with open(self.config_file, 'w') as file:
-      if self.config_file.endswith('.json'):
-        print(self.model_dump(mode='json'), file=file)
-      elif self.config_file.endswith('.yaml'):
-        print(yaml.dump(self.model_dump()), file=file)
+    if self.config_file is not None:
+      with open(self.config_file, 'w') as file:
+        if self.config_file.endswith('.json'):
+          print(self.model_dump(mode='json'), file=file)
+        elif self.config_file.endswith('.yaml'):
+          print(yaml.dump(self.model_dump()), file=file)
+    
+  def env_file_lines(self) -> list[str]:
+    env_file_lines = []
+    for key, value in ConfigModel.model_fields.items():
+      json_schema_extra = JsonSchemaExtra.model_validate(value.json_schema_extra)
+      config_value = self.model_dump()[key]
+      if isinstance(config_value, list):
+        config_value = ','.join(config_value)
+      elif config_value is None:
+        config_value = ''
+      env_file_lines.append(f'{json_schema_extra.environment_var}={config_value}')
+
+    return env_file_lines
 
 CONFIG = Config()

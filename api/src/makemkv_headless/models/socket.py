@@ -1,17 +1,16 @@
 from typing import Generic, Literal, TypeVar
 from makemkv_headless.models.state import ErrorStateModel
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
 
 from makemkv_headless.models.makemkv import CurrentProgressModel, MkvLogModel, ProgressModel, ProgressValueModel, SourceInfoModel, TitleInfoModel, TotalProgressModel, TrackInfoModel, mkv_model_from_raw
 
 T = TypeVar('T')
 
 class SocketMessage(BaseModel):
-  type: str
-
-  def __init__(self, **kwargs):
-    kwargs['type'] = self.__class__.__name__
-    super().__init__(**kwargs)
+  @computed_field
+  @property
+  def type(self) -> str: 
+    return self.__class__.__name__
 
   def __getitem__(self, key):
     return self.__dict__[key]
@@ -30,7 +29,8 @@ class RipStartStopMessage(SocketMessage):
   state: Literal['stop', 'start']
 
 class TocStatusMessage(SocketMessage):
-  state: Literal['running', 'complete']
+  state: Literal['running', 'complete'
+  ]
 
 # MKV Messages
 class ProgressMessage(SocketMessage): ...

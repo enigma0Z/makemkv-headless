@@ -85,6 +85,10 @@ async def exception_handler(request: Request, ex: Exception):
 async def arbitrary_file(path: str | None = None):
   if path is None or path == '':
     path = 'index.html'
+  
+  if path.startswith('api/'):
+    raise StarletteHTTPException(501, f'API {path} Not Implmented')
+
   # Configured UI path
   if CONFIG.ui_path is not None:
     served_file = os.path.join(CONFIG.ui_path, path)
@@ -93,7 +97,7 @@ async def arbitrary_file(path: str | None = None):
   # Configured external UI
   elif CONFIG.frontend is not None:
     return RedirectResponse(
-      '/'.join(CONFIG.frontend, path),
+      '/'.join([CONFIG.frontend, path]),
       status_code=status.HTTP_302_FOUND
     )
   # Use bundled UI
