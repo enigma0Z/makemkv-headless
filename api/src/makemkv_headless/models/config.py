@@ -145,7 +145,7 @@ class ConfigModel(BaseModel):
       )
     )
   ).model_dump())
-  pid_file: str | None = Field(default=f'{basename(argv[0])}.pid', json_schema_extra=JsonSchemaExtra(
+  pid_file: str = Field(default=f'{basename(argv[0])}.pid', json_schema_extra=JsonSchemaExtra(
     cli_argument=CliArgument(
       args=['--pid-file'],
       kwargs=ParserKwargs(
