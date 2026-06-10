@@ -2,7 +2,6 @@ import { configureStore, type Middleware, type UnknownAction } from "@reduxjs/to
 import { useDispatch, useSelector } from "react-redux";
 
 import rip, { ripActions, type RipState } from './v1/rip/store'
-import tmdb, { type TmdbState } from "./v1/tmdb/store";
 import socket, { type SocketState } from "./v1/socket/store";
 import { SOCKET_URI, SocketConnection } from "./v1/socket/api";
 import { setupListeners } from "@reduxjs/toolkit/query";
@@ -11,7 +10,6 @@ import { api as apiV1 } from "./v1";
 
 export type RootState = {
   rip: RipState,
-  tmdb: TmdbState,
   socket: SocketState
 }
 
@@ -56,7 +54,7 @@ export const store = configureStore({
     apiV1.middleware
   ),
   reducer: {
-    rip: rip.reducer, tmdb, socket, api: apiV1.reducer
+    rip: rip.reducer, socket, api: apiV1.reducer
   },
 })
 

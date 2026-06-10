@@ -24,7 +24,7 @@ export type Response<T> = {
 }
 
 export const api = createApi({
-  tagTypes: ['error', 'api/config', 'api/state', 'api/toc'],
+  tagTypes: ['error', 'api/config', 'api/state', 'api/toc', 'api/tmdb', 'api/tmdb/configuration'],
   baseQuery: fetchBaseQuery({ baseUrl: `${BACKEND}/api/v1` }),
   endpoints: () => ({}),
 })

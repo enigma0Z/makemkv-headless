@@ -2,12 +2,11 @@ import { useAppDispatch, useAppSelector } from "@/api"
 import { ripActions } from "@/api/v1/rip/store"
 import { Autocomplete, Card, InputLabel, Link, MenuItem, Select, TextField } from "@mui/material"
 import { ContentFormControl, FirstEpisodeFormControl, LibraryFormControl, MediaFormControl, NameIdFormControl, NameOptionWrapper, SeasonFormControl, SplitSegmentsFormControl, StyledFormGroup } from "./index.styles"
-import React, { useCallback, useState } from "react"
-import { throttle } from "lodash"
+import React, { useState } from "react"
 import type { TmdbSearchResult } from "@/api/v1/tmdb/types"
 import { AutocompleteWrapper } from "@/theme"
-import { endpoints, type ApiModel } from "@/api/endpoints"
 import { useGetStateQuery } from "@/api/v1/state/api"
+import { useGetTmdbConfigurationQuery, useGetTmdbSearchQuery } from "@/api/v1/tmdb/api"
 
 export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
 
@@ -25,12 +24,15 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
   const content = rip?.destination?.content ?? ''
   const seasonNumber = rip?.sort_info?.season_number ?? ''
   const firstEpisode = rip?.sort_info?.first_episode ?? ''
+
   // const splitSegments = useAppSelector((state) => state.rip.sort_info?.split_segments)
-  const tmdbConfiguration = useAppSelector((store) => store.tmdb.configuration)
+
+  const { data: tmdbConfiguration } = useGetTmdbConfigurationQuery()
+
   const tmdbSelection = rip?.tmdb_selection ?? ''
 
   const [ nameValue, setNameValue ] = useState<string | null>(null)
-  const [ nameOptions, setNameOptions ] = useState<(TmdbSearchResult)[]>([])
+  // const [ nameOptions, setNameOptions ] = useState<(TmdbSearchResult)[]>([])
 
   const [ splitSegmentsValue, setSplitSegmentsValue ] = useState<string>()
 
@@ -44,24 +46,31 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
     }
   }
 
-  const updateOptions = useCallback(throttle((searchText: string) => {
-    const foundOption = nameOptions?.find((option) => (
-      getOptionLabel(option) === searchText
-    ))
-    if (!foundOption && searchText !== '') {
-      if (content?.toLowerCase() === 'show') {
-        fetch(endpoints.tmdb.movie(searchText), { method: 'GET' })
-        .then(response => response.json() as Promise<ApiModel['v1']['tmdb/movie']>)
-        .then(({ data }) => {
-          setNameOptions(data)
-        })
-      }
-    }
-  }, 2000, {trailing: true, leading: false}), [content, nameOptions]);
+  const { data: nameOptions } = useGetTmdbSearchQuery({content, query: nameValue ?? ''})
+
+  // const updateOptions = useCallback(throttle((searchText: string) => {
+  //   const foundOption = nameOptions?.find((option) => (
+  //     getOptionLabel(option) === searchText
+  //   ))
+  //   if (!foundOption && searchText !== '') {
+  //     if (content?.toLowerCase() === 'show') {
+  //       fetch(endpoints.tmdb.show(searchText), { method: 'GET' })
+  //       .then(response => response.json() as Promise<ApiModel['v1']['tmdb/show']>)
+  //       .then(({ data }) => {
+  //         setNameOptions(data)
+  //       })
+  //     } else if (content?.toLowerCase() === 'movie') {
+  //       fetch(endpoints.tmdb.movie(searchText), { method: 'GET' })
+  //       .then(response => response.json() as Promise<ApiModel['v1']['tmdb/movie']>)
+  //       .then(({ data }) => {
+  //         setNameOptions(data)
+  //       })
+  //     }
+  //   }
+  // }, 2000, {trailing: true, leading: false}), [content, nameOptions]);
 
   const handleNameOnInputChange = (_event: React.SyntheticEvent, value: string) => {
     setNameValue(value)
-    updateOptions(value)
   }
 
   const handleNameOnChange = (_event: React.SyntheticEvent, value: TmdbSearchResult | string | undefined | null) => {
@@ -158,7 +167,7 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
               renderInput={(params) => ( <TextField {...params} label="Name" />)} 
               onInputChange={handleNameOnInputChange}
               onChange={handleNameOnChange}
-              options={[...nameOptions, tmdbSelection]}
+              options={[...(nameOptions ?? []), tmdbSelection]}
               getOptionLabel={(option) => getOptionLabel(option)}
               filterOptions={(options, state) => {
                 const filteredOptions = options.filter((option) => {
