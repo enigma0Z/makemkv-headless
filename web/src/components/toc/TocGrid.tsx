@@ -262,7 +262,6 @@ export const TocGrid = ({ }: Props) => {
           })
         ) : (
           <FullWidthRow>
-            <Typography variant="body2">No data</Typography>
           </FullWidthRow>
         )
       }
