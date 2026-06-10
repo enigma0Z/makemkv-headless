@@ -1,52 +1,42 @@
 import { configureStore, type Middleware, type UnknownAction } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
-import { throttle } from "lodash";
 
-import rip, { ripStateIsValid, type RipState } from './v1/rip/store'
+import rip, { ripActions, type RipState } from './v1/rip/store'
 import tmdb, { type TmdbState } from "./v1/tmdb/store";
 import socket, { type SocketState } from "./v1/socket/store";
-import { BACKEND, endpoints } from "./endpoints";
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { Toc } from "./v1/toc/types";
-import toc from './v1/toc/store'
 import { SOCKET_URI, SocketConnection } from "./v1/socket/api";
+import { setupListeners } from "@reduxjs/toolkit/query";
+import { stateApi } from "./v1/state/api";
+import { api as apiV1 } from "./v1";
 
 export type RootState = {
   rip: RipState,
-  toc: Partial<Toc>,
   tmdb: TmdbState,
   socket: SocketState
 }
 
-const updateRipStateOnApi = throttle(async (ripState: RipState) => {
-  if (ripStateIsValid(ripState)) {
-    console.info("Updating rip state on API")
-    fetch(endpoints.state.get(), {
-      method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({
-        rip: ripState
-      })
-    })
-  } else {
-    console.info("Cannot update rip state, is not valid", ripState)
+const updateApiMiddleware: Middleware<{}, RootState> = store => next => _action => {
+  const action = (_action as any)
+  if (action.type === 'api/executeQuery/fulfilled') {
+    if (action.meta?.arg?.endpointName === 'getState') {
+      console.log('Update rip state from API', action.payload.rip)
+      store.dispatch(ripActions.setRipData(action.payload.rip))
+    }
   }
-}, 500, { leading: false, trailing: true })
-
-export const api = createApi({
-  tagTypes: ['error', 'config'],
-  baseQuery: fetchBaseQuery({ baseUrl: BACKEND }),
-  endpoints: () => ({}),
-})
-
-const updateApiMiddleware: Middleware<{}, RootState> = store => next => action => {
+  
   if ((action as UnknownAction).type.startsWith('rip/')) {
+    const currentRipState = store.getState().rip
     const result = next(action)
     const nextRipState = store.getState().rip
-    updateRipStateOnApi(nextRipState)
-
+    if (JSON.stringify(currentRipState) !== JSON.stringify(nextRipState)) {
+      console.log('Put state into API', currentRipState, nextRipState)
+      const initiate: UnknownAction = (stateApi.endpoints.putState.initiate({ rip: nextRipState }) as any)
+      store.dispatch(initiate)
+    }
     return result
-  } else {
-    return next(action)
   }
+
+  return next(action)
 }
 
 export type ThunkExtraArgument = {
@@ -63,12 +53,14 @@ export const store = configureStore({
   }).concat(
     updateApiMiddleware
   ).concat(
-    api.middleware
+    apiV1.middleware
   ),
   reducer: {
-    rip: rip.reducer, toc, tmdb, socket, api: api.reducer
+    rip: rip.reducer, tmdb, socket, api: apiV1.reducer
   },
 })
+
+setupListeners(store.dispatch)
 
 export type AppDispatch = typeof store.dispatch
 

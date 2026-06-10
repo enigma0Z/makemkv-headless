@@ -1,7 +1,6 @@
 import { AppBar, Button, CircularProgress, IconButton, LinearProgress, Toolbar, Tooltip, Typography } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "@/api";
 import { socketActions, type SocketProgress } from "@/api/v1/socket/store";
-import { tocActions } from "@/api/v1/toc/store";
 import { ConfirmationDialog } from "./ConfirmationModal";
 import { useState } from "react";
 
@@ -15,25 +14,33 @@ import { endpoints, type ApiModel } from "@/api/endpoints";
 import { ripActions } from "@/api/v1/rip/store";
 import { uniqueFilter } from "@/util/array";
 import { ConfigDialog } from "./modals/ConfigDialog";
+import { useGetTocQuery, useStartTocLoadMutation, useStopTocLoadMutation } from "@/api/v1/toc/api";
 
 type Props = {}
 
 export const ButtonBar = ({ }: Props) => {
   const dispatch = useAppDispatch()
 
+  const { data: tocData } = useGetTocQuery()
+
   const sortInfo = useAppSelector((state) => state.rip.sort_info)
   const library = useAppSelector((state) => state.rip.destination?.library)
   const media = useAppSelector((state) => state.rip.destination?.media)
   const content = useAppSelector((state) => state.rip.destination?.content)
   const socketRipState = useAppSelector((state) => state.socket.rip)
+
+  // This should be handled by the API
   const ripAll = useAppSelector((state) =>
-    state.toc.source?.titles.length == [
+    tocData && tocData.data && tocData.data.source.titles.length == [
       ...state.rip.sort_info.extra_indexes, 
       ...state.rip.sort_info.main_indexes
     ].filter(uniqueFilter).length
   )
 
-  const tocLoading = useAppSelector((state) => state.toc.loading)
+  const [ startTocLoad, _startTocLoadResult ] = useStartTocLoadMutation()
+  const [ stopTocLoad, _stopTocLoadResult ] = useStopTocLoadMutation()
+
+  const tocLoading = tocData?.status && tocData.status === 'in progress'
 
   const [cancelModalOpen, setCancelModalOpen] = useState<boolean>(false)
   const [configDialogOpen, setConfigDialogOpen] = useState<boolean>(false)
@@ -51,18 +58,16 @@ export const ButtonBar = ({ }: Props) => {
 
   const handleLoadToc = () => {
     console.info('Fetching Toc')
-    dispatch(tocActions.setTocLoading(true))
-    dispatch(tocActions.setTocData(undefined))
     dispatch(socketActions.setSocketRipState())
     dispatch(ripActions.setMainIndexes([]))
     dispatch(ripActions.setExtraIndexes([]))
-    fetch(endpoints.toc.get(), { method: 'GET' })
+    // fetch(endpoints.toc.get(), { method: 'GET' })
+    startTocLoad()
   }
 
   const handleCancelLoadToc = () => {
-    console.info('Cancelling laod TOC')
-    fetch(endpoints.toc.stop(), { method: 'GET' })
-    dispatch(tocActions.setTocLoading(false))
+    console.info('Cancelling load TOC')
+    stopTocLoad()
   }
 
   const handleCancelRip = () => {

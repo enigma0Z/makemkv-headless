@@ -1,28 +1,33 @@
-import { useAppSelector } from "@/api"
+import { useAppDispatch, useAppSelector } from "@/api"
 import { ripActions } from "@/api/v1/rip/store"
 import { Autocomplete, Card, InputLabel, Link, MenuItem, Select, TextField } from "@mui/material"
-import { useDispatch } from "react-redux"
 import { ContentFormControl, FirstEpisodeFormControl, LibraryFormControl, MediaFormControl, NameIdFormControl, NameOptionWrapper, SeasonFormControl, SplitSegmentsFormControl, StyledFormGroup } from "./index.styles"
 import React, { useCallback, useState } from "react"
 import { throttle } from "lodash"
 import type { TmdbSearchResult } from "@/api/v1/tmdb/types"
 import { AutocompleteWrapper } from "@/theme"
 import { endpoints, type ApiModel } from "@/api/endpoints"
+import { useGetStateQuery } from "@/api/v1/state/api"
 
 export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
 
-  const dispatch = useDispatch();
+  const { error: stateError, isLoading, isSuccess } = useGetStateQuery()
 
-  const name = useAppSelector((state) => state.rip.sort_info?.name)
-  const id = useAppSelector((state) => state.rip.sort_info?.id)
-  const library = useAppSelector((state) => state.rip.destination?.library)
-  const media = useAppSelector((state) => state.rip.destination?.media)
-  const content = useAppSelector((state) => state.rip.destination?.content)
-  const seasonNumber = useAppSelector((state) => state.rip.sort_info?.season_number)
-  const firstEpisode = useAppSelector((state) => state.rip.sort_info?.first_episode)
+  const rip = useAppSelector((state) => state.rip)
+
+  const dispatch = useAppDispatch();
+
+  // const name = useAppSelector((state) => state.rip.sort_info?.name)
+  const name = rip?.sort_info?.name ?? ''
+  const id = rip?.sort_info?.id ?? ''
+  const library = rip?.destination?.library ?? ''
+  const media = rip?.destination?.media ?? ''
+  const content = rip?.destination?.content ?? ''
+  const seasonNumber = rip?.sort_info?.season_number ?? ''
+  const firstEpisode = rip?.sort_info?.first_episode ?? ''
   // const splitSegments = useAppSelector((state) => state.rip.sort_info?.split_segments)
-  const tmdbConfiguration = useAppSelector((state) => state.tmdb.configuration)
-  const tmdbSelection = useAppSelector((state) => state.rip.tmdb_selection)
+  const tmdbConfiguration = useAppSelector((store) => store.tmdb.configuration)
+  const tmdbSelection = rip?.tmdb_selection ?? ''
 
   const [ nameValue, setNameValue ] = useState<string | null>(null)
   const [ nameOptions, setNameOptions ] = useState<(TmdbSearchResult)[]>([])
@@ -45,12 +50,6 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
     ))
     if (!foundOption && searchText !== '') {
       if (content?.toLowerCase() === 'show') {
-        fetch(endpoints.tmdb.show(searchText), { method: 'GET' })
-        .then(response => response.json() as Promise<ApiModel['v1']['tmdb/show']>)
-        .then(({ data }) => {
-          setNameOptions(data)
-        })
-      } else if (content?.toLowerCase() === 'movie') {
         fetch(endpoints.tmdb.movie(searchText), { method: 'GET' })
         .then(response => response.json() as Promise<ApiModel['v1']['tmdb/movie']>)
         .then(({ data }) => {
@@ -88,6 +87,9 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
 
   if (isValid) onClearError && onClearError();
   else onError && onError();
+
+  if (isLoading) return <></>;
+  if (stateError) return <>Error</>
 
   return <>
     <StyledFormGroup>

@@ -19,26 +19,26 @@ type StatusMessage = Literal[
 ]
 
 class RipDestinationModel(BaseModel):
-  library: str = None
-  media: str = None
-  content: str = None
+  library: str | None = None
+  media: str | None = None
+  content: str | None = None
 
 class RipSortInfoModel(BaseModel):
-  name: str = None
-  id: str = None
-  main_indexes: list[int] = None 
-  extra_indexes: list[int] = None
-  split_segments: list[int] = []
+  name: str | None = None
+  id: str | None = None
+  main_indexes: list[int] | None = None 
+  extra_indexes: list[int] | None = None
+  split_segments: list[int] | None = []
   id_db: str = "tmdbid"
 
 class RipShowInfoModel(RipSortInfoModel):
-  first_episode: int = None
-  season_number: int = None
+  first_episode: int | None = None
+  season_number: int | None = None
 
 class RipStateModel(BaseModel):
-  destination: RipDestinationModel = None
-  sort_info: RipSortInfoModel | RipShowInfoModel = None
-  rip_all: bool = None
+  destination: RipDestinationModel | None = None
+  sort_info: RipSortInfoModel | RipShowInfoModel | None = None
+  rip_all: bool | None = None
   tmdb_selection: TMDBShowSearchResultModel | TMDBMovieSearchResultModel | None = None
 
 class ProgressStateModel(BaseModel):

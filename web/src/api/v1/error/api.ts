@@ -1,6 +1,6 @@
 import { type ApiModel, endpointsV1 } from "@/api/endpoints";
-import { api } from "@/api";
 import type { ApiError } from "./types";
+import { api } from "..";
 
 // Define a service using a base URL and expected endpoints
 const errorApi = api.injectEndpoints({

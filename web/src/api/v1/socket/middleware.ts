@@ -3,10 +3,9 @@ import type { UnknownAction } from "@reduxjs/toolkit";
 import type { ThunkAction } from "redux-thunk";
 import { socketActions, type SocketState } from "./store";
 import { isRippingStatus, type ErrorMessage, type LogMessage, type MkvLogMessage, type ProgressMessage, type ProgressValueMessage, type RipStartStopMessage, type TocStatusMessage } from "@/api/v1/socket/model";
-import { endpoints, type ApiModel } from "@/api/endpoints";
-import { tocActions } from "../toc/store";
 import { throttle } from "lodash";
 import { errorApiUtil } from '@/api/v1/error/api'
+import { api } from "..";
 
 type SocketThunkAction<T> = ThunkAction<T, RootState, ThunkExtraArgument, UnknownAction>
 
@@ -46,14 +45,7 @@ export const socketConnect = (): SocketThunkAction<void> => (
 
   socketConnection.on("TocStatusMessage", (value: TocStatusMessage) => {
     if (value.state === "complete") {
-      fetch(endpoints.state.get("toc"), { method: 'GET' })
-        .then(response => response.json() as Promise<ApiModel['v1']['state']>)
-        .then(({ data }) => {
-          if (data.toc) {
-            dispatch(tocActions.setTocData(data.toc))
-            dispatch(tocActions.setTocLoading(false))
-          }
-        })
+      dispatch(api.util.invalidateTags(['api/toc']))
     }
   })
 

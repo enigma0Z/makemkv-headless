@@ -1,7 +1,8 @@
 import { store } from "@/api"
-import { BACKEND_HOST_PORT, endpoints, type ApiModel } from "@/api/endpoints"
+import { endpoints, type ApiModel } from "@/api/endpoints"
 import { type BaseMessageType, ClientPingMessage, type ServerToClientMessages } from "./model"
 import { socketActions } from "./store"
+import { BACKEND_HOST_PORT } from ".."
 
 export const SOCKET_URI = `ws://${BACKEND_HOST_PORT}/api/v1/socket`
 

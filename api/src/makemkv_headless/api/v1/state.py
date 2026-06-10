@@ -67,7 +67,7 @@ def get_state_by_path(path: str, page=None, page_size=None, filter_keys: list[st
 @router.get('')
 @router.get('/')
 def get_state():
-  return STATE
+  return APIResponse(status="success", data=STATE)
 
 @router.get('/{state_path:path}')
 def get_state_select(state_path: str):

@@ -1,22 +1,10 @@
 import type { TmdbConfiguration } from "./v1/tmdb/store"
 import type { Toc as TocV1 } from "./v1/toc/types"
-import type { Response as ResponseV1 } from "./v1"
+import { BACKEND, type Response as ResponseV1 } from "./v1"
 import type { State as StateV1 } from "./v1/state/types"
 import type { TmdbSearchResultMovie, TmdbSearchResultShow } from "./v1/tmdb/types"
 import type { Config } from "./v1/config/types"
 import type { ApiError } from "./v1/error/types"
-
-let backend_port = window.location.port;
-
-if (import.meta.env.DEV) {
-  backend_port = import.meta.env.BACKEND_PORT ?? 4000
-  console.info(`Setting backend port to ${backend_port}`)
-}
-
-export const BACKEND_HOST_PORT = `${window.location.hostname}:${backend_port}`
-export const BACKEND = `${window.location.protocol}//${BACKEND_HOST_PORT}`
-
-// export const BACKEND = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`
 
 export const endpoints = {
   disc: {
@@ -43,34 +31,34 @@ export const endpoints = {
 
 export const endpointsV1 = {
   disc: {
-    eject: () => `/api/v1/disc/eject`,
+    eject: () => `/disc/eject`,
   },
-  toc: () => `/api/v1/toc`,
+  toc: () => `/toc`,
   state: {
-    get: (path?: string) => `/api/v1/state${path ? "/" + path : ""}`,
-    resetSocket: () => `/api/v1/state.reset/socket`,
+    get: (path: string | void) => `/state${path ? "/" + path : ""}`,
+    resetSocket: () => `/state.reset/socket`,
   },
   rip: {
-    start: () => `/api/v1/rip`,
-    stop: () => `/api/v1/rip.stop`
+    start: () => `/rip`,
+    stop: () => `/rip.stop`
   },
   tmdb: {
-    show: (query: string) => `/api/v1/tmdb/show?${new URLSearchParams({q: query})}`,
-    movie: (query: string) => `/api/v1/tmdb/movie?${new URLSearchParams({q: query})}`,
-    configuration: () => `/api/v1/tmdb/configuration`
+    show: (query: string) => `/tmdb/show?${new URLSearchParams({q: query})}`,
+    movie: (query: string) => `/tmdb/movie?${new URLSearchParams({q: query})}`,
+    configuration: () => `/tmdb/configuration`
   },
   config: {
-    get: () => `/api/v1/config`,
+    get: () => `/config`,
     put: () => (body: Partial<Config>) => ({
       url: '/api/v1/config',
       method: 'PUT',
       body
     }),
-    reload: () => () => `/api/v1/config.reload`
+    reload: () => () => `/config.reload`
   },
   error: {
-    get: () => `/api/v1/error`,
-    clear: () => `/api/v1/error.clear`
+    get: () => `/error`,
+    clear: () => `/error.clear`
   }
 }
 
