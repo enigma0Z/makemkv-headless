@@ -1,22 +1,26 @@
 import { endpointsV1, type ApiModel } from "@/api/endpoints"
-import type { Config } from "./types"
 import { api } from ".."
+import type { Config } from "./types"
 
-const configApi = api.injectEndpoints({
+export const configApi = api.injectEndpoints({
   endpoints: (build) => ({
     getConfig: build.query<Config, void, ApiModel['v1']['config']>({
       providesTags: ['api/config'],
-      query: () => endpointsV1.config.get(),
+      query: () => '/config',
       transformResponse: (response) => response.data
     }),
     reloadConfig: build.mutation<Config, void, ApiModel['v1']['config']>({
       invalidatesTags: ['api/config'],
-      query: endpointsV1.config.reload(),
+      query: () => '/config.reload',
       transformResponse: (response) => response.data,
     }),
     putConfig: build.mutation<Config, Partial<Config>, ApiModel['v1']['config']>({
       invalidatesTags: ['api/config'],
-      query: endpointsV1.config.put(),
+      query: (body: Partial<Config>) => ({
+        url: '/config',
+        method: 'PUT',
+        body
+      }),
       transformResponse: (response) => response.data,
     })
   }),
