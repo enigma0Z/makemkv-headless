@@ -1,4 +1,4 @@
-import { Box, DialogActions, DialogContent, DialogTitle, styled, Tabs } from "@mui/material"
+import { Box, DialogActions, DialogContent, DialogTitle, styled } from "@mui/material"
 
 export const StyledTabContent = styled(Box)(({}) => ({
   marginLeft: '1em'

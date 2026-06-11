@@ -18,6 +18,10 @@ export interface RootState {
   socket: SocketState
 }
 
+export type ThunkExtraArgument = {
+  socketConnection: SocketConnection
+}
+
 // Exploded currying syntax, for reference
 // const updateApiMiddleware: Middleware<{}, RootState> = (store) => {
 //   return function wrapDispatch(next) { // next

@@ -1,4 +1,4 @@
-import { type ApiModel, endpointsV1 } from "@/api/endpoints";
+import { type ApiModel } from "@/api/endpoints";
 import type { State } from "./types";
 import { api } from "..";
 

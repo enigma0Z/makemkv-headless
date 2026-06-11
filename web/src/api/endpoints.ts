@@ -1,8 +1,7 @@
-import type { TmdbConfiguration } from "./v1/tmdb/store"
 import type { Toc as TocV1 } from "./v1/toc/types"
 import { BACKEND, type Response as ResponseV1 } from "./v1"
 import type { State as StateV1 } from "./v1/state/types"
-import type { TmdbSearchResultMovie, TmdbSearchResultShow } from "./v1/tmdb/types"
+import type { TmdbConfiguration, TmdbSearchResultMovie, TmdbSearchResultShow } from "./v1/tmdb/types"
 import type { Config } from "./v1/config/types"
 import type { ApiError } from "./v1/error/types"
 

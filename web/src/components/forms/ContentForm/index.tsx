@@ -10,7 +10,7 @@ import { useGetTmdbConfigurationQuery, useGetTmdbSearchQuery } from "@/api/v1/tm
 
 export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
 
-  const { error: stateError, isLoading, isSuccess } = useGetStateQuery()
+  const { error: stateError, isLoading } = useGetStateQuery()
 
   const rip = useAppSelector((state) => state.rip)
 
@@ -29,7 +29,7 @@ export const CombinedShowMovieForm = ({ onError, onClearError }: BaseProps) => {
 
   const { data: tmdbConfiguration } = useGetTmdbConfigurationQuery()
 
-  const tmdbSelection = rip?.tmdb_selection ?? ''
+  const tmdbSelection = rip?.tmdb_selection
 
   const [ nameValue, setNameValue ] = useState<string | null>(null)
   // const [ nameOptions, setNameOptions ] = useState<(TmdbSearchResult)[]>([])

@@ -1,4 +1,4 @@
-import { endpointsV1, type ApiModel } from "@/api/endpoints"
+import { type ApiModel } from "@/api/endpoints"
 import { api } from ".."
 import type { Config } from "./types"
 
