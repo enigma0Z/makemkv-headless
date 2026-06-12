@@ -1,7 +1,12 @@
 import type { RipState } from "@/api/v1/rip/store";
-import type { TocState } from "@/api/v1/toc/store";
 import type { SocketState } from "@/api/v1/socket/store";
+import type { Toc } from "../toc/types";
 
+export interface TocState {
+  lines: Toc['lines'];
+  source?: Toc['source'];
+  loading?: Toc['loading']
+}
 export type CurrentStatus = "Scanning CD-ROM devices"
   | "Opening DVD disc"
   | "Processing title sets"

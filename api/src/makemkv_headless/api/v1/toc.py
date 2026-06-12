@@ -23,37 +23,40 @@ CANCEL = Event()
 
 router = APIRouter(prefix="/toc")
 
-# @lru_cache
-async def get_toc_from_disc(source):
+async def get_toc_from_disc(source = CONFIG.source):
   with LOCK:
     toc = Toc()
-    # STATE.reset_rip_indexes() # Reset which indexes are selected
+    STATE.reset_toc()
+    STATE.reset_rip_indexes() # Reset which indexes are selected
     STATE.reset_socket() # Reset which indexes are complete
     logger.info('Getting TOC...')
     await cancellable_async(toc.get_from_disc(source), CANCEL)
-    STATE.toc = toc
+    STATE.toc.source = toc.source
     get_interface().send(TocStatusMessage(state="complete"))
     return toc
 
 @router.get('')
 @router.get('/')
-@router.get('.async') # Deprecated
-async def get_toc_async(background_tasks: BackgroundTasks):
-  try:
-    if LOCK.locked():
-      return APIResponse("in progress")
+async def get_toc():
+  if LOCK.locked():
+    return APIResponse("in progress")
+  else:
+    if STATE.toc.source is not None:
+      return APIResponse(status='success', data=STATE.toc)
     else:
-      background_tasks.add_task(get_toc_from_disc, CONFIG.source)
-      return APIResponse("started")
-  except TocError as ex:
-    logger.error(ex.args[0])
-  except Exception as ex:
-    logger.error(format_exc())
-    raise APIException(500, GenericAPIError("error", ex))
+      return APIResponse(status='stopped')
+
+
+@router.get('.start')
+async def get_toc_start(background_tasks: BackgroundTasks):
+  if LOCK.locked():
+    return APIResponse("in progress")
+  else:
+    background_tasks.add_task(get_toc_from_disc)
+    return APIResponse("started")
 
 @router.get('.status')
-@router.get('.async.status') # Deprecated
-async def get_toc_async_status():
+async def get_toc_status():
   if LOCK.locked():
     return APIResponse("in progress")
   else:
@@ -66,14 +69,3 @@ async def toc_get_stop():
     return APIResponse("in progress")
   else:
     return APIResponse("done")
-
-@router.get('.cache.clear')
-async def toc_clear_cache():
-  try:
-    get_toc_from_disc.cache_clear()
-  except Exception as ex:
-    raise APIException(500, GenericAPIError("error", ex))
-
-@router.get('.cache.info')
-async def toc_clear_cache():
-  return get_toc_from_disc.cache_info()

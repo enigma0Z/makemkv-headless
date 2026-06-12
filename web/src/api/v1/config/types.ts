@@ -1,6 +1,6 @@
 export type LogLevel = "ERROR" | "WARNING" | "INFO" | "DEBUG"
 
-export type Config = {
+export interface Config {
   config_file: string;
   destination: string;
   source: string;

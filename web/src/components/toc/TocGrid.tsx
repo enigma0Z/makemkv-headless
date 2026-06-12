@@ -13,6 +13,7 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import { isRippingStatus } from "@/api/v1/socket/model"
 import type { TitleInfo, Toc } from "@/api/v1/toc/types"
+import { useGetTocQuery } from "@/api/v1/toc/api"
 
 
 type Props = {
@@ -36,7 +37,10 @@ export const TocGrid = ({ }: Props) => {
 
   const dispatch = useAppDispatch()
 
-  const data = useAppSelector((state) => state.toc)
+  const { data } = useGetTocQuery()
+
+  const tocData = data?.data
+
   const mainIndexes = useAppSelector((state) => state.rip.sort_info?.main_indexes)
   const extraIndexes = useAppSelector((state) => state.rip.sort_info?.extra_indexes)
   const content = useAppSelector((state) => state.rip.destination?.content)
@@ -52,10 +56,10 @@ export const TocGrid = ({ }: Props) => {
       titleGroup.matches
     )).flat())
 
-    data?.source?.titles.forEach((outerTitle, outerIndex) => {
+    tocData?.source?.titles.forEach((outerTitle, outerIndex) => {
       const newTitleGroup: TitleGroup = { title: outerTitle, index: outerIndex, matches: [outerIndex] }
       const outerTitleLength = hmsToSeconds(outerTitle.runtime)
-      data?.source?.titles.forEach((innerTitle, innerIndex) => {
+      tocData?.source?.titles.forEach((innerTitle, innerIndex) => {
         if (
           matchedIndexes().indexOf(innerIndex) === -1 // No match already on this index
           && hmsToSeconds(innerTitle.runtime) > outerTitleLength - EPISODE_LENGTH_TOLERANCE_SECONDS
@@ -126,7 +130,7 @@ export const TocGrid = ({ }: Props) => {
       console.info("TitleGroups", titleGroups)
       console.info("Biggest (show)", biggestTitleGroup)
       console.info("Longest (movie)", longestTitleGroup)
-      for (let i = 0; i < (data?.source?.titles.length ?? 0); i++) {
+      for (let i = 0; i < (tocData?.source?.titles.length ?? 0); i++) {
         if (activeTitleGroup.matches.indexOf(i) > -1) {
           mainIndexes.push(i)
         } else {
@@ -146,19 +150,19 @@ export const TocGrid = ({ }: Props) => {
 
   useEffect(() => {
     const makeItAsync = async () => {
-      if (data && !socketRipState?.started) {
-        dispatch(ripActions.setTocLength(data?.source?.titles.length));
+      if (tocData && !socketRipState?.started) {
+        dispatch(ripActions.setTocLength(tocData?.source?.titles.length));
         setIndexes();
       }
     }
 
     makeItAsync()
-  }, [data, content])
+  }, [tocData, content])
 
   const handleSelectAllOnClick = (_event: React.ChangeEvent, checked: boolean) => {
     if (checked) {
       const { mainIndexes: newMainIndexes, extraIndexes: newExtraIndexes } = getIndexes()
-      data?.source?.titles.forEach((_value, index) => {
+      tocData?.source?.titles.forEach((_value, index) => {
         const isInMainIndexes = (mainIndexes.indexOf(index) > -1)
         const isInExtraIndexes = (extraIndexes.indexOf(index) > -1)
         const wasInMainIndexes = (oldMainIndexes.indexOf(index) > -1)
@@ -230,9 +234,9 @@ export const TocGrid = ({ }: Props) => {
           </Typography>
         </FilenameHead>
       </FilenameCell>
-      {data
+      {tocData
         ? (
-          data?.source?.titles.map((title, index) => {
+          tocData?.source?.titles.map((title, index) => {
             return (
               <Fragment key={index}>
                 <DividerCell />
@@ -258,7 +262,6 @@ export const TocGrid = ({ }: Props) => {
           })
         ) : (
           <FullWidthRow>
-            <Typography variant="body2">No data</Typography>
           </FullWidthRow>
         )
       }

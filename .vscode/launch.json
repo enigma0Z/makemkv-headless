@@ -2,14 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Current File",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${file}",
-      "console": "integratedTerminal"
-    },
-    {
-      "name": "Debug API",
+      "name": "API",
       "type": "debugpy",
       "request": "launch",
       "module": "makemkv_headless.__main__",
@@ -19,10 +12,17 @@
     },
     {
       "type": "node-terminal",
-      "name": "Launch Web",
+      "name": "Web",
       "request": "launch",
       "command": "npm run dev",
       "cwd": "${workspaceFolder}/web"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "API + Web",
+      "configurations": ["API", "Web"],
+      "stopAll": true
     }
   ]
 }

@@ -3,6 +3,7 @@ from typing import TypedDict
 
 from makemkv_headless.models.socket import CurrentProgressMessage, ProgressValueMessage, TotalProgressMessage
 from makemkv_headless.models.state import ProgressStateModel, StateModel
+from makemkv_headless.models.toc import TocStateModel
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,9 @@ class State(StateModel):
       setattr(self, field, default_value)
 
     self.model_fields_set.clear()
+  
+  def reset_toc(self):
+    self.toc = TocStateModel()
 
   def reset_socket(self):
     for field, field_info in type(self.socket.rip).model_fields.items():
