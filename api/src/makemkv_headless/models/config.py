@@ -166,7 +166,7 @@ class ConfigModel(BaseModel):
     default=False, 
     json_schema_extra=JsonSchemaExtra(
       cli_argument=CliArgument(
-        args=['--daemon'],
+        args=['--do-cleanup'],
         kwargs=ParserKwargs(
           action=BooleanOptionalAction,
           help="Run as a daemon (fork and return to the terminal)"
