@@ -162,3 +162,15 @@ class ConfigModel(BaseModel):
       )
     )
   ).model_dump())
+  do_cleanup: bool = Field(
+    default=False, 
+    json_schema_extra=JsonSchemaExtra(
+      cli_argument=CliArgument(
+        args=['--daemon'],
+        kwargs=ParserKwargs(
+          action=BooleanOptionalAction,
+          help="Run as a daemon (fork and return to the terminal)"
+        )
+      )
+    ).model_dump()
+  )

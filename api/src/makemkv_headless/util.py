@@ -152,6 +152,7 @@ async def cmd(
   callback: Callable[[str], Any] | None = None, 
   timeout=0.25,
 ):
+  logger.info(f"Running command {shlex.join(args)}")
   process = await create_subprocess_shell(
     shlex.join(args),
     stdout=PIPE,
@@ -179,6 +180,7 @@ async def cmd(
       else:
         if callback is not None:
           callback(stdout.decode().strip())
+          logger.info(f"{args[0]}: {stdout.decode().strip()}")
 
 async def cancel_event_task(task: asyncio.Task, event: asyncio.Event):
   await event.wait()

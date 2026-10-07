@@ -1,4 +1,6 @@
 import logging
+
+from makemkv_headless.config import CONFIG
 logger = logging.getLogger(__name__)
 
 from os import path, remove, rename, makedirs
@@ -129,7 +131,7 @@ async def sort_titles(
               interface.print('Failed to rename segment', segment_index, target=Target.SORT)
               interface.print(ex, target=Target.SORT)
               failed_titles.append(f'{index}: {title.filename}, {title.runtime}, Segment {segment_index}\n{ex}')
-          if (features.DO_CLEANUP):
+          if (CONFIG.do_cleanup):
             remove(path.join(rip_path, title.filename))
         else:
           try:
@@ -175,7 +177,7 @@ async def sort_titles(
       )
 
   finally:
-    if features.DO_CLEANUP:
+    if CONFIG.do_cleanup:
       interface.print(f"Cleaning up {rip_path_base}", target=Target.SORT)
       logger.info(f"Cleaning up {rip_path_base}")
       rmtree(rip_path_base)
